@@ -1,336 +1,232 @@
-# Parkinson's Disease Detection - Multimodal AI System
+# 🧠 Parkinson's Disease Detection Using Multi-Modal Deep Learning
 
-## 🎯 Project Overview
+A comprehensive deep learning system for early Parkinson's Disease detection using both **speech analysis** and **handwriting pattern recognition**.
 
-This project implements a state-of-the-art multimodal deep learning system for Parkinson's Disease detection using:
-- **Handwriting Analysis** (spiral/wave drawings)
-- **Speech Analysis** (sustained vowel sounds)
-- **Fusion Model** (combining both modalities)
+---
 
-## 📊 Dataset
+## 📋 Project Overview
 
-- **Handwriting**: 3,264 images (1,632 Healthy + 1,632 Parkinson)
-- **Speech**: 81 audio files (41 Healthy + 40 Parkinson)
-- **Source**: Automatically cloned from GitHub repository
+This project implements state-of-the-art deep learning approaches for Parkinson's Disease detection through two primary modalities:
 
-## 🚀 Quick Start Guide
+1. **Speech-Based Detection** - Analyzing speech patterns using Wav2Vec 2.0 + Conformer architecture
+2. **Handwriting-Based Detection** - Analyzing handwriting samples using EfficientNet with attention mechanisms
+
+---
+
+## 🏗️ Project Structure
+
+```
+📁 SDP/
+├── 📓 parkinsons_speech_recognition(2).ipynb   # Speech-based PD detection
+├── 📓 handwriting_parkinsons_detection.ipynb   # Handwriting-based PD detection
+├── 🔧 feature_config(1).json                   # Audio feature configuration
+├── 📊 model_summary(1).json                    # Model architecture summary
+├── 🧠 best_model(1).pt                         # Best speech model checkpoint
+├── 🧠 best_severity_model.pt                   # Severity prediction model
+├── 🧠 best_speech_model.pth                    # Speech model weights
+├── 🧠 best_handwriting_model.pth               # Handwriting model weights
+├── 🧠 handwriting_parkinsons_model_final.pth   # Final handwriting model
+├── 📁 original-speech-dataset/                 # Original speech recordings
+│   ├── DL/                                     # DL speaker recordings
+│   ├── emma/                                   # Emma dataset
+│   ├── Faces/                                  # Face recordings
+│   ├── LW/                                     # LW speaker recordings
+│   └── Tessi/                                  # Tessi dataset
+├── 📁 denoised-speech-dataset/                 # Preprocessed/denoised audio
+│   ├── DL/
+│   ├── emma/
+│   ├── Faces/
+│   ├── LW/
+│   └── Tessi/
+├── 📁 handwritten dataset/                     # Handwriting samples
+│   └── Dataset/
+│       └── Dataset/
+│           ├── Healthy/                        # Healthy control samples
+│           └── Parkinson/                      # Parkinson's patient samples
+└── 📁 speech/
+    └── Parkinson-Patient-Speech-Dataset/
+```
+
+---
+
+## 🚀 Key Features
+
+### Speech Recognition Module
+- **Wav2Vec 2.0** pre-trained feature extraction
+- **Conformer** encoder with Squeeze-and-Excitation blocks
+- **Multi-task learning** (CTC + Severity + Contrastive + Domain)
+- **Advanced augmentation** (MixUp, CutMix, SpecAugment++, VTLP, RIR)
+- **Prosodic-acoustic fusion** for enhanced detection
+- **Contrastive learning** on paired datasets
+
+### Handwriting Recognition Module
+- **EfficientNet** backbone with attention mechanisms
+- **Transfer learning** with fine-tuning
+- **Albumentations** for robust data augmentation
+- **Grad-CAM** visualization for interpretability
+
+---
+
+## 📊 Model Architecture
+
+### Speech Model Configuration
+```json
+{
+  "model_type": "Multi-Task Parkinson Speech Recognition",
+  "architecture": "Wav2Vec2 + Conformer + Multi-Modal Fusion",
+  "total_parameters": 6,614,051,
+  "training_config": {
+    "epochs": 100,
+    "batch_size": 2,
+    "learning_rate": 5e-05,
+    "optimizer": "AdamW"
+  }
+}
+```
+
+### Audio Feature Configuration
+```json
+{
+  "sample_rate": 16000,
+  "n_mels": 80,
+  "n_fft": 512,
+  "hop_length": 256,
+  "max_audio_length": 10.0,
+  "prosodic_dim": 25
+}
+```
+
+---
+
+## 🛠️ Installation
 
 ### Prerequisites
-- Google Colab account (recommended for GPU access)
-- OR Local setup with CUDA-enabled GPU
+- Python 3.8+
+- CUDA-capable GPU (recommended)
+- PyTorch 1.9+
 
-### Step-by-Step Execution
-
-#### **1. Handwriting Detection Model** (`handwriting_parkinsons_detection.ipynb`)
-
-**Run first to train the handwriting model**
-
+### Setup
 ```bash
-1. Upload to Google Colab
-2. Run all cells sequentially
-3. Downloads: best_handwriting_model.pth, handwriting_parkinsons_model_final.pth
+# Clone the repository
+git clone https://github.com/Tvenkatathanuj/SDP.git
+cd SDP
+
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+# or
+.\.venv\Scripts\Activate.ps1  # Windows PowerShell
+
+# Install dependencies
+pip install torch torchvision torchaudio
+pip install transformers librosa soundfile
+pip install efficientnet-pytorch albumentations grad-cam scikit-plot
+pip install timm pandas numpy matplotlib seaborn tqdm
 ```
-
-**Key Features:**
-- ✨ EfficientNet-B4 backbone
-- ✨ Spatial Pyramid Pooling (SPP)
-- ✨ CBAM Attention mechanism
-- ✨ Advanced data augmentation
-- ✨ Focal Loss for better convergence
-
-**Expected Accuracy:** 95-98%
 
 ---
 
-#### **2. Speech Detection Model** (`speech_parkinsons_detection.ipynb`)
+## 💻 Usage
 
-**Run second to train the speech model**
+### Speech-Based Detection
+1. Open `parkinsons_speech_recognition(2).ipynb`
+2. Place datasets in the appropriate folders
+3. Run cells sequentially
 
-```bash
-1. Upload to Google Colab
-2. Run all cells sequentially
-3. Downloads: best_speech_model.pth, speech_parkinsons_model_final.pth
-```
+### Handwriting-Based Detection
+1. Open `handwriting_parkinsons_detection.ipynb`
+2. Ensure handwriting dataset is in place
+3. Run cells sequentially
 
-**Key Features:**
-- 🎤 Wav2Vec 2.0 (Facebook's SOTA model)
-- 🎤 BiLSTM for temporal modeling
-- 🎤 Multi-Head Self-Attention
-- 🎤 Hybrid features (Wav2Vec + MFCC/Jitter/Shimmer)
-- 🎤 Two-stage training (frozen → fine-tuned)
-
-**Expected Accuracy:** 85-92%
-
----
-
-#### **3. Multimodal Fusion Model** (`multimodal_fusion_parkinsons.ipynb`)
-
-**Run last to create the fusion system**
-
-```bash
-1. Upload to Google Colab
-2. Upload the 2 model files from previous steps:
-   - handwriting_parkinsons_model_final.pth
-   - speech_parkinsons_model_final.pth
+### Google Colab
+Both notebooks are **Google Colab ready**:
+1. Upload notebook to Google Colab
+2. Upload datasets or mount Google Drive
 3. Run all cells sequentially
-4. Downloads: multimodal_fusion_parkinsons_final.pth
-```
-
-**Key Features:**
-- 🔥 Cross-Modal Attention Fusion (Novel!)
-- 🔥 Uncertainty Quantification (Monte Carlo Dropout)
-- 🔥 Adaptive Weighting based on confidence
-- 🔥 Ensemble Decision Making
-- 🔥 Meta-learning optimization
-
-**Expected Accuracy:** **98-99%**
 
 ---
 
-## 🛠️ Fixed Issues
+## 📈 Results
 
-### Version 2.0 Fixes (December 5, 2025)
+### Speech Model Performance
+| Metric | Value |
+|--------|-------|
+| Severity MAE | 0.201 |
+| Severity RMSE | 0.201 |
 
-#### **Handwriting Model Fixes:**
-1. ✅ Removed complex Mixup/CutMix (causing tuple/list errors)
-2. ✅ Simplified dataset to return `torch.tensor` directly
-3. ✅ Fixed `train_epoch` to handle normal tensors only
-4. ✅ Improved error handling
-
-#### **Speech Model Fixes:**
-1. ✅ Fixed `Shift` augmentation parameter error
-   - Changed from `min_fraction/max_fraction` to proper implementation
-   - Removed problematic augmentation, kept working ones
-2. ✅ Simplified augmentation pipeline
-3. ✅ Better error handling for acoustic feature extraction
-
-#### **General Improvements:**
-1. ✅ Cleaner code structure
-2. ✅ Better documentation
-3. ✅ Removed complex features that caused errors
-4. ✅ Maintained high accuracy potential
+### Novel Contributions
+- Wav2Vec 2.0 pre-training for Parkinson's speech
+- Conformer encoder with SE blocks
+- Stochastic depth regularization
+- Multi-modal prosodic-acoustic fusion
+- Mixed precision training (FP16)
+- Exponential Moving Average (EMA)
+- Cosine annealing with warmup
 
 ---
 
-## 📈 Model Architectures
+## 📁 Datasets
 
-### 1. Handwriting Model
-```
-Input (336x336 RGB Image)
-    ↓
-EfficientNet-B4 Backbone
-    ↓
-CBAM Attention (Channel + Spatial)
-    ↓
-Spatial Pyramid Pooling [1x1, 2x2, 4x4]
-    ↓
-Fully Connected Layers [1024 → 512 → 2]
-    ↓
-Output (Healthy/Parkinson)
-```
+### Speech Datasets
+- **DL Dataset**: 48 speaker recordings
+- **LW Dataset**: 21 speaker recordings  
+- **Tessi Dataset**: Spanish/Italian recordings
+- **Emma Dataset**: IC and WP recordings
+- **Faces Dataset**: Multi-speaker recordings
 
-### 2. Speech Model
-```
-Input (Audio Waveform)
-    ↓
-Wav2Vec 2.0 Encoder (768-dim)
-    ↓
-BiLSTM (256 hidden × 2 directions)
-    ↓
-Multi-Head Attention (8 heads)
-    ↓
-Acoustic Features Branch (MFCC/Jitter/Shimmer)
-    ↓
-Fusion Layer [640-dim]
-    ↓
-Fully Connected Layers [512 → 256 → 2]
-    ↓
-Output (Healthy/Parkinson)
-```
+### Handwriting Dataset
+- **Healthy Controls**: Handwriting samples from healthy individuals
+- **Parkinson's Patients**: Handwriting samples from PD patients
 
-### 3. Fusion Model
-```
-Handwriting Features (512-dim) ──┐
-                                  ├─→ Cross-Modal Attention
-Speech Features (512-dim) ───────┘
-         ↓
-    Attended Features (256-dim each)
-         ↓
-    Uncertainty Quantification (Monte Carlo Dropout)
-         ↓
-    Adaptive Weight Calculation
-         ↓
-    [Hand Pred | Speech Pred | Fusion Pred]
-         ↓
-    Ensemble Voting
-         ↓
-    Final Output (Healthy/Parkinson + Confidence)
+---
+
+## 🔬 Technical Details
+
+### Training Configuration
+- **Epochs**: 100
+- **Batch Size**: 2
+- **Learning Rate**: 5e-05
+- **Optimizer**: AdamW
+- **Mixed Precision**: Supported
+
+### Augmentation Techniques
+- MixUp
+- CutMix
+- SpecAugment++
+- VTLP (Vocal Tract Length Perturbation)
+- RIR (Room Impulse Response)
+
+---
+
+## 📝 Citation
+
+If you use this work in your research, please cite:
+
+```bibtex
+@misc{parkinsons_multimodal_detection,
+  title={Multi-Modal Deep Learning for Parkinson's Disease Detection},
+  author={Venkata Thanuj T.},
+  year={2026},
+  url={https://github.com/Tvenkatathanuj/SDP}
+}
 ```
 
 ---
 
-## 🎓 Novel Contributions
-
-1. **Cross-Modal Attention Fusion**
-   - Novel bidirectional attention between handwriting and speech features
-   - Not commonly implemented in existing Parkinson's detection systems
-
-2. **Uncertainty-Aware Fusion**
-   - Monte Carlo Dropout for uncertainty quantification
-   - Adaptive weighting based on modality confidence
-   - Better than fixed-weight fusion
-
-3. **Hybrid Speech Features**
-   - Combines deep learning (Wav2Vec 2.0) with traditional features
-   - Captures both learned and clinical markers
-
-4. **Efficient Architecture**
-   - EfficientNet-B4 for parameter efficiency
-   - Spatial Pyramid Pooling for multi-scale features
-
----
-
-## 📊 Performance Metrics
-
-| Model | Accuracy | Precision | Recall | F1-Score | AUC-ROC |
-|-------|----------|-----------|--------|----------|---------|
-| Handwriting | 95-98% | ~0.96 | ~0.96 | ~0.96 | ~0.98 |
-| Speech | 85-92% | ~0.88 | ~0.87 | ~0.87 | ~0.92 |
-| **Fusion** | **98-99%** | **~0.98** | **~0.98** | **~0.98** | **~0.99** |
-
----
-
-## 💡 Usage Tips
-
-### For Google Colab:
-1. **Enable GPU**: Runtime → Change runtime type → GPU (T4 recommended)
-2. **Session Management**: Models take ~2-3 hours each to train
-3. **Save Checkpoints**: Download model files after each notebook
-
-### For Local Training:
-1. **Requirements**:
-   ```bash
-   pip install torch torchvision timm transformers
-   pip install librosa soundfile audiomentations
-   pip install albumentations scikit-learn matplotlib seaborn
-   pip install praat-parselmouth efficientnet-pytorch
-   ```
-
-2. **GPU Memory**: Requires ~8GB VRAM minimum
-
----
-
-## 🔬 Research & Publication
-
-This implementation is suitable for:
-- ✅ IEEE conference papers
-- ✅ Journal publications
-- ✅ Final year projects
-- ✅ Master's thesis
-- ✅ PhD research
-
-**Citation**: When using this work, please acknowledge the novel contributions:
-- Cross-modal attention fusion
-- Uncertainty quantification in multimodal learning
-- Hybrid feature extraction for Parkinson's detection
-
----
-
-## 📁 Repository Structure
-
-```
-SDP/
-├── handwritten dataset/
-│   └── Dataset/Dataset/
-│       ├── Healthy/        (1,632 images)
-│       └── Parkinson/      (1,632 images)
-├── speech dataset/
-│   ├── HC_AH/HC_AH/        (41 audio files)
-│   └── PD_AH/PD_AH/        (40 audio files)
-├── handwriting_parkinsons_detection.ipynb
-├── speech_parkinsons_detection.ipynb
-├── multimodal_fusion_parkinsons.ipynb
-├── implementation.txt
-└── README.md (this file)
-```
-
----
-
-## 🐛 Troubleshooting
-
-### Common Issues:
-
-**1. "AttributeError: 'list' object has no attribute 'to'"**
-- ✅ FIXED in v2.0
-- Dataset now returns proper tensors
-
-**2. "TypeError: Shift.__init__() got unexpected keyword argument"**
-- ✅ FIXED in v2.0
-- Removed problematic augmentation
-
-**3. Out of Memory (OOM)**
-- Reduce batch size in the notebook
-- Use smaller model: Change `efficientnet_b4` to `efficientnet_b0`
-
-**4. Slow Training**
-- Ensure GPU is enabled in Colab
-- Reduce `NUM_EPOCHS` for testing
-
-**5. Audio Loading Errors**
-- Install: `pip install librosa soundfile`
-- Check audio file format (should be .wav)
-
----
-
-## 🎯 Expected Results
-
-After running all three notebooks, you should have:
-
-1. **Three trained models** saved locally
-2. **Performance visualizations** showing:
-   - Training curves
-   - Confusion matrices
-   - ROC curves
-   - Model comparisons
-3. **Comprehensive metrics** for each model
-4. **Ready-to-deploy** fusion system
-
----
-
-## 📞 Support
-
-For issues or questions:
-1. Check the troubleshooting section above
-2. Review error messages carefully
-3. Ensure all dependencies are installed
-4. Verify GPU availability for training
-
----
-
-## 🏆 Achievements
-
-- ✅ State-of-the-art accuracy (98-99% fusion)
-- ✅ Novel architecture (cross-modal attention)
-- ✅ Production-ready code
-- ✅ Comprehensive evaluation
-- ✅ Publication-quality results
-
----
-
-## 📜 License
+## 📄 License
 
 This project is for educational and research purposes.
 
 ---
 
-## 🙏 Acknowledgments
+## 👥 Contributors
 
-- Dataset sources: Public Parkinson's disease datasets
-- Pre-trained models: Facebook Wav2Vec 2.0, EfficientNet
-- Framework: PyTorch, Hugging Face Transformers
+- **Venkata Thanuj T.** - Project Lead
 
 ---
 
-**Version**: 2.0 (December 5, 2025)  
-**Status**: ✅ All issues fixed and tested  
-**Repository**: https://github.com/Tvenkatathanuj/SDP
+## 🙏 Acknowledgments
+
+- Wav2Vec 2.0 by Facebook AI Research
+- EfficientNet by Google Research
+- Conformer architecture by Google Brain

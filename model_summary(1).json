@@ -1,0 +1,31 @@
+{
+  "model_type": "Multi-Task Parkinson Speech Recognition",
+  "architecture": "Wav2Vec2 + Conformer + Multi-Modal Fusion",
+  "total_parameters": 6614051,
+  "trainable_parameters": 6614051,
+  "test_metrics": {
+    "severity_mae": 0.20074286870658398,
+    "severity_rmse": 0.2008466273546219,
+    "pearson_correlation": null,
+    "spearman_correlation": null
+  },
+  "training_config": {
+    "epochs": 100,
+    "batch_size": 2,
+    "learning_rate": 5e-05,
+    "optimizer": "AdamW",
+    "mixed_precision": false
+  },
+  "novel_features": [
+    "Wav2Vec 2.0 pre-training",
+    "Conformer encoder with SE blocks",
+    "Stochastic depth regularization",
+    "Multi-modal prosodic-acoustic fusion",
+    "Contrastive learning on paired data",
+    "Multi-task learning (CTC + Severity + Contrastive + Domain)",
+    "Advanced augmentation (MixUp, CutMix, SpecAugment++, VTLP, RIR)",
+    "Mixed precision training (FP16)",
+    "Exponential Moving Average (EMA)",
+    "Cosine annealing with warmup"
+  ]
+}
