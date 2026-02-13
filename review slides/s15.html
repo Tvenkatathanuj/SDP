@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=1280, height=720" name="viewport"/>
+<title>Conclusion</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Inter', sans-serif;
+        overflow: hidden;
+    }
+    .slide-container {
+        width: 1280px;
+        height: 720px;
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+        position: relative;
+    }
+    .header-section {
+        background: #1e3a8a;
+        color: white;
+        padding: 30px 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .title-text {
+        font-size: 42px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+    .content-area {
+        flex: 1;
+        padding: 22px 60px;
+        background: #f8fafc;
+        display: flex;
+        flex-direction: column;
+    }
+    .bullet-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 11px;
+        background: white;
+        padding: 12px 18px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border-left: 4px solid #10b981;
+    }
+    .bullet-icon {
+        width: 34px;
+        height: 34px;
+        background: #10b981;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 15px;
+        flex-shrink: 0;
+        margin-right: 16px;
+    }
+    .bullet-text {
+        flex: 1;
+        font-size: 16px;
+        line-height: 1.5;
+        color: #334155;
+    }
+    .footer-bar {
+        background: #1e3a8a;
+        padding: 12px 60px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: white;
+        font-size: 14px;
+    }
+</style>
+</head>
+<body>
+<div class="slide-container">
+<div class="header-section">
+<div class="title-text">
+<p><i class="fas fa-flag-checkered"></i> Conclusion</p>
+</div>
+<div style="text-align: right;">
+<p style="font-size: 18px; font-weight: 600;">Key Achievements &amp; Future Work</p>
+<p style="font-size: 14px; opacity: 0.9;">Senior Design Project</p>
+</div>
+</div>
+<div class="content-area">
+<div class="bullet-item">
+<div class="bullet-icon">
+<i class="fas fa-network-wired"></i>
+</div>
+<div class="bullet-text">
+<p><strong>Multi-modal approach</strong> addresses critical limitations in existing PD detection systems by synergistically combining handwriting (EfficientNet-B4 + SPP + CBAM) and speech (tri-path architecture) analysis for comprehensive symptom coverage</p>
+</div>
+</div>
+<div class="bullet-item">
+<div class="bullet-icon">
+<i class="fas fa-sitemap"></i>
+</div>
+<div class="bullet-text">
+<p><strong>Attention-based late fusion</strong> adaptively weights modalities per patient, ensuring robustness across diverse symptom presentations and providing superior accuracy compared to single-modality approaches</p>
+</div>
+</div>
+<div class="bullet-item">
+<div class="bullet-icon">
+<i class="fas fa-chart-line"></i>
+</div>
+<div class="bullet-text">
+<p><strong>SMOTE effectively addresses</strong> severe class imbalance (5.7:1 ratio), generating 332 synthetic Parkinson's samples to prevent majority-class bias while maintaining high PD detection sensitivity</p>
+</div>
+</div>
+<div class="bullet-item">
+<div class="bullet-icon">
+<i class="fas fa-user-check"></i>
+</div>
+<div class="bullet-text">
+<p><strong>LOPO cross-validation</strong> ensures genuine patient-independent generalization with robust performance on unseen patients, simulating real-world clinical deployment scenarios</p>
+</div>
+</div>
+<div class="bullet-item">
+<div class="bullet-icon">
+<i class="fas fa-mobile-alt"></i>
+</div>
+<div class="bullet-text">
+<p><strong>Accessible, non-invasive pipeline</strong> using smartphone camera and microphone enables clinical screening, home monitoring, and deployment in resource-limited settings without specialized equipment</p>
+</div>
+</div>
+<div class="bullet-item">
+<div class="bullet-icon">
+<i class="fas fa-arrow-right"></i>
+</div>
+<div class="bullet-text">
+<p><strong>Next steps:</strong> Extended datasets, prospective clinical trials, explainability enhancements (attention visualization), mobile app development, and integration with clinical decision support systems</p>
+</div>
+</div>
+</div>
+<div class="footer-bar">
+<div>
+<p><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>Slide 15</p>
+</div>
+<div>
+<p>Multi-Modal Parkinson's Disease Detection System</p>
+</div>
+</div>
+</div>
+</body>
+</html>

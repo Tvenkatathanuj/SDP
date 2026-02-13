@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=1280, height=720" name="viewport"/>
+<title>References</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Inter', sans-serif;
+        overflow: hidden;
+    }
+    .slide-container {
+        width: 1280px;
+        height: 720px;
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+        position: relative;
+    }
+    .header-section {
+        background: #1e3a8a;
+        color: white;
+        padding: 25px 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .title-text {
+        font-size: 36px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+    .content-area {
+        flex: 1;
+        padding: 25px 50px 15px 50px;
+        background: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    .references-container {
+        background: white;
+        border-radius: 10px;
+        padding: 20px 25px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+        margin-bottom: 16px;
+        flex: 1;
+    }
+    .reference-item {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .reference-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    .reference-number {
+        width: 35px;
+        height: 35px;
+        background: #dbeafe;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #1e40af;
+        font-weight: 800;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+    .reference-content {
+        flex: 1;
+    }
+    .reference-text {
+        font-size: 13px;
+        color: #334155;
+        line-height: 1.5;
+    }
+    .reference-title {
+        font-weight: 700;
+        color: #1e40af;
+    }
+    .reference-journal {
+        font-style: italic;
+        color: #64748b;
+    }
+    .reference-year {
+        font-weight: 600;
+        color: #059669;
+    }
+    .additional-note {
+        background: #fef3c7;
+        border: 2px solid #fbbf24;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-top: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .note-icon {
+        width: 32px;
+        height: 32px;
+        background: #f59e0b;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+    .note-text {
+        font-size: 13px;
+        color: #92400e;
+        font-weight: 600;
+    }
+    .contact-section {
+        display: flex;
+        gap: 20px;
+        margin-top: 0;
+    }
+    .contact-card {
+        flex: 1;
+        background: white;
+        border-radius: 8px;
+        padding: 18px 22px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+        border-left: 4px solid #8b5cf6;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    .repo-card {
+        border-left-color: #10b981;
+    }
+    .contact-icon {
+        width: 45px;
+        height: 45px;
+        background: #8b5cf6;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+    .repo-card .contact-icon {
+        background: #10b981;
+    }
+    .contact-info {
+        flex: 1;
+    }
+    .contact-label {
+        font-size: 12px;
+        color: #64748b;
+        font-weight: 600;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .contact-value {
+        font-size: 15px;
+        color: #1e40af;
+        font-weight: 700;
+    }
+    .contact-link {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 700;
+    }
+    .contact-link:hover {
+        text-decoration: underline;
+    }
+    .footer-bar {
+        background: #1e3a8a;
+        padding: 12px 60px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: white;
+        font-size: 14px;
+    }
+</style>
+</head>
+<body>
+<div class="slide-container">
+<div class="header-section">
+<div class="title-text">
+<p><i class="fas fa-book"></i> References</p>
+</div>
+<div style="text-align: right;">
+<p style="font-size: 16px; font-weight: 600;">Key Citations &amp; Resources</p>
+</div>
+</div>
+<div class="content-area">
+<div class="references-container">
+<div class="reference-item">
+<div class="reference-number">
+<p>1</p>
+</div>
+<div class="reference-content">
+<p class="reference-text"><span class="reference-title">"Automated Parkinson's Disease Detection using Deep Learning on Spiral Drawings"</span>, <span class="reference-journal">IEEE Engineering in Medicine and Biology Conference (EMBC)</span>, <span class="reference-year">2023</span></p>
+</div>
+</div>
+<div class="reference-item">
+<div class="reference-number">
+<p>2</p>
+</div>
+<div class="reference-content">
+<p class="reference-text"><span class="reference-title">"Deep Learning on Voice Recordings for Parkinson's Disease Diagnosis"</span>, <span class="reference-journal">Nature Scientific Reports</span>, <span class="reference-year">2024</span></p>
+</div>
+</div>
+<div class="reference-item">
+<div class="reference-number">
+<p>3</p>
+</div>
+<div class="reference-content">
+<p class="reference-text"><span class="reference-title">"Multi-Modal PD Detection: Gait + Speech Analysis"</span>, <span class="reference-journal">Medical Image Analysis</span>, <span class="reference-year">2023</span></p>
+</div>
+</div>
+<div class="reference-item">
+<div class="reference-number">
+<p>4</p>
+</div>
+<div class="reference-content">
+<p class="reference-text"><span class="reference-title">"Attention-Based CNN for Spiral Drawing Analysis in Parkinson's Detection"</span>, <span class="reference-journal">International Conference on Medical Image Computing and Computer-Assisted Intervention (MICCAI)</span>, <span class="reference-year">2024</span></p>
+</div>
+</div>
+<div class="reference-item">
+<div class="reference-number">
+<p>5</p>
+</div>
+<div class="reference-content">
+<p class="reference-text"><span class="reference-title">"CNN-LSTM Hybrid for Parkinson's Disease Voice Analysis"</span>, <span class="reference-journal">Journal of Biomedical Informatics</span>, <span class="reference-year">2022</span></p>
+</div>
+</div>
+<div class="reference-item">
+<div class="reference-number">
+<p>6</p>
+</div>
+<div class="reference-content">
+<p class="reference-text"><span class="reference-title">"Transfer Learning with EfficientNet for Handwriting-Based PD Classification"</span>, <span class="reference-journal">IEEE Transactions on Neural Systems and Rehabilitation Engineering</span>, <span class="reference-year">2024</span></p>
+</div>
+</div>
+<div class="reference-item">
+<div class="reference-number">
+<p>7</p>
+</div>
+<div class="reference-content">
+<p class="reference-text"><span class="reference-title">"SMOTE-Based Oversampling for Imbalanced Medical Datasets"</span>, <span class="reference-journal">Journal of Machine Learning Research</span>, <span class="reference-year">2022</span></p>
+</div>
+</div>
+<div class="additional-note">
+<div class="note-icon">
+<i class="fas fa-info-circle"></i>
+</div>
+<p class="note-text">Complete bibliography with 25 references (2019-2024) covering handwriting-based, speech-based, and multi-modal PD detection approaches available in full documentation</p>
+</div>
+</div>
+<div class="contact-section">
+<div class="contact-card repo-card">
+<div class="contact-icon">
+<i class="fab fa-github"></i>
+</div>
+<div class="contact-info">
+<p class="contact-label">Project Repository</p>
+<p class="contact-value"><a class="contact-link" href="#">github.com/parkinsons-multimodal-detection</a></p>
+</div>
+</div>
+<div class="contact-card">
+<div class="contact-icon">
+<i class="fas fa-envelope"></i>
+</div>
+<div class="contact-info">
+<p class="contact-label">Contact Information</p>
+<p class="contact-value">parkinsons.detection@university.edu</p>
+</div>
+</div>
+</div>
+</div>
+<div class="footer-bar">
+<div>
+<p><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>Slide 16</p>
+</div>
+<div>
+<p>Multi-Modal Parkinson's Disease Detection System</p>
+</div>
+</div>
+</div>
+</body>
+</html>

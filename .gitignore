@@ -1,0 +1,21 @@
+# Old datasets (kept locally, not tracked in git)
+denoised-speech-dataset/
+original-speech-dataset/
+handwritten dataset/
+speech/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+*.tmp

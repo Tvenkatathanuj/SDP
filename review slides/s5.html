@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=1280, height=720" name="viewport"/>
+<title>Literature Review: Speech-Based PD Detection</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Inter', sans-serif;
+        overflow: hidden;
+    }
+    .slide-container {
+        width: 1280px;
+        height: 720px;
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+        position: relative;
+    }
+    .header-section {
+        background: #1e3a8a;
+        color: white;
+        padding: 30px 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .title-text {
+        font-size: 38px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+    .content-area {
+        flex: 1;
+        padding: 28px 48px;
+        background: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+    }
+    .table-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        overflow: hidden;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    thead {
+        background: #1e3a8a;
+        color: white;
+    }
+    th {
+        padding: 13px 15px;
+        text-align: left;
+        font-size: 15.5px;
+        font-weight: 700;
+        border-bottom: 3px solid #3b82f6;
+    }
+    th:first-child {
+        width: 50px;
+        text-align: center;
+    }
+    th:nth-child(2) {
+        width: 40%;
+    }
+    th:nth-child(3) {
+        width: 25%;
+    }
+    th:nth-child(4) {
+        width: 25%;
+    }
+    th:last-child {
+        width: 10%;
+        text-align: center;
+    }
+    tbody tr {
+        border-bottom: 1px solid #e2e8f0;
+    }
+    tbody tr:nth-child(even) {
+        background: #f8fafc;
+    }
+    tbody tr:nth-child(odd) {
+        background: white;
+    }
+    tbody tr:hover {
+        background: #e0f2fe;
+    }
+    td {
+        padding: 11px 15px;
+        font-size: 14.5px;
+        color: #334155;
+        line-height: 1.4;
+    }
+    td:first-child {
+        text-align: center;
+        font-weight: 700;
+        color: #1e40af;
+        font-size: 16px;
+    }
+    td:last-child {
+        text-align: center;
+        font-weight: 700;
+        color: #059669;
+        font-size: 17px;
+    }
+    .method-text {
+        font-weight: 600;
+        color: #1e40af;
+    }
+    .dataset-text {
+        color: #475569;
+    }
+    .footer-bar {
+        background: #1e3a8a;
+        padding: 12px 60px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: white;
+        font-size: 14px;
+    }
+    .subtitle-badge {
+        background: #3b82f6;
+        color: white;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+</style>
+</head>
+<body>
+<div class="slide-container">
+<div class="header-section">
+<div class="title-text">
+<p><i class="fas fa-microphone-alt"></i> Existing Systems: Speech-Based PD Detection</p>
+</div>
+<div style="text-align: right;">
+<div class="subtitle-badge">
+<p>Table 2: Literature Survey</p>
+</div>
+</div>
+</div>
+<div class="content-area">
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th><p>Sl No.</p></th>
+<th><p>Title and Year</p></th>
+<th><p>Methodology</p></th>
+<th><p>Dataset</p></th>
+<th><p>Acc</p></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><p>9</p></td>
+<td><p>"Deep Learning on Voice Recordings for PD Diagnosis" (2024)</p></td>
+<td><p><span class="method-text">1D-CNN on MFCC Features</span></p></td>
+<td><p><span class="dataset-text">PC-GITA Dataset</span></p></td>
+<td><p>83.5%</p></td>
+</tr>
+<tr>
+<td><p>10</p></td>
+<td><p>"Transformer-Based Speech Analysis for Parkinson's" (2023)</p></td>
+<td><p><span class="method-text">Speech Transformer + Acoustic Features</span></p></td>
+<td><p><span class="dataset-text">Italian Parkinson's Voice</span></p></td>
+<td><p>85.3%</p></td>
+</tr>
+<tr>
+<td><p>11</p></td>
+<td><p>"CNN-LSTM Hybrid for PD Voice Analysis" (2022)</p></td>
+<td><p><span class="method-text">BiLSTM + CNN on Spectrograms</span></p></td>
+<td><p><span class="dataset-text">mPower Dataset (1,200 samples)</span></p></td>
+<td><p>84.2%</p></td>
+</tr>
+<tr>
+<td><p>12</p></td>
+<td><p>"Multi-Feature Fusion for PD Speech Detection" (2024)</p></td>
+<td><p><span class="method-text">XGBoost on 132 Acoustic Features</span></p></td>
+<td><p><span class="dataset-text">Sakar Dataset</span></p></td>
+<td><p>86.7%</p></td>
+</tr>
+<tr>
+<td><p>13</p></td>
+<td><p>"Mel-Spectrogram CNN for Dysarthria Detection" (2023)</p></td>
+<td><p><span class="method-text">ResNet18 on Mel-Spectrograms</span></p></td>
+<td><p><span class="dataset-text">Custom Dataset (650 recordings)</span></p></td>
+<td><p>83.9%</p></td>
+</tr>
+<tr>
+<td><p>14</p></td>
+<td><p>"Wav2Vec 2.0 Fine-Tuning for PD Detection" (2024)</p></td>
+<td><p><span class="method-text">Pre-trained Wav2Vec 2.0</span></p></td>
+<td><p><span class="dataset-text">Multiple Datasets Combined</span></p></td>
+<td><p>86.8%</p></td>
+</tr>
+<tr>
+<td><p>15</p></td>
+<td><p>"Jitter-Shimmer Analysis with Deep Neural Networks" (2022)</p></td>
+<td><p><span class="method-text">Fully Connected DNN on Voice Features</span></p></td>
+<td><p><span class="dataset-text">PC-GITA</span></p></td>
+<td><p>81.4%</p></td>
+</tr>
+<tr>
+<td><p>16</p></td>
+<td><p>"Capsule Networks for PD Voice Classification" (2023)</p></td>
+<td><p><span class="method-text">CapsNet on MFCC + Prosody Features</span></p></td>
+<td><p><span class="dataset-text">mPower + PC-GITA</span></p></td>
+<td><p>84.5%</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="footer-bar">
+<div>
+<p><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>Slide 5</p>
+</div>
+<div>
+<p>Multi-Modal Parkinson's Disease Detection System</p>
+</div>
+</div>
+</div>
+</body>
+</html>

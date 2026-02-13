@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=1280, height=720" name="viewport"/>
+<title>Literature Review: Multi-Modal and Recent Trends</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Inter', sans-serif;
+        overflow: hidden;
+    }
+    .slide-container {
+        width: 1280px;
+        height: 720px;
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+        position: relative;
+    }
+    .header-section {
+        background: #1e3a8a;
+        color: white;
+        padding: 30px 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .title-text {
+        font-size: 38px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+    .content-area {
+        flex: 1;
+        padding: 26px 46px;
+        background: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+    }
+    .table-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        overflow: hidden;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    thead {
+        background: #1e3a8a;
+        color: white;
+    }
+    th {
+        padding: 12px 14px;
+        text-align: left;
+        font-size: 15px;
+        font-weight: 700;
+        border-bottom: 3px solid #3b82f6;
+    }
+    th:first-child {
+        width: 50px;
+        text-align: center;
+    }
+    th:nth-child(2) {
+        width: 40%;
+    }
+    th:nth-child(3) {
+        width: 25%;
+    }
+    th:nth-child(4) {
+        width: 25%;
+    }
+    th:last-child {
+        width: 10%;
+        text-align: center;
+    }
+    tbody tr {
+        border-bottom: 1px solid #e2e8f0;
+    }
+    tbody tr:nth-child(even) {
+        background: #f8fafc;
+    }
+    tbody tr:nth-child(odd) {
+        background: white;
+    }
+    tbody tr:hover {
+        background: #e0f2fe;
+    }
+    td {
+        padding: 10px 14px;
+        font-size: 14px;
+        color: #334155;
+        line-height: 1.4;
+    }
+    td:first-child {
+        text-align: center;
+        font-weight: 700;
+        color: #1e40af;
+        font-size: 16px;
+    }
+    td:last-child {
+        text-align: center;
+        font-weight: 700;
+        color: #059669;
+        font-size: 17px;
+    }
+    .method-text {
+        font-weight: 600;
+        color: #1e40af;
+    }
+    .dataset-text {
+        color: #475569;
+    }
+    .footer-bar {
+        background: #1e3a8a;
+        padding: 12px 60px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: white;
+        font-size: 14px;
+    }
+    .subtitle-badge {
+        background: #3b82f6;
+        color: white;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+</style>
+</head>
+<body>
+<div class="slide-container">
+<div class="header-section">
+<div class="title-text">
+<p><i class="fas fa-layer-group"></i> Existing Systems: Multi-Modal & Recent Approaches</p>
+</div>
+<div style="text-align: right;">
+<div class="subtitle-badge">
+<p>Tables 3 & 4</p>
+</div>
+</div>
+</div>
+<div class="content-area">
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th><p>Sl No.</p></th>
+<th><p>Title and Year</p></th>
+<th><p>Methodology</p></th>
+<th><p>Dataset</p></th>
+<th><p>Acc</p></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><p>17</p></td>
+<td><p>"Multi-Modal PD Detection: Gait + Speech" (2023)</p></td>
+<td><p><span class="method-text">Late Fusion CNN + LSTM</span></p></td>
+<td><p><span class="dataset-text">Custom Multi-Modal Dataset</span></p></td>
+<td><p>91.2%</p></td>
+</tr>
+<tr>
+<td><p>18</p></td>
+<td><p>"Handwriting + MRI Fusion for PD Diagnosis" (2022)</p></td>
+<td><p><span class="method-text">Early Fusion ResNet + 3D-CNN</span></p></td>
+<td><p><span class="dataset-text">Clinical Multi-Modal Data</span></p></td>
+<td><p>90.7%</p></td>
+</tr>
+<tr>
+<td><p>19</p></td>
+<td><p>"Speech + Facial Expression Analysis for PD" (2024)</p></td>
+<td><p><span class="method-text">Attention-Based Multi-Modal Fusion</span></p></td>
+<td><p><span class="dataset-text">Video + Audio (320 patients)</span></p></td>
+<td><p>93.1%</p></td>
+</tr>
+<tr>
+<td><p>20</p></td>
+<td><p>"Triple-Modal PD Detection: Gait+Speech+Handwriting" (2023)</p></td>
+<td><p><span class="method-text">Hierarchical Fusion Network</span></p></td>
+<td><p><span class="dataset-text">Custom Dataset (280 subjects)</span></p></td>
+<td><p>94.3%</p></td>
+</tr>
+<tr>
+<td><p>21</p></td>
+<td><p>"Meta-Learning for Multi-Modal PD Classification" (2024)</p></td>
+<td><p><span class="method-text">MAML on Speech + Handwriting</span></p></td>
+<td><p><span class="dataset-text">Combined Datasets</span></p></td>
+<td><p>92.8%</p></td>
+</tr>
+<tr>
+<td><p>22</p></td>
+<td><p>"Graph Neural Network for Multi-Feature PD Analysis" (2023)</p></td>
+<td><p><span class="method-text">GNN on Feature Correlation Graph</span></p></td>
+<td><p><span class="dataset-text">Multi-Modal Clinical Data</span></p></td>
+<td><p>91.5%</p></td>
+</tr>
+<tr>
+<td><p>23</p></td>
+<td><p>"Federated Learning for Privacy-Preserving PD Detection" (2024)</p></td>
+<td><p><span class="method-text">Federated ResNet on Handwriting</span></p></td>
+<td><p><span class="dataset-text">Distributed (1,500 samples)</span></p></td>
+<td><p>88.8%</p></td>
+</tr>
+<tr>
+<td><p>24</p></td>
+<td><p>"Self-Supervised Learning for PD Speech Analysis" (2023)</p></td>
+<td><p><span class="method-text">SimCLR Pre-training + Fine-tuning</span></p></td>
+<td><p><span class="dataset-text">Unlabeled + Labeled Speech</span></p></td>
+<td><p>86.4%</p></td>
+</tr>
+<tr>
+<td><p>25</p></td>
+<td><p>"Edge Computing for Real-Time PD Screening" (2024)</p></td>
+<td><p><span class="method-text">MobileNetV3 on Spiral Drawings</span></p></td>
+<td><p><span class="dataset-text">NewHandPD (Edge Deployment)</span></p></td>
+<td><p>85.6%</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="footer-bar">
+<div>
+<p><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>Slide 6</p>
+</div>
+<div>
+<p>Multi-Modal Parkinson's Disease Detection System</p>
+</div>
+</div>
+</div>
+</body>
+</html>

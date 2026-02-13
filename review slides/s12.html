@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=1280, height=720" name="viewport"/>
+<title>Software and Hardware Requirements</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Inter', sans-serif;
+        overflow: hidden;
+    }
+    .slide-container {
+        width: 1280px;
+        height: 720px;
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+        position: relative;
+    }
+    .header-section {
+        background: #1e3a8a;
+        color: white;
+        padding: 22px 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .title-text {
+        font-size: 38px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+    .content-area {
+        flex: 1;
+        padding: 25px 50px;
+        background: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    .section-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+    }
+    .section-icon {
+        width: 32px;
+        height: 32px;
+        background: #3b82f6;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 15px;
+        margin-right: 10px;
+    }
+    .bullet-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 8px;
+        background: white;
+        padding: 10px 16px;
+        border-radius: 6px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border-left: 3px solid #3b82f6;
+    }
+    .bullet-icon {
+        width: 26px;
+        height: 26px;
+        background: #3b82f6;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 11px;
+        flex-shrink: 0;
+        margin-right: 10px;
+        margin-top: 2px;
+    }
+    .bullet-text {
+        flex: 1;
+        font-size: 14px;
+        line-height: 1.4;
+        color: #334155;
+    }
+    .hardware-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 12px;
+    }
+    .hardware-card {
+        background: white;
+        border-radius: 8px;
+        padding: 14px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        border-top: 4px solid #3b82f6;
+    }
+    .hardware-card.recommended {
+        border-top-color: #10b981;
+    }
+    .hardware-card.optimal {
+        border-top-color: #8b5cf6;
+    }
+    .card-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+    }
+    .card-badge {
+        font-size: 11px;
+        padding: 3px 8px;
+        border-radius: 12px;
+        margin-left: 8px;
+        font-weight: 600;
+    }
+    .badge-min {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    .badge-rec {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    .badge-opt {
+        background: #ede9fe;
+        color: #5b21b6;
+    }
+    .spec-item {
+        font-size: 12px;
+        color: #475569;
+        margin-bottom: 5px;
+        display: flex;
+        align-items: flex-start;
+    }
+    .spec-label {
+        font-weight: 600;
+        color: #334155;
+        min-width: 60px;
+    }
+    .footer-bar {
+        background: #1e3a8a;
+        padding: 12px 60px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: white;
+        font-size: 14px;
+    }
+</style>
+</head>
+<body>
+<div class="slide-container">
+<div class="header-section">
+<div class="title-text">
+<p><i class="fas fa-cog"></i> Software and Hardware Requirements</p>
+</div>
+<div style="text-align: right;">
+<p style="font-size: 18px; font-weight: 600;">System Specifications</p>
+<p style="font-size: 14px; opacity: 0.9;">Development &amp; Deployment</p>
+</div>
+</div>
+<div class="content-area">
+<div style="margin-bottom: 18px;">
+<div class="section-title">
+<div class="section-icon">
+<i class="fas fa-code"></i>
+</div>
+<p>Software Requirements</p>
+</div>
+<div class="bullet-item">
+<div class="bullet-icon">
+<i class="fab fa-python"></i>
+</div>
+<div class="bullet-text">
+<p><strong>Core Frameworks:</strong> Python 3.8+, PyTorch 2.0+, TorchVision/Audio 0.15+</p>
+</div>
+</div>
+<div class="bullet-item">
+<div class="bullet-icon">
+<i class="fas fa-waveform"></i>
+</div>
+<div class="bullet-text">
+<p><strong>Audio Processing:</strong> Librosa 0.10+, Praat-Parselmouth 0.4+, SoundFile 0.12+</p>
+</div>
+</div>
+<div class="bullet-item">
+<div class="bullet-icon">
+<i class="fas fa-image"></i>
+</div>
+<div class="bullet-text">
+<p><strong>Image Processing:</strong> OpenCV 4.8+, Pillow 10.0+, Albumentations 1.3+</p>
+</div>
+</div>
+<div class="bullet-item">
+<div class="bullet-icon">
+<i class="fas fa-chart-line"></i>
+</div>
+<div class="bullet-text">
+<p><strong>ML &amp; Data Science:</strong> Scikit-learn 1.3+, Imbalanced-learn 0.11+ (SMOTE), NumPy, Pandas, SciPy</p>
+</div>
+</div>
+<div class="bullet-item">
+<div class="bullet-icon">
+<i class="fas fa-tools"></i>
+</div>
+<div class="bullet-text">
+<p><strong>Development Tools:</strong> Jupyter/VS Code, Git, TensorBoard 2.13+, Matplotlib, Seaborn</p>
+</div>
+</div>
+</div>
+<div>
+<div class="section-title">
+<div class="section-icon">
+<i class="fas fa-server"></i>
+</div>
+<p>Hardware Configurations</p>
+</div>
+<div class="hardware-grid">
+<div class="hardware-card">
+<div class="card-title">
+<p>Minimum</p>
+<span class="card-badge badge-min">Testing</span>
+</div>
+<div class="spec-item">
+<span class="spec-label">CPU:</span>
+<p>i5 8th gen / Ryzen 5</p>
+</div>
+<div class="spec-item">
+<span class="spec-label">RAM:</span>
+<p>16 GB DDR4</p>
+</div>
+<div class="spec-item">
+<span class="spec-label">GPU:</span>
+<p>GTX 1650 (4 GB)</p>
+</div>
+<div class="spec-item">
+<span class="spec-label">Storage:</span>
+<p>256 GB SSD</p>
+</div>
+</div>
+<div class="hardware-card recommended">
+<div class="card-title">
+<p>Recommended</p>
+<span class="card-badge badge-rec">Training</span>
+</div>
+<div class="spec-item">
+<span class="spec-label">CPU:</span>
+<p>i7/i9 10th+ / Ryzen 7/9</p>
+</div>
+<div class="spec-item">
+<span class="spec-label">RAM:</span>
+<p>32 GB DDR4/DDR5</p>
+</div>
+<div class="spec-item">
+<span class="spec-label">GPU:</span>
+<p>RTX 3060/3070 (12+ GB)</p>
+</div>
+<div class="spec-item">
+<span class="spec-label">Storage:</span>
+<p>512 GB NVMe SSD</p>
+</div>
+</div>
+<div class="hardware-card optimal">
+<div class="card-title">
+<p>Optimal</p>
+<span class="card-badge badge-opt">Large-Scale</span>
+</div>
+<div class="spec-item">
+<span class="spec-label">CPU:</span>
+<p>Threadripper / Xeon 16+</p>
+</div>
+<div class="spec-item">
+<span class="spec-label">RAM:</span>
+<p>64 GB DDR4/DDR5</p>
+</div>
+<div class="spec-item">
+<span class="spec-label">GPU:</span>
+<p>RTX 4090 / A100 (24+ GB)</p>
+</div>
+<div class="spec-item">
+<span class="spec-label">Storage:</span>
+<p>1 TB NVMe SSD</p>
+</div>
+</div>
+</div>
+<div style="margin-top: 15px; background: white; padding: 12px 18px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
+<p style="font-size: 14px; color: #475569;"><i class="fas fa-cloud" style="color: #3b82f6; margin-right: 8px;"></i><strong>Cloud Alternatives:</strong> Google Colab Pro/Pro+ (T4, V100, A100), AWS EC2 (p3.2xlarge, g4dn.xlarge), Azure ML NC-series, Kaggle Notebooks (Free 16 GB GPU)</p>
+</div>
+</div>
+</div>
+<div class="footer-bar">
+<div>
+<p><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>Slide 12</p>
+</div>
+<div>
+<p>Multi-Modal Parkinson's Disease Detection System</p>
+</div>
+</div>
+</div>
+</body>
+</html>

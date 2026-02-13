@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=1280, height=720" name="viewport"/>
+<title>Training Strategy: Imbalance, Validation, and Optimization</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Inter', sans-serif;
+        overflow: hidden;
+    }
+    .slide-container {
+        width: 1280px;
+        height: 720px;
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+        position: relative;
+    }
+    .header-section {
+        background: #1e3a8a;
+        color: white;
+        padding: 30px 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .title-text {
+        font-size: 38px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+    .content-area {
+        flex: 1;
+        padding: 35px 70px;
+        background: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+    }
+    .bullet-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 14px;
+        background: white;
+        padding: 14px 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border-left: 4px solid #3b82f6;
+    }
+    .bullet-icon {
+        width: 40px;
+        height: 40px;
+        background: #3b82f6;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 18px;
+        flex-shrink: 0;
+        margin-right: 20px;
+    }
+    .bullet-text {
+        flex: 1;
+        font-size: 16px;
+        line-height: 1.5;
+        color: #334155;
+    }
+    .footer-bar {
+        background: #1e3a8a;
+        padding: 12px 60px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: white;
+        font-size: 14px;
+    }
+</style>
+</head>
+<body>
+<div class="slide-container">
+<div class="header-section">
+<div class="title-text">
+<p><i class="fas fa-bullseye"></i> OBJECTIVES</p>
+</div>
+<div style="text-align: right;">
+<p style="font-size: 18px; font-weight: 600;">Project Goals</p>
+<p style="font-size: 14px; opacity: 0.9;">Key Deliverables & Targets</p>
+</div>
+</div>
+<div class="content-area">
+<div class="bullet-item">
+<div class="bullet-icon">
+<i class="fas fa-chart-line"></i>
+</div>
+<div class="bullet-text">
+<p><strong>Develop High-Accuracy Multi-Modal PD Detection System:</strong> Design and implement a deep learning architecture that achieves >95% accuracy by fusing handwriting and speech analysis, surpassing single-modality baselines by at least 10-15%.</p>
+</div>
+</div>
+<div class="bullet-item">
+<div class="bullet-icon">
+<i class="fas fa-user-check"></i>
+</div>
+<div class="bullet-text">
+<p><strong>Ensure Patient-Independent Generalization:</strong> Validate the system using Leave-One-Patient-Out (LOPO) cross-validation to guarantee robust performance on unseen patients across different demographics, disease stages, and symptom presentations.</p>
+</div>
+</div>
+<div class="bullet-item">
+<div class="bullet-icon">
+<i class="fas fa-mobile-alt"></i>
+</div>
+<div class="bullet-text">
+<p><strong>Create Accessible Non-Invasive Screening Tool:</strong> Build a user-friendly system requiring only a smartphone camera (for handwriting) and microphone (for speech), enabling remote screening, home monitoring, and deployment in resource-limited settings without specialized medical equipment.</p>
+</div>
+</div>
+<div class="bullet-item">
+<div class="bullet-icon">
+<i class="fas fa-eye"></i>
+</div>
+<div class="bullet-text">
+<p><strong>Provide Interpretable Clinical Insights:</strong> Implement explainability mechanisms (attention visualization, feature importance analysis) to identify which specific symptoms (tremor frequency, voice pitch variability, etc.) contribute most to predictions, facilitating clinical validation and physician trust.</p>
+</div>
+</div>
+</div>
+<div class="footer-bar">
+<div>
+<p><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>Slide 10</p>
+</div>
+<div>
+<p>Multi-Modal Parkinson's Disease Detection System</p>
+</div>
+</div>
+</div>
+</body>
+</html>

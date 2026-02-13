@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=1280, height=720" name="viewport"/>
+<title>System Architecture Diagram</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Inter', sans-serif;
+        overflow: hidden;
+    }
+    .slide-container {
+        width: 1280px;
+        height: 720px;
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+        position: relative;
+    }
+    .header-section {
+        background: #1e3a8a;
+        color: white;
+        padding: 18px 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .title-text {
+        font-size: 32px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+    .content-area {
+        flex: 1;
+        padding: 12px 30px;
+        background: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+    .architecture-flow {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        height: 100%;
+    }
+    .flow-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+    }
+    .module-box {
+        background: white;
+        border-radius: 8px;
+        padding: 10px 14px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 160px;
+        border: 2px solid #3b82f6;
+    }
+    .input-box {
+        background: #dbeafe;
+        border-color: #2563eb;
+        min-width: 200px;
+    }
+    .process-box {
+        background: #fff7ed;
+        border-color: #f59e0b;
+        min-width: 240px;
+    }
+    .fusion-box {
+        background: #f0fdf4;
+        border-color: #10b981;
+        min-width: 280px;
+    }
+    .output-box {
+        background: #fce7f3;
+        border-color: #ec4899;
+        min-width: 220px;
+    }
+    .module-icon {
+        width: 32px;
+        height: 32px;
+        background: #3b82f6;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 16px;
+        margin-bottom: 6px;
+    }
+    .input-icon {
+        background: #2563eb;
+    }
+    .process-icon {
+        background: #f59e0b;
+    }
+    .fusion-icon {
+        background: #10b981;
+    }
+    .output-icon {
+        background: #ec4899;
+    }
+    .module-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: #1e40af;
+        margin-bottom: 3px;
+        text-align: center;
+    }
+    .module-desc {
+        font-size: 10px;
+        color: #475569;
+        text-align: center;
+        line-height: 1.2;
+    }
+    .arrow-down {
+        width: 0;
+        height: 0;
+        border-left: 12px solid transparent;
+        border-right: 12px solid transparent;
+        border-top: 16px solid #64748b;
+        margin: 0 auto;
+    }
+    .arrow-right {
+        width: 0;
+        height: 0;
+        border-top: 10px solid transparent;
+        border-bottom: 10px solid transparent;
+        border-left: 16px solid #64748b;
+    }
+    .footer-bar {
+        background: #1e3a8a;
+        padding: 12px 60px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: white;
+        font-size: 14px;
+    }
+    .dual-input {
+        display: flex;
+        gap: 20px;
+    }
+    .speech-paths {
+        display: flex;
+        gap: 12px;
+        margin-top: 6px;
+    }
+    .sub-module {
+        background: #fef3c7;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 9px;
+        font-weight: 600;
+        color: #92400e;
+        border: 2px solid #f59e0b;
+    }
+    .training-note {
+        position: absolute;
+        bottom: 6px;
+        right: 30px;
+        background: #ede9fe;
+        padding: 6px 10px;
+        border-radius: 6px;
+        border: 2px solid #8b5cf6;
+        font-size: 9px;
+        color: #5b21b6;
+        font-weight: 600;
+        max-width: 360px;
+    }
+</style>
+</head>
+<body>
+<div class="slide-container">
+<div class="header-section">
+<div class="title-text">
+<p><i class="fas fa-project-diagram"></i> Proposed System Architecture</p>
+</div>
+<div style="text-align: right;">
+<p style="font-size: 16px; font-weight: 600;">Multi-Modal Deep Learning Pipeline</p>
+</div>
+</div>
+<div class="content-area">
+<div class="architecture-flow">
+<div class="flow-row">
+<div class="dual-input">
+<div class="module-box input-box">
+<div class="module-icon input-icon">
+<i class="fas fa-pen"></i>
+</div>
+<p class="module-title">Handwriting Input</p>
+<p class="module-desc">Spiral &amp; Wave drawings<br/>336×336 RGB images</p>
+</div>
+<div class="module-box input-box">
+<div class="module-icon input-icon">
+<i class="fas fa-microphone"></i>
+</div>
+<p class="module-title">Speech Input</p>
+<p class="module-desc">Audio recordings<br/>5 sec, 16 kHz sampling</p>
+</div>
+</div>
+</div>
+<div class="flow-row">
+<div class="arrow-down"></div>
+<div style="width: 40px;"></div>
+<div class="arrow-down"></div>
+</div>
+<div class="flow-row">
+<div class="module-box process-box">
+<div class="module-icon process-icon">
+<i class="fas fa-brain"></i>
+</div>
+<p class="module-title">Handwriting Module</p>
+<p class="module-desc">EfficientNet-B4 + SPP + CBAM<br/>ImageNet pre-trained<br/>Multi-scale features → embedding</p>
+</div>
+<div class="module-box process-box" style="min-width: 340px;">
+<div class="module-icon process-icon">
+<i class="fas fa-wave-square"></i>
+</div>
+<p class="module-title">Speech Tri-Path Architecture</p>
+<p class="module-desc" style="margin-bottom: 8px;">Parallel feature extraction paths</p>
+<div class="speech-paths">
+<div class="sub-module">
+<p>CNN<br/>Mel-Spec<br/>128 bins</p>
+</div>
+<div class="sub-module">
+<p>MLP<br/>MFCC<br/>80 Stats</p>
+</div>
+<div class="sub-module">
+<p>MLP<br/>14 Clinical<br/>Features</p>
+</div>
+</div>
+</div>
+</div>
+<div class="flow-row">
+<div style="display: flex; align-items: center; gap: 10px;">
+<div class="arrow-down"></div>
+<div style="width: 180px; height: 3px; background: #64748b;"></div>
+</div>
+<div style="display: flex; align-items: center; gap: 10px;">
+<div style="width: 180px; height: 3px; background: #64748b;"></div>
+<div class="arrow-down"></div>
+</div>
+</div>
+<div class="flow-row">
+<div class="module-box fusion-box">
+<div class="module-icon fusion-icon">
+<i class="fas fa-layer-group"></i>
+</div>
+<p class="module-title">Attention-Based Late Fusion</p>
+<p class="module-desc">Adaptive modality weighting<br/>Learns per-patient importance<br/>Concatenate → Dense Layers</p>
+</div>
+</div>
+<div class="flow-row">
+<div class="arrow-down"></div>
+</div>
+<div class="flow-row">
+<div class="module-box output-box">
+<div class="module-icon output-icon">
+<i class="fas fa-chart-line"></i>
+</div>
+<p class="module-title">Binary Classification</p>
+<p class="module-desc">Healthy vs Parkinson's Disease<br/>Probability Score + Confidence Interval</p>
+</div>
+</div>
+</div>
+<div class="training-note">
+<p><i class="fas fa-cog"></i> <strong>Training:</strong> SMOTE balancing (5.7:1→1:1) | LOPO CV | Early stopping (30 epochs, patience=10)</p>
+</div>
+</div>
+<div class="footer-bar">
+<div>
+<p><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>Slide 8</p>
+</div>
+<div>
+<p>Multi-Modal Parkinson's Disease Detection System</p>
+</div>
+</div>
+</div>
+</body>
+</html>
