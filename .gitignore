@@ -1,7 +1,6 @@
 # Old datasets (kept locally, not tracked in git)
 denoised-speech-dataset/
 original-speech-dataset/
-handwritten dataset/
 speech/
 
 # Python
