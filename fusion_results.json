@@ -1,0 +1,110 @@
+{
+  "model": "Cross-Modal Attention Fusion Network (CMAFN)",
+  "architecture": {
+    "handwriting_encoder": "EfficientNet-B4 + SPP + CBAM (frozen, pre-trained)",
+    "audio_encoder": "XLS-R 300M + CNN + MFCC + Acoustic + SE Attention (frozen, pre-trained)",
+    "fusion": "Cross-Modal Transformer Attention + Gated Multimodal Unit",
+    "fusion_embed_dim": 256,
+    "n_attention_heads": 8,
+    "n_transformer_layers": 2,
+    "modality_dropout": 0.25
+  },
+  "datasets": {
+    "handwriting": "3264 images (spiral/wave)",
+    "audio": "831 recordings (Italian PD Voice & Speech)"
+  },
+  "cross_validation": {
+    "n_folds": 5,
+    "per_fold": [
+      {
+        "fold": 1,
+        "best_epoch": 3,
+        "best_val_bal_acc": 0.9909747292418772,
+        "best_val_f1": 0.9909899379523295,
+        "best_val_auc": 0.9998052099836376,
+        "total_epochs": 13,
+        "final_train_acc": 0.9774673276250563
+      },
+      {
+        "fold": 2,
+        "best_epoch": 7,
+        "best_val_bal_acc": 0.9640287769784173,
+        "best_val_f1": 0.9639216807946331,
+        "best_val_auc": 0.9970391917512921,
+        "total_epochs": 17,
+        "final_train_acc": 0.9765660207300586
+      },
+      {
+        "fold": 3,
+        "best_epoch": 23,
+        "best_val_bal_acc": 0.9945978235462172,
+        "best_val_f1": 0.9945945945945946,
+        "best_val_auc": 0.9995974339661844,
+        "total_epochs": 33,
+        "final_train_acc": 0.9873817034700315
+      },
+      {
+        "fold": 4,
+        "best_epoch": 2,
+        "best_val_bal_acc": 0.9982014388489209,
+        "best_val_f1": 0.9981981981981982,
+        "best_val_auc": 1.0,
+        "total_epochs": 12,
+        "final_train_acc": 0.9792699414150519
+      },
+      {
+        "fold": 5,
+        "best_epoch": 6,
+        "best_val_bal_acc": 0.9981949458483754,
+        "best_val_f1": 0.9981949399670919,
+        "best_val_auc": 1.0,
+        "total_epochs": 16,
+        "final_train_acc": 0.9716216216216216
+      }
+    ],
+    "mean_balanced_accuracy": 0.9891995428927617,
+    "std_balanced_accuracy": 0.012867102101418644,
+    "mean_f1": 0.9891798703013694,
+    "std_f1": 0.012908705902323807,
+    "mean_auc": 0.9992883671402228,
+    "std_auc": 0.0011343968804699827,
+    "summary": "0.9892 \u00b1 0.0129"
+  },
+  "test_metrics_ensemble": {
+    "accuracy": 0.9693877551020408,
+    "balanced_accuracy": 0.9693877551020409,
+    "f1_macro": 0.9693590411672746,
+    "auc_roc": 0.9994668887963349,
+    "pd_precision": 1.0,
+    "pd_recall": 0.9387755102040817,
+    "hc_precision": 0.9423076923076923,
+    "hc_recall": 1.0,
+    "n_ensemble_models": 5
+  },
+  "mc_dropout_metrics": {
+    "accuracy": 0.9714285714285714,
+    "balanced_accuracy": 0.9714285714285714,
+    "f1_macro": 0.9714052287581699,
+    "auc_roc": 0.9994335693461058,
+    "mean_uncertainty": 0.06137355789542198
+  },
+  "baseline_comparison": {
+    "handwriting_only": {
+      "accuracy": 0.8755,
+      "auc": 0.9354,
+      "f1": 0.8752
+    },
+    "speech_only": {
+      "accuracy": 0.9362,
+      "auc": 0.9661,
+      "f1": 0.9357
+    }
+  },
+  "training": {
+    "method": "5-fold cross-validation with ensemble",
+    "scheduler": "CosineAnnealingLR",
+    "best_fold": 4,
+    "best_fold_epoch": 2,
+    "total_epochs_all_folds": 91
+  }
+}
