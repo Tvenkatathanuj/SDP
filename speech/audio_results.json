@@ -1,0 +1,65 @@
+{
+  "method": "XLS-R Cross-Attention Fusion + Stacking Ensemble",
+  "architecture": {
+    "backbone": "facebook/wav2vec2-xls-r-300m",
+    "pooling": "Attentive Statistical Pooling",
+    "fusion": "Multi-Head Cross-Attention (4 heads)",
+    "temporal": "BiLSTM",
+    "tta": "5x"
+  },
+  "data": "831 voice samples from Italian PD dataset",
+  "languages": [
+    "italian"
+  ],
+  "n_folds": 5,
+  "ensemble_metrics": {
+    "accuracy": 0.9169675090252708,
+    "balanced_accuracy": 0.9145593513689322,
+    "f1_weighted": 0.9166363383645166,
+    "f1_macro": 0.9162294715527329,
+    "auc_roc": 0.9705595372231063,
+    "pd_recall": 0.9610983981693364,
+    "hc_recall": 0.868020304568528
+  },
+  "ml_only": {
+    "balanced_accuracy": 0.9125207633960204,
+    "f1_macro": 0.913914531710285
+  },
+  "sota_comparison": {
+    "best_prior_acc": 89.5,
+    "our_acc": 91.69675090252709,
+    "margin": 2.1967509025270857
+  },
+  "per_fold": {
+    "Fold-1": {
+      "f1": 0.9524822695035461,
+      "ml_f1": 0.9411592505854801,
+      "dl_f1": 0.815980024968789,
+      "method": "Stacking"
+    },
+    "Fold-2": {
+      "f1": 0.9449986249656241,
+      "ml_f1": 0.9549988749718743,
+      "dl_f1": 0.844965117151359,
+      "method": "Stacking"
+    },
+    "Fold-3": {
+      "f1": 0.8732472838703687,
+      "ml_f1": 0.8621530382595649,
+      "dl_f1": 0.8724418278665544,
+      "method": "Weighted Avg"
+    },
+    "Fold-4": {
+      "f1": 0.8374635916535358,
+      "ml_f1": 0.8298850574712644,
+      "dl_f1": 0.8354031510658017,
+      "method": "Weighted Avg"
+    },
+    "Fold-5": {
+      "f1": 0.9199819168173599,
+      "ml_f1": 0.9199819168173599,
+      "dl_f1": 0.8694564694564695,
+      "method": "Stacking"
+    }
+  }
+}

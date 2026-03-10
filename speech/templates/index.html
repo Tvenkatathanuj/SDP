@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PD Live Translate — Speech Analysis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; background: #f5f6fa; color: #1a1a2e; min-height: 100vh; }
+
+        /* ── Header ── */
+        header { background: linear-gradient(135deg, #0d1b4a 0%, #1a237e 50%, #283593 100%); color: #fff; padding: 18px 30px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,.2); position: sticky; top: 0; z-index: 100; }
+        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .logo-area .icon { width: 40px; height: 40px; background: rgba(255,255,255,.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .logo-area h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: .3px; }
+        .logo-area p { font-size: .75rem; opacity: .7; margin-top: 1px; }
+        .header-actions { display: flex; gap: 8px; }
+        .header-btn { padding: 8px 14px; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; background: rgba(255,255,255,.08); color: #fff; cursor: pointer; font-size: .78rem; font-weight: 500; transition: all .15s; display: flex; align-items: center; gap: 5px; }
+        .header-btn:hover { background: rgba(255,255,255,.18); }
+
+        /* ── How It Works Banner ── */
+        .how-it-works { max-width: 1200px; margin: 20px auto 0; padding: 0 16px; }
+        .steps-row { display: flex; gap: 16px; flex-wrap: wrap; }
+        .step-card { flex: 1; min-width: 180px; background: #fff; border-radius: 12px; padding: 18px 16px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,.06); border: 1px solid #eef0f5; position: relative; }
+        .step-card .step-num { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #1a237e; color: #fff; width: 24px; height: 24px; border-radius: 50%; font-size: .72rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+        .step-card .step-icon { font-size: 1.8rem; margin: 8px 0 6px; }
+        .step-card h3 { font-size: .82rem; font-weight: 600; color: #1a237e; }
+        .step-card p { font-size: .72rem; color: #888; margin-top: 4px; line-height: 1.4; }
+
+        /* ── Main Container ── */
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 16px; display: flex; gap: 20px; flex-wrap: wrap; }
+
+        /* ── Panels ── */
+        .panel { background: #fff; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,.06); padding: 22px; flex: 1; min-width: 340px; border: 1px solid #eef0f5; }
+        .panel-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+        .panel-header .panel-icon { width: 32px; height: 32px; background: #eef1ff; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+        .panel-header h2 { font-size: 1rem; font-weight: 600; color: #1a237e; }
+
+        /* ── Upload Area ── */
+        .upload-zone { margin: 20px 0; padding: 60px 20px; border: 3px dashed #d0d4e4; border-radius: 12px; text-align: center; cursor: pointer; transition: all .3s; background: #fafbfd; position: relative; }
+        .upload-zone:hover { border-color: #1a237e; background: #f0f1ff; }
+        .upload-zone.drag-over { border-color: #1a237e; background: #eef1ff; transform: scale(1.02); }
+        .upload-zone .upload-icon { font-size: 3rem; margin-bottom: 12px; opacity: .6; }
+        .upload-zone h3 { font-size: 1.1rem; font-weight: 600; color: #1a237e; margin-bottom: 8px; }
+        .upload-zone p { font-size: .85rem; color: #888; line-height: 1.6; }
+        .upload-zone .file-types { font-size: .75rem; color: #bbb; margin-top: 8px; }
+        .upload-zone input { display: none; }
+
+        /* ── Audio Player ── */
+        .audio-player { margin: 20px 0; padding: 16px; background: #f8f9fc; border-radius: 10px; border: 1px solid #eef0f5; }
+        .audio-player audio { width: 100%; margin-top: 8px; }
+        .audio-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .audio-info .filename { font-size: .85rem; font-weight: 600; color: #1a237e; }
+        .audio-info .remove-btn { padding: 4px 10px; background: #ffebee; color: #c62828; border: none; border-radius: 6px; cursor: pointer; font-size: .75rem; font-weight: 500; }
+        .audio-info .remove-btn:hover { background: #ffcdd2; }
+
+        /* ── Action Buttons ── */
+        .action-row { display: flex; gap: 10px; margin-top: 14px; }
+        .btn-analyze { flex: 1; padding: 13px; background: linear-gradient(135deg, #1a237e, #3949ab); color: #fff; border: none; border-radius: 10px; font-size: .95rem; font-weight: 600; cursor: pointer; transition: transform .1s, box-shadow .2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-analyze:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(26,35,126,.3); }
+        .btn-analyze:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+        /* ── Results ── */
+        .results-panel { flex: 1; min-width: 340px; }
+        .placeholder { text-align: center; padding: 50px 20px; color: #bbb; }
+        .placeholder .ph-icon { font-size: 3rem; margin-bottom: 10px; opacity: .5; }
+        .placeholder p { font-size: .85rem; line-height: 1.5; }
+
+        /* ── Gauge ── */
+        .gauge-box { text-align: center; padding: 20px 0 10px; }
+        .gauge-box svg { max-width: 260px; }
+        .risk-label { font-size: 1rem; font-weight: 600; color: #666; margin-top: 4px; }
+        .risk-pct { font-size: 2.6rem; font-weight: 800; letter-spacing: -1px; }
+        .status-badge { display: inline-block; padding: 6px 20px; border-radius: 20px; font-size: .85rem; font-weight: 600; margin-top: 8px; }
+        .status-LOW    { background: #e8f5e9; color: #2e7d32; }
+        .status-MODERATE { background: #fff3e0; color: #e65100; }
+        .status-HIGH   { background: #ffebee; color: #c62828; }
+
+        /* ── Interpretation ── */
+        .interpretation { margin: 16px 0; padding: 14px 16px; border-radius: 10px; font-size: .82rem; line-height: 1.6; border-left: 4px solid; }
+        .interp-low { background: #f1f8e9; border-color: #4caf50; color: #33691e; }
+        .interp-moderate { background: #fff8e1; border-color: #ff9800; color: #e65100; }
+        .interp-high { background: #fce4ec; border-color: #f44336; color: #b71c1c; }
+
+        /* ── Score Cards ── */
+        .scores { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 16px 0; }
+        .score-card { background: #f8f9fc; border-radius: 10px; padding: 12px; text-align: center; border: 1px solid #eef0f5; }
+        .score-card .label { font-size: .68rem; color: #888; text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
+        .score-card .val { font-size: 1.4rem; font-weight: 700; margin-top: 3px; }
+
+        /* ── Spinner ── */
+        .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin .6s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Toast ── */
+        .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; background: #1a237e; color: #fff; border-radius: 10px; font-size: .82rem; font-weight: 500; box-shadow: 0 4px 16px rgba(0,0,0,.2); z-index: 1000; transform: translateY(80px); opacity: 0; transition: all .3s; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+
+        footer { text-align: center; padding: 20px 16px; font-size: .72rem; color: #999; max-width: 1200px; margin: 0 auto; }
+        footer a { color: #1a237e; }
+
+        @media (max-width: 768px) {
+            header { flex-direction: column; gap: 10px; text-align: center; }
+            .container { flex-direction: column; }
+            .steps-row { flex-direction: column; }
+            .scores { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-area">
+        <div class="icon">🎤</div>
+        <div>
+            <h1>PD Live Translate — Speech</h1>
+            <p>AI-Powered Parkinson's Disease Speech Screening</p>
+        </div>
+    </div>
+    <div class="header-actions">
+        <button class="header-btn" onclick="showHelp()" title="How to use">❓ Help</button>
+    </div>
+</header>
+
+<!-- How It Works -->
+<div class="how-it-works">
+    <div class="steps-row">
+        <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-icon">🎙️</div>
+            <h3>Record or Upload</h3>
+            <p>Upload a voice recording (sustained vowel, sentence, or speech sample)</p>
+        </div>
+        <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-icon">🧠</div>
+            <h3>AI Analysis</h3>
+            <p>Our ensemble analyzes acoustic features, MFCC, and spectral patterns</p>
+        </div>
+        <div class="step-card">
+            <div class="step-num">3</div>
+            <div class="step-icon">📊</div>
+            <h3>View Results</h3>
+            <p>See your risk score and detailed model breakdown instantly</p>
+        </div>
+        <div class="step-card">
+            <div class="step-num">4</div>
+            <div class="step-icon">📋</div>
+            <h3>Track Progress</h3>
+            <p>Monitor changes over time and share results with your doctor</p>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Left: Upload -->
+    <div class="panel">
+        <div class="panel-header">
+            <div class="panel-icon">🎤</div>
+            <h2>Upload Voice Recording</h2>
+        </div>
+
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+            <div class="upload-icon">🎵</div>
+            <h3>Drop audio file here or click to browse</h3>
+            <p>Upload a clear voice recording for analysis<br>Best results with sustained vowels (e.g., "Ahhh") or reading sentences</p>
+            <p class="file-types">Supported: WAV, MP3, OGG, FLAC, M4A (max 16MB)</p>
+            <input type="file" id="fileInput" accept="audio/*" onchange="handleFileSelect(event)">
+        </div>
+
+        <div id="audioPlayerContainer" style="display:none;">
+            <div class="audio-player">
+                <div class="audio-info">
+                    <span class="filename" id="fileName"></span>
+                    <button class="remove-btn" onclick="removeAudio()">✕ Remove</button>
+                </div>
+                <audio id="audioPlayer" controls></audio>
+            </div>
+        </div>
+
+        <div class="action-row">
+            <button id="analyzeBtn" class="btn-analyze" onclick="analyzeAudio()" disabled>
+                🔬 Analyze Voice
+            </button>
+        </div>
+    </div>
+
+    <!-- Right: Results -->
+    <div class="panel results-panel">
+        <div class="panel-header">
+            <div class="panel-icon">📊</div>
+            <h2>Analysis Results</h2>
+        </div>
+        <div id="resultsContent">
+            <div class="placeholder">
+                <div class="ph-icon">🔬</div>
+                <p>Upload a voice recording and click <strong>Analyze Voice</strong></p>
+                <p style="font-size:.75rem;color:#ccc;margin-top:8px;">The AI will evaluate vocal tremor, pitch variation, and speech patterns</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <strong>⚠️ Disclaimer:</strong> This is a screening tool for <em>research purposes only</em>. It is <strong>not</strong> a substitute for professional medical diagnosis. Please consult a healthcare provider for clinical evaluation.
+    <br>Ensemble: XLS-R Multilingual + ML Classifiers | 92%+ accuracy | 0.95+ AUC-ROC
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let currentFile = null;
+
+// Drag & Drop
+const uploadZone = document.getElementById('uploadZone');
+uploadZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadZone.classList.add('drag-over');
+});
+uploadZone.addEventListener('dragleave', () => {
+    uploadZone.classList.remove('drag-over');
+});
+uploadZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('audio/')) {
+        loadAudioFile(file);
+    } else {
+        showToast('Please drop an audio file');
+    }
+});
+
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (file) loadAudioFile(file);
+}
+
+function loadAudioFile(file) {
+    currentFile = file;
+    const url = URL.createObjectURL(file);
+    
+    document.getElementById('fileName').textContent = file.name;
+    document.getElementById('audioPlayer').src = url;
+    document.getElementById('audioPlayerContainer').style.display = 'block';
+    document.getElementById('analyzeBtn').disabled = false;
+    
+    showToast('Audio loaded successfully');
+}
+
+function removeAudio() {
+    currentFile = null;
+    document.getElementById('audioPlayerContainer').style.display = 'none';
+    document.getElementById('analyzeBtn').disabled = true;
+    document.getElementById('fileInput').value = '';
+    resetResults();
+    showToast('Audio removed');
+}
+
+function resetResults() {
+    document.getElementById('resultsContent').innerHTML = `
+        <div class="placeholder">
+            <div class="ph-icon">🔬</div>
+            <p>Upload a voice recording and click <strong>Analyze Voice</strong></p>
+            <p style="font-size:.75rem;color:#ccc;margin-top:8px;">The AI will evaluate vocal tremor, pitch variation, and speech patterns</p>
+        </div>`;
+}
+
+async function analyzeAudio() {
+    if (!currentFile) {
+        showToast('Please upload an audio file first');
+        return;
+    }
+
+    const btn = document.getElementById('analyzeBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Analyzing...';
+
+    const formData = new FormData();
+    formData.append('file', currentFile);
+
+    try {
+        const response = await fetch('/predict', {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.error) {
+            showToast('Error: ' + result.error);
+            btn.disabled = false;
+            btn.innerHTML = '🔬 Analyze Voice';
+            return;
+        }
+
+        displayResults(result);
+        showToast('Analysis complete!');
+    } catch (error) {
+        showToast('Error: ' + error.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '🔬 Analyze Voice';
+    }
+}
+
+function displayResults(data) {
+    const risk = data.combined_risk;
+    const status = data.status.replace(' RISK', '');
+    const confidence = data.confidence || 0.9;
+    
+    let statusClass = 'LOW';
+    let interpClass = 'interp-low';
+    let interpText = 'No significant Parkinson\'s indicators detected in your voice. Your speech patterns appear normal.';
+    let color = '#4caf50';
+    
+    if (risk >= 0.66) {
+        statusClass = 'HIGH';
+        interpClass = 'interp-high';
+        interpText = 'Significant Parkinson\'s indicators detected. Please consult a neurologist for comprehensive evaluation.';
+        color = '#f44336';
+    } else if (risk >= 0.33) {
+        statusClass = 'MODERATE';
+        interpClass = 'interp-moderate';
+        interpText = 'Some Parkinson\'s indicators present. Consider follow-up testing and monitoring.';
+        color = '#ff9800';
+    }
+
+    const gaugeAngle = -90 + (risk * 180);
+    
+    document.getElementById('resultsContent').innerHTML = `
+        <div class="gauge-box">
+            <svg viewBox="0 0 200 120" style="max-width:260px;">
+                <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#eee" stroke-width="20" stroke-linecap="round"/>
+                <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="${color}" stroke-width="20" stroke-linecap="round"
+                      stroke-dasharray="${risk * 251.2} 251.2" style="transition: stroke-dasharray 1s ease;"/>
+                <circle cx="100" cy="100" r="6" fill="${color}"/>
+                <line x1="100" y1="100" x2="${100 + 70 * Math.cos(gaugeAngle * Math.PI / 180)}" 
+                      y2="${100 + 70 * Math.sin(gaugeAngle * Math.PI / 180)}" 
+                      stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+            <div class="risk-pct" style="color:${color};">${(risk * 100).toFixed(1)}%</div>
+            <div class="risk-label">Parkinson's Risk Score</div>
+            <div class="status-badge status-${statusClass}">${data.status}</div>
+        </div>
+
+        <div class="interpretation ${interpClass}">
+            <strong>Interpretation:</strong> ${interpText}
+        </div>
+
+        <div class="scores">
+            <div class="score-card">
+                <div class="label">Ensemble Risk</div>
+                <div class="val" style="color:${color};">${(risk * 100).toFixed(1)}%</div>
+            </div>
+            <div class="score-card">
+                <div class="label">Confidence</div>
+                <div class="val">${(confidence * 100).toFixed(1)}%</div>
+            </div>
+        </div>
+
+        <div style="margin-top:20px;padding:14px;background:#f8f9fc;border-radius:10px;font-size:.8rem;">
+            <strong>Model Predictions:</strong>
+            <div style="margin-top:8px;">
+                ${data.individual_predictions.map((p, i) => `
+                    <div style="display:flex;justify-content:space-between;padding:4px 0;">
+                        <span>Fold ${i + 1}:</span>
+                        <span style="font-weight:600;">${(p * 100).toFixed(1)}%</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+function showHelp() {
+    alert(`🎤 How to Use:\n\n1. Record or upload a voice sample (sustained vowel "Ahhh" for 3-5 seconds works best)\n2. Click "Analyze Voice" to process\n3. View your risk score and interpretation\n\n📝 Tips:\n- Use a quiet environment\n- Speak naturally at normal volume\n- Sustained vowels provide best results\n- Multiple recordings can help track changes over time\n\n⚠️ This is a screening tool only - consult a doctor for diagnosis.`);
+}
+</script>
+
+</body>
+</html>
