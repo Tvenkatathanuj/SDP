@@ -31,6 +31,13 @@ import librosa
 import cv2
 from PIL import Image
 import timm
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+from datetime import datetime
+import tempfile
+import io
 
 warnings.filterwarnings("ignore")
 
@@ -330,9 +337,9 @@ class Wav2VecAudioModel(nn.Module):
             nn.Linear(hidden_dim, 128), nn.BatchNorm1d(128), nn.ReLU(), nn.Dropout(dropout * 0.7),
             nn.Linear(128, 2),
         )
-        # Feature head for CMAFN fusion -> 512-dim (named audio_feature_extractor
-        # in the fusion training notebook; renamed here to avoid confusion)
-        self.audio_feature_head = nn.Sequential(
+        # Feature head for CMAFN fusion -> 512-dim
+        # MUST be named audio_feature_extractor to match training checkpoint keys
+        self.audio_feature_extractor = nn.Sequential(
             nn.Linear(fusion_dim, 512), nn.BatchNorm1d(512), nn.ReLU(),
         )
     def forward(self, mel_spec, mfcc, acoustic, w2v_emb, return_features=False):
@@ -351,7 +358,7 @@ class Wav2VecAudioModel(nn.Module):
 
         if return_features:
             # Project to 512-d for CMAFN fusion (matches fusion training)
-            out = self.audio_feature_head(fused)
+            out = self.audio_feature_extractor(fused)
             if single:
                 self.train()
             return out
@@ -503,13 +510,20 @@ class CrossModalAttentionFusionNetwork(nn.Module):
 
     @torch.no_grad()
     def predict_with_uncertainty(self, hw_features, audio_features,
-                                 hw_mask=None, audio_mask=None, n_samples=10):
-        self.train()  # Enable dropout for MC sampling
+                                 hw_mask=None, audio_mask=None, n_samples=10,
+                                 temperature=1.0):
+        # Enable dropout for MC sampling BUT disable modality dropout
+        # (modality dropout randomly removes entire modalities, adding
+        # massive variance that corrupts uncertainty estimates)
+        saved_mod_dropout = self.config.modality_dropout
+        self.config.modality_dropout = 0.0  # keep both modalities active
+        self.train()  # enable regular dropout layers only
         all_probs = []
         for _ in range(n_samples):
             out = self.forward(hw_features, audio_features, hw_mask, audio_mask)
-            all_probs.append(F.softmax(out["logits"], dim=-1))
+            all_probs.append(F.softmax(out["logits"] / temperature, dim=-1))
         self.eval()
+        self.config.modality_dropout = saved_mod_dropout  # restore
         stacked = torch.stack(all_probs)
         mean_p = stacked.mean(0)
         std_p = stacked.std(0)
@@ -692,13 +706,244 @@ IMAGENET_STD = np.array([0.229, 0.224, 0.225])
 
 
 def preprocess_image(image, size=336):
-    """Preprocess a handwriting image -> (1, 3, size, size) tensor."""
-    if isinstance(image, np.ndarray):
-        image = Image.fromarray(image)
-    image = image.convert("RGB").resize((size, size), Image.LANCZOS)
-    arr = np.array(image, dtype=np.float32) / 255.0
+    """Preprocess a handwriting image -> (1, 3, size, size) tensor.
+
+    Uses cv2 resize (INTER_LINEAR) to match the albumentations pipeline
+    used during fusion training.  Previous versions used PIL LANCZOS which
+    produced slightly different pixel values and degraded fusion accuracy.
+    """
+    if isinstance(image, Image.Image):
+        image = np.array(image.convert("RGB"))
+    elif isinstance(image, np.ndarray):
+        if image.ndim == 2:  # grayscale
+            image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
+        elif image.shape[2] == 4:  # RGBA
+            image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
+        # If already RGB (from Gradio), keep as-is
+    # Resize with INTER_LINEAR (matches albumentations A.Resize default)
+    image = cv2.resize(image, (size, size), interpolation=cv2.INTER_LINEAR)
+    arr = image.astype(np.float32) / 255.0
     arr = (arr - IMAGENET_MEAN) / IMAGENET_STD
     return torch.from_numpy(arr.transpose(2, 0, 1)).unsqueeze(0).float()
+
+
+# ════════════════════════════════════════════════════════════════
+# ░░ 5b. VISUALIZATION & UTILITY FUNCTIONS ░░
+# ════════════════════════════════════════════════════════════════
+
+def generate_risk_gauge(pd_probability: float, title: str = "Risk Assessment") -> np.ndarray:
+    """Generate a semi-circular gauge chart showing PD risk level."""
+    fig, ax = plt.subplots(figsize=(5, 3), subplot_kw={'aspect': 'equal'})
+    fig.patch.set_facecolor('#1a1a2e')
+
+    # Draw background arc segments (green -> yellow -> orange -> red)
+    colors = ['#00c853', '#76ff03', '#ffeb3b', '#ff9800', '#f44336']
+    boundaries = [0, 0.2, 0.4, 0.6, 0.8, 1.0]
+    for i in range(len(colors)):
+        start_angle = 180 - boundaries[i + 1] * 180
+        end_angle = 180 - boundaries[i] * 180
+        wedge = mpatches.Wedge(center=(0, 0), r=1, theta1=start_angle, theta2=end_angle,
+                                facecolor=colors[i], alpha=0.3, edgecolor='none')
+        ax.add_patch(wedge)
+
+    # Draw needle
+    angle_rad = np.pi * (1 - pd_probability)
+    needle_x = 0.85 * np.cos(angle_rad)
+    needle_y = 0.85 * np.sin(angle_rad)
+    ax.plot([0, needle_x], [0, needle_y], color='white', linewidth=2.5, zorder=5)
+    ax.plot(0, 0, 'o', color='white', markersize=6, zorder=6)
+
+    # Active arc highlight
+    highlight_angle = 180 - pd_probability * 180
+    if pd_probability <= 0.35:
+        highlight_color = '#00c853'
+    elif pd_probability <= 0.50:
+        highlight_color = '#ffeb3b'
+    elif pd_probability <= 0.70:
+        highlight_color = '#ff9800'
+    else:
+        highlight_color = '#f44336'
+    highlight = mpatches.Wedge(center=(0, 0), r=1, theta1=highlight_angle, theta2=180,
+                                facecolor=highlight_color, alpha=0.7, edgecolor='none')
+    ax.add_patch(highlight)
+
+    # Labels
+    ax.text(0, -0.25, f"{pd_probability * 100:.1f}%", fontsize=22, fontweight='bold',
+            color='white', ha='center', va='center')
+    ax.text(0, -0.50, title, fontsize=10, color='#aaaaaa', ha='center', va='center')
+    ax.text(-1.05, -0.05, "Low", fontsize=8, color='#00c853', ha='center')
+    ax.text(1.05, -0.05, "High", fontsize=8, color='#f44336', ha='center')
+
+    ax.set_xlim(-1.3, 1.3)
+    ax.set_ylim(-0.65, 1.15)
+    ax.axis('off')
+    plt.tight_layout(pad=0.5)
+
+    # Convert to numpy image
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png', dpi=120, bbox_inches='tight',
+                facecolor=fig.get_facecolor(), edgecolor='none')
+    plt.close(fig)
+    buf.seek(0)
+    img = Image.open(buf)
+    return np.array(img)
+
+
+def generate_audio_visualization(wav: np.ndarray, sr: int = 16000) -> np.ndarray:
+    """Generate waveform + mel-spectrogram visualization."""
+    fig, axes = plt.subplots(2, 1, figsize=(8, 5), gridspec_kw={'height_ratios': [1, 1.5]})
+    fig.patch.set_facecolor('#1a1a2e')
+    for ax in axes:
+        ax.set_facecolor('#16213e')
+
+    # Waveform
+    time_axis = np.linspace(0, len(wav) / sr, len(wav))
+    axes[0].plot(time_axis, wav, color='#00d4ff', linewidth=0.5, alpha=0.8)
+    axes[0].fill_between(time_axis, wav, alpha=0.15, color='#00d4ff')
+    axes[0].set_title('Waveform', color='white', fontsize=11, pad=8)
+    axes[0].set_xlabel('Time (s)', color='#aaaaaa', fontsize=9)
+    axes[0].set_ylabel('Amplitude', color='#aaaaaa', fontsize=9)
+    axes[0].tick_params(colors='#888888', labelsize=8)
+    axes[0].set_xlim(0, len(wav) / sr)
+    for spine in axes[0].spines.values():
+        spine.set_color('#333355')
+
+    # Mel-spectrogram
+    mel = librosa.feature.melspectrogram(y=wav, sr=sr, n_mels=128, n_fft=2048, hop_length=512)
+    mel_db = librosa.power_to_db(mel, ref=np.max)
+    img = axes[1].imshow(mel_db, aspect='auto', origin='lower', cmap='magma',
+                          extent=[0, len(wav) / sr, 0, sr / 2 / 1000])
+    axes[1].set_title('Mel Spectrogram', color='white', fontsize=11, pad=8)
+    axes[1].set_xlabel('Time (s)', color='#aaaaaa', fontsize=9)
+    axes[1].set_ylabel('Frequency (kHz)', color='#aaaaaa', fontsize=9)
+    axes[1].tick_params(colors='#888888', labelsize=8)
+    for spine in axes[1].spines.values():
+        spine.set_color('#333355')
+
+    cbar = fig.colorbar(img, ax=axes[1], format='%+2.0f dB', pad=0.02)
+    cbar.ax.tick_params(colors='#888888', labelsize=8)
+    cbar.set_label('dB', color='#aaaaaa', fontsize=9)
+
+    plt.tight_layout(pad=1.0)
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png', dpi=120, bbox_inches='tight',
+                facecolor=fig.get_facecolor(), edgecolor='none')
+    plt.close(fig)
+    buf.seek(0)
+    return np.array(Image.open(buf))
+
+
+def generate_preprocessing_preview(image) -> np.ndarray:
+    """Show the preprocessed version of the image that the model actually sees."""
+    if isinstance(image, np.ndarray):
+        image = Image.fromarray(image)
+    image = image.convert("RGB").resize((336, 336), Image.LANCZOS)
+    arr = np.array(image, dtype=np.float32) / 255.0
+
+    # Create a side-by-side visualization: original resized | edge-enhanced
+    gray = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2GRAY)
+    edges = cv2.Canny(gray, 50, 150)
+    edges_colored = cv2.cvtColor(edges, cv2.COLOR_GRAY2RGB)
+
+    # Adaptive threshold for highlighting strokes
+    adaptive = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                      cv2.THRESH_BINARY_INV, 11, 2)
+    adaptive_colored = cv2.applyColorMap(adaptive, cv2.COLORMAP_HOT)
+    adaptive_colored = cv2.cvtColor(adaptive_colored, cv2.COLOR_BGR2RGB)
+
+    fig, axes = plt.subplots(1, 3, figsize=(10, 3.5))
+    fig.patch.set_facecolor('#1a1a2e')
+    titles = ['Input (336x336)', 'Edge Detection', 'Stroke Heatmap']
+    images = [np.array(image), edges_colored, adaptive_colored]
+    for ax, img, title in zip(axes, images, titles):
+        ax.imshow(img)
+        ax.set_title(title, color='white', fontsize=10, pad=6)
+        ax.axis('off')
+
+    plt.tight_layout(pad=1.0)
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png', dpi=120, bbox_inches='tight',
+                facecolor=fig.get_facecolor(), edgecolor='none')
+    plt.close(fig)
+    buf.seek(0)
+    return np.array(Image.open(buf))
+
+
+def generate_report_file(report_text: str, analysis_type: str) -> str:
+    """Generate a downloadable text report file and return its path."""
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"PD_Report_{analysis_type}_{timestamp}.txt"
+    filepath = os.path.join(tempfile.gettempdir(), filename)
+
+    header = f"""{'='*60}
+  PARKINSON'S DISEASE SCREENING REPORT
+  Analysis Type: {analysis_type}
+  Date: {datetime.now().strftime('%B %d, %Y at %H:%M:%S')}
+{'='*60}
+
+DISCLAIMER: This is a screening tool only, NOT a diagnostic
+instrument. Always consult a qualified healthcare professional
+for proper medical evaluation.
+
+{'='*60}
+
+"""
+    # Strip markdown formatting for clean text
+    clean_text = report_text.replace('###', '').replace('##', '').replace('**', '')
+    clean_text = clean_text.replace('---', '-' * 40)
+
+    with open(filepath, 'w', encoding='utf-8') as f:
+        f.write(header + clean_text)
+
+    return filepath
+
+
+def generate_comparison_chart(history: list) -> Optional[np.ndarray]:
+    """Generate a chart comparing PD probabilities across sessions."""
+    if not history or len(history) < 2:
+        return None
+
+    fig, ax = plt.subplots(figsize=(8, 4))
+    fig.patch.set_facecolor('#1a1a2e')
+    ax.set_facecolor('#16213e')
+
+    times = [h['timestamp'] for h in history[-10:]]  # last 10
+    probs = [h['pd_prob'] for h in history[-10:]]
+    types = [h['type'] for h in history[-10:]]
+
+    colors_map = {'Handwriting': '#ff6b6b', 'Speech': '#4ecdc4', 'Fusion': '#a855f7'}
+    bar_colors = [colors_map.get(t, '#888888') for t in types]
+
+    x = range(len(times))
+    bars = ax.bar(x, [p * 100 for p in probs], color=bar_colors, alpha=0.8, edgecolor='white', linewidth=0.5)
+
+    # Threshold line
+    ax.axhline(y=50, color='#ff9800', linestyle='--', alpha=0.6, label='Threshold (50%)')
+
+    ax.set_xlabel('Session', color='#aaaaaa', fontsize=10)
+    ax.set_ylabel('PD Probability (%)', color='#aaaaaa', fontsize=10)
+    ax.set_title('Analysis History — PD Probability Trend', color='white', fontsize=12, pad=10)
+    ax.set_xticks(list(x))
+    ax.set_xticklabels([t.split(' ')[1][:5] for t in times], rotation=45, ha='right',
+                        color='#888888', fontsize=8)
+    ax.tick_params(colors='#888888')
+    ax.set_ylim(0, 100)
+    for spine in ax.spines.values():
+        spine.set_color('#333355')
+
+    # Legend
+    legend_patches = [mpatches.Patch(color=c, label=l) for l, c in colors_map.items()]
+    legend_patches.append(plt.Line2D([0], [0], color='#ff9800', linestyle='--', label='Threshold'))
+    ax.legend(handles=legend_patches, loc='upper right', fontsize=8,
+              facecolor='#16213e', edgecolor='#333355', labelcolor='#aaaaaa')
+
+    plt.tight_layout(pad=1.0)
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png', dpi=120, bbox_inches='tight',
+                facecolor=fig.get_facecolor(), edgecolor='none')
+    plt.close(fig)
+    buf.seek(0)
+    return np.array(Image.open(buf))
 
 
 # ════════════════════════════════════════════════════════════════
@@ -865,6 +1110,34 @@ if fusion_results_path.exists():
 
 print("\n[OK] All models loaded!\n")
 
+# ═══════════════════════════════════════════════════════
+# ░░ SESSION HISTORY TRACKING ░░
+# ═══════════════════════════════════════════════════════
+SESSION_HISTORY: List[Dict] = []
+
+
+def add_to_history(analysis_type: str, pd_prob: float, healthy_prob: float, confidence: str = "N/A"):
+    """Record an analysis result in session history."""
+    SESSION_HISTORY.append({
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "type": analysis_type,
+        "pd_prob": pd_prob,
+        "healthy_prob": healthy_prob,
+        "confidence": confidence,
+    })
+
+
+def get_history_table() -> str:
+    """Return session history as a markdown table."""
+    if not SESSION_HISTORY:
+        return "No analyses performed yet in this session."
+    md = "| # | Time | Analysis | PD Prob | Healthy Prob | Confidence |\n"
+    md += "|---|------|----------|---------|-------------|------------|\n"
+    for i, h in enumerate(SESSION_HISTORY, 1):
+        md += (f"| {i} | {h['timestamp'].split(' ')[1]} | {h['type']} | "
+               f"{h['pd_prob']*100:.1f}% | {h['healthy_prob']*100:.1f}% | {h['confidence']} |\n")
+    return md
+
 
 # ════════════════════════════════════════════════════════════════
 # ░░ 7. AUDIO PREPROCESSING HELPER ░░
@@ -913,7 +1186,7 @@ def prepare_audio(audio_tuple, target_sr=16000, max_seconds=8, min_seconds=1):
 def predict_handwriting(image):
     """Predict PD from handwriting with TTA + temperature scaling."""
     if image is None:
-        return None, "⚠️ Please upload a handwriting image."
+        return None, "⚠️ Please upload a handwriting image.", None, None, None
     try:
         img_t = preprocess_image(image, size=336).to(DEVICE)
         with torch.no_grad():
@@ -938,9 +1211,17 @@ def predict_handwriting(image):
                 txt += (f"⚠️ Parkinson's probability ({pd_p * 100:.1f}%) is elevated "
                         f"but below threshold. Consider monitoring.\n\n")
             txt += "*Regular checkups are still recommended.*"
-        return result, txt
+
+        # New features: gauge, preview, report
+        gauge = generate_risk_gauge(pd_p, "Handwriting Risk")
+        preview = generate_preprocessing_preview(image)
+        conf = "High" if abs(pd_p - 0.5) > 0.25 else ("Moderate" if abs(pd_p - 0.5) > 0.10 else "Low")
+        add_to_history("Handwriting", pd_p, healthy_p, conf)
+        report_path = generate_report_file(txt, "Handwriting")
+
+        return result, txt, gauge, preview, report_path
     except Exception as e:
-        return None, f"❌ Error: {e}"
+        return None, f"❌ Error: {e}", None, None, None
 
 
 # ── 8b. Speech / Audio ─────────────────────────────────────
@@ -948,7 +1229,7 @@ def predict_handwriting(image):
 def predict_speech(audio):
     """Predict PD from speech using 5-fold DL ensemble (matching notebook training)."""
     if audio is None:
-        return None, "⚠️ Please upload or record audio."
+        return None, "⚠️ Please upload or record audio.", None, None, None
     try:
         wav = prepare_audio(audio)
 
@@ -1071,24 +1352,41 @@ def predict_speech(audio):
 
 *⚠️ Screening tool only — consult a neurologist for proper diagnosis.*"""
 
-        return result, analysis
+        # New features: gauge, spectrogram viz, report
+        gauge = generate_risk_gauge(pd_p, "Speech Risk")
+        audio_viz = generate_audio_visualization(wav)
+        add_to_history("Speech", pd_p, healthy_p, confidence)
+        report_path = generate_report_file(analysis, "Speech")
+
+        return result, analysis, gauge, audio_viz, report_path
     except Exception as e:
         import traceback
-        return None, f"❌ Error: {e}\n```\n{traceback.format_exc()}\n```"
+        return None, f"❌ Error: {e}\n```\n{traceback.format_exc()}\n```", None, None, None
 
 
 # ── 8c. CMAFN Fusion (Combined) ────────────────────────────
 
 def predict_fusion(image, audio):
-    """Run the CMAFN 5-fold ensemble fusion on both modalities."""
+    """Run the CMAFN 5-fold ensemble fusion on both modalities.
+
+    Algorithm v3 — Confidence-gated meta-fusion:
+      1. Extract features and run standalone models
+      2. Run CMAFN ensemble with adaptive temperature scaling
+      3. Use trimmed-mean to discard outlier fold predictions
+      4. Run MC-Dropout (with modality dropout disabled) for uncertainty
+      5. Compute confidence score from ensemble std + MC uncertainty
+      6. Meta-fuse: blend CMAFN with standalone predictions weighted by
+         confidence (high confidence → trust CMAFN, low → trust standalones)
+      7. Use meta-fused probability for risk level, gauge, and reporting
+    """
     has_image = image is not None
     has_audio = audio is not None
 
     if not has_image and not has_audio:
-        return "⚠️ Please provide at least one input (handwriting image or speech audio)."
+        return "⚠️ Please provide at least one input (handwriting image or speech audio).", None, None
 
     if not fusion_models:
-        return "⚠️ CMAFN fusion models are not loaded. Check `checkpoint_fusion/` directory."
+        return "⚠️ CMAFN fusion models are not loaded. Check `checkpoint_fusion/` directory.", None, None
 
     report = "# 🧬 Cross-Modal Attention Fusion Network (CMAFN) Analysis\n\n"
 
@@ -1125,7 +1423,7 @@ def predict_fusion(image, audio):
 
         with torch.no_grad():
             audio_feat = audio_model(mel, mfcc_t, acoustic_t, w2v_t, return_features=True)  # (1, 512)
-            # Ensemble standalone audio prediction (no temperature)
+            # Ensemble standalone audio prediction
             all_audio_probs = []
             for am in audio_models:
                 am.eval()
@@ -1145,25 +1443,48 @@ def predict_fusion(image, audio):
     hw_mask = torch.tensor([has_image], dtype=torch.bool, device=DEVICE)
     audio_mask = torch.tensor([has_audio], dtype=torch.bool, device=DEVICE)
 
-    # ── Ensemble prediction ─────────────────────────────────
-    all_probs = []
+    # ── Step 1: Collect per-fold CMAFN logits ───────────────
+    # We collect raw logits so we can apply temperature scaling before softmax
+    fold_logits = []
     for model in fusion_models:
         model.eval()
         with torch.no_grad():
             out = model(hw_feat, audio_feat, hw_mask.clone(), audio_mask.clone())
-            probs = F.softmax(out["logits"], dim=-1).cpu().numpy()
-            all_probs.append(probs)
+            fold_logits.append(out["logits"].cpu())  # (1, 2)
 
-    avg_probs = np.mean(all_probs, axis=0)  # (1, 2)
-    h_prob, pd_prob = float(avg_probs[0, 0]), float(avg_probs[0, 1])
-    prob_std = float(np.std([p[0, 1] for p in all_probs]))
+    # ── Step 2: Adaptive temperature scaling ────────────────
+    # Initial pass without temperature to gauge raw confidence
+    raw_probs_list = [F.softmax(lg, dim=-1).numpy() for lg in fold_logits]
+    raw_prob_std = float(np.std([p[0, 1] for p in raw_probs_list]))
 
-    # ── MC-Dropout uncertainty ──────────────────────────────
+    # Temperature increases with ensemble disagreement:
+    #   low std (<0.05) → T ≈ 1.0 (trust model), high std → T up to 2.5
+    base_temperature = 1.0 + min(raw_prob_std * 5.0, 1.5)
+
+    # Apply temperature to all fold logits
+    all_probs = [F.softmax(lg / base_temperature, dim=-1).numpy() for lg in fold_logits]
+
+    # ── Step 3: Trimmed-mean ensemble (robust to outlier folds) ──
+    fold_pd_probs = [float(p[0, 1]) for p in all_probs]
+    if len(fold_pd_probs) >= 5:
+        # Remove the min and max → average the middle 3
+        sorted_probs = sorted(fold_pd_probs)
+        trimmed = sorted_probs[1:-1]
+        pd_prob = float(np.mean(trimmed))
+        h_prob = 1.0 - pd_prob
+    else:
+        avg_probs = np.mean(all_probs, axis=0)
+        h_prob, pd_prob = float(avg_probs[0, 0]), float(avg_probs[0, 1])
+
+    prob_std = float(np.std(fold_pd_probs))  # std of temperature-scaled probs
+
+    # ── Step 4: MC-Dropout uncertainty (modality dropout disabled) ──
     mc_results = []
     for model in fusion_models:
         res = model.predict_with_uncertainty(
             hw_feat, audio_feat, hw_mask.clone(), audio_mask.clone(),
             n_samples=fusion_config.mc_dropout_samples,
+            temperature=base_temperature,
         )
         mc_results.append(res)
 
@@ -1171,52 +1492,148 @@ def predict_fusion(image, audio):
     mc_uncertainty = torch.stack([r["uncertainty"] for r in mc_results]).mean().item()
     mc_h, mc_pd = float(mc_mean_probs[0, 0]), float(mc_mean_probs[0, 1])
 
-    # ── Classification ──────────────────────────────────────
-    if pd_prob > 0.60:
+    # ── Step 5: Confidence score ────────────────────────────
+    # Combine ensemble std and MC uncertainty into a single confidence
+    # score ∈ [0, 1] where 1 = fully confident
+    conf_from_std = max(0.0, 1.0 - (prob_std / 0.20))       # std > 0.20 → 0
+    conf_from_mc = max(0.0, 1.0 - (mc_uncertainty / 0.15))  # unc > 0.15 → 0
+    cmafn_confidence = conf_from_std * conf_from_mc           # both must be good
+    cmafn_confidence = max(0.0, min(1.0, cmafn_confidence))
+
+    if cmafn_confidence > 0.70:
+        conf_label = "High"
+    elif cmafn_confidence > 0.35:
+        conf_label = "Moderate"
+    else:
+        conf_label = "Low"
+
+    # ── Step 6: Confidence-gated meta-fusion ────────────────
+    # Blend CMAFN with standalone predictions based on confidence.
+    #   High confidence → final ≈ CMAFN (cross-modal patterns reliable)
+    #   Low confidence  → final ≈ weighted standalone average
+    if has_image and has_audio and hw_standalone and audio_standalone:
+        # Weighted standalone: audio model is stronger (93.6% vs 87.6%)
+        standalone_pd = 0.40 * hw_standalone["pd"] + 0.60 * audio_standalone["pd"]
+
+        # Alpha: how much to trust CMAFN vs standalones
+        # Floor at 0.25 — always give CMAFN some weight since it may detect
+        # genuine cross-modal patterns invisible to standalone models
+        alpha = max(0.25, cmafn_confidence)
+
+        # Blend CMAFN ensemble with MC-dropout first
+        cmafn_pd = 0.5 * pd_prob + 0.5 * mc_pd
+
+        # Final meta-fusion
+        final_pd = alpha * cmafn_pd + (1.0 - alpha) * standalone_pd
+        final_h = 1.0 - final_pd
+    elif has_image and hw_standalone:
+        standalone_pd = hw_standalone["pd"]
+        alpha = max(0.30, cmafn_confidence)
+        cmafn_pd = 0.5 * pd_prob + 0.5 * mc_pd
+        final_pd = alpha * cmafn_pd + (1.0 - alpha) * standalone_pd
+        final_h = 1.0 - final_pd
+    elif has_audio and audio_standalone:
+        standalone_pd = audio_standalone["pd"]
+        alpha = max(0.30, cmafn_confidence)
+        cmafn_pd = 0.5 * pd_prob + 0.5 * mc_pd
+        final_pd = alpha * cmafn_pd + (1.0 - alpha) * standalone_pd
+        final_h = 1.0 - final_pd
+    else:
+        final_pd = 0.5 * pd_prob + 0.5 * mc_pd
+        final_h = 1.0 - final_pd
+        alpha = 1.0
+        standalone_pd = None
+
+    # ── Step 7: Risk classification on meta-fused probability ──
+    if final_pd > 0.60:
         risk = "HIGH"
         icon = "🔴"
-    elif pd_prob > 0.45:
+    elif final_pd > 0.45:
         risk = "MODERATE"
         icon = "🟠"
-    elif pd_prob > 0.35:
+    elif final_pd > 0.30:
         risk = "LOW-MODERATE"
         icon = "🟡"
     else:
         risk = "LOW"
         icon = "🟢"
 
-    if mc_uncertainty < 0.05:
-        conf_label = "High"
-    elif mc_uncertainty < 0.10:
-        conf_label = "Moderate"
-    else:
-        conf_label = "Low"
+    risk_qualifier = ""
+    if conf_label == "Low":
+        risk_qualifier = " *(Low Confidence — interpret with caution)*"
 
     # ── Build Report ────────────────────────────────────────
     report += "---\n\n"
     report += "## 🧬 CMAFN Fusion Result\n\n"
-    report += f"### {icon} Risk Level: **{risk}**\n\n"
+    report += f"### {icon} Risk Level: **{risk}**{risk_qualifier}\n\n"
+
+    # Main result table — show the meta-fused prediction prominently
     report += f"| Metric | Value |\n|---|---|\n"
-    report += f"| Ensemble Healthy Prob | {h_prob * 100:.1f}% |\n"
-    report += f"| Ensemble Parkinson's Prob | {pd_prob * 100:.1f}% |\n"
-    report += f"| Ensemble Agreement (std) | ±{prob_std * 100:.2f}% |\n"
-    report += f"| MC-Dropout Healthy Prob | {mc_h * 100:.1f}% |\n"
-    report += f"| MC-Dropout Parkinson's Prob | {mc_pd * 100:.1f}% |\n"
+    report += f"| **Final PD Probability** | **{final_pd * 100:.1f}%** |\n"
+    report += f"| **Final Healthy Probability** | **{final_h * 100:.1f}%** |\n"
+    report += f"| Confidence Score | {conf_label} ({cmafn_confidence:.2f}) |\n"
+    report += f"| CMAFN Trust Weight (α) | {alpha:.2f} |\n"
+    report += f"| Temperature Scaling | {base_temperature:.2f} |\n\n"
+
+    # Detailed breakdown table
+    report += "<details><summary>📊 Detailed Breakdown (click to expand)</summary>\n\n"
+    report += f"| Component | Healthy | Parkinson's |\n|---|---|---|\n"
+    if hw_standalone:
+        report += f"| Handwriting Standalone | {hw_standalone['healthy']*100:.1f}% | {hw_standalone['pd']*100:.1f}% |\n"
+    if audio_standalone:
+        report += f"| Speech Standalone | {audio_standalone['healthy']*100:.1f}% | {audio_standalone['pd']*100:.1f}% |\n"
+    if standalone_pd is not None:
+        report += f"| Weighted Standalone | {(1-standalone_pd)*100:.1f}% | {standalone_pd*100:.1f}% |\n"
+    report += f"| CMAFN Ensemble (T={base_temperature:.1f}) | {h_prob*100:.1f}% | {pd_prob*100:.1f}% |\n"
+    report += f"| MC-Dropout Mean | {mc_h*100:.1f}% | {mc_pd*100:.1f}% |\n"
+    report += f"| **Meta-Fused Final** | **{final_h*100:.1f}%** | **{final_pd*100:.1f}%** |\n\n"
+
+    report += f"| Diagnostic | Value |\n|---|---|\n"
+    report += f"| Ensemble Fold Std | ±{prob_std*100:.2f}% |\n"
     report += f"| MC-Dropout Uncertainty | {mc_uncertainty:.4f} |\n"
-    report += f"| Confidence | {conf_label} |\n"
-    report += f"| Ensemble Models Used | {len(fusion_models)} |\n"
-    report += f"| MC Samples per Model | {fusion_config.mc_dropout_samples} |\n\n"
+    report += f"| Ensemble Models | {len(fusion_models)} |\n"
+    report += f"| MC Samples per Model | {fusion_config.mc_dropout_samples} |\n"
+
+    # Per-fold predictions
+    report += f"\n| Fold | PD Prob (raw) | PD Prob (T-scaled) |\n|---|---|---|\n"
+    for i, (raw_p, scaled_p) in enumerate(zip(raw_probs_list, fold_pd_probs)):
+        raw_pd = float(raw_p[0, 1]) * 100
+        sc_pd = scaled_p * 100
+        marker = " ⚠️" if abs(scaled_p - pd_prob) > 0.20 else ""
+        report += f"| Fold {i+1} | {raw_pd:.1f}% | {sc_pd:.1f}%{marker} |\n"
+    report += "\n</details>\n\n"
 
     # ── Concordance ─────────────────────────────────────────
     if has_image and has_audio and hw_standalone and audio_standalone:
         hw_says_pd = hw_standalone["pd"] > 0.55
         audio_says_pd = audio_standalone["pd"] > 0.50
+
         if hw_says_pd == audio_says_pd:
-            report += "### 🔄 Modality Concordance: ✅ **Agreement**\n\n"
-            report += "Both modalities point in the same direction.\n\n"
+            direction = "Parkinson's indicators" if hw_says_pd else "Healthy patterns"
+            report += f"### 🔄 Modality Concordance: ✅ **Agreement → {direction}**\n\n"
+            report += f"Both standalone models lean toward **{direction}**.\n\n"
         else:
+            hw_dir = "PD" if hw_says_pd else "Healthy"
+            audio_dir = "PD" if audio_says_pd else "Healthy"
             report += "### 🔄 Modality Concordance: ⚠️ **Discordant**\n\n"
-            report += "Handwriting and speech disagree — CMAFN cross-modal attention resolves this adaptively.\n\n"
+            report += (f"Handwriting leans **{hw_dir}** while Speech leans **{audio_dir}** "
+                       f"— CMAFN cross-modal attention resolves this adaptively.\n\n")
+
+    # ── Explain meta-fusion logic ───────────────────────────
+    report += "### 🧮 How the Final Prediction is Computed\n\n"
+    report += (f"The final probability combines **CMAFN cross-modal fusion** "
+               f"with **standalone model predictions**, weighted by the fusion "
+               f"model's confidence:\n\n")
+    report += f"$$P_{{final}} = \\alpha \\cdot P_{{CMAFN}} + (1 - \\alpha) \\cdot P_{{standalone}}$$\n\n"
+    report += (f"Where α = **{alpha:.2f}** (derived from ensemble agreement "
+               f"and MC-Dropout uncertainty). ")
+    if alpha < 0.50:
+        report += (f"Since CMAFN confidence is low, standalone predictions "
+                   f"are weighted more heavily.\n\n")
+    elif alpha < 0.80:
+        report += (f"CMAFN and standalone predictions are given moderate weight.\n\n")
+    else:
+        report += (f"CMAFN is confident — cross-modal patterns dominate.\n\n")
 
     # ── Model provenance ────────────────────────────────────
     report += "---\n\n### 📊 Model Performance (from training)\n\n"
@@ -1236,11 +1653,32 @@ def predict_fusion(image, audio):
     report += "---\n\n### 📋 Important Notes\n\n"
     report += "- This is a **screening tool only**, NOT a diagnostic instrument.\n"
     report += "- The CMAFN model uses **cross-modal transformer attention** — each modality enriches the other.\n"
-    report += "- **Modality dropout** during training makes single-modality input viable but less reliable.\n"
-    report += "- MC-Dropout uncertainty > 0.10 suggests the model is unsure — interpret with caution.\n"
+    report += "- **Meta-fusion** blends CMAFN with standalone predictions based on confidence.\n"
+    report += "- When CMAFN confidence is low, standalone models receive higher weight.\n"
+    report += "- When CMAFN confidence is high, cross-modal patterns are trusted.\n"
     report += "\n⚕️ **Always consult healthcare professionals for proper medical evaluation.**\n"
 
-    return report
+    # Gauge uses final meta-fused probability, not raw CMAFN
+    gauge = generate_risk_gauge(final_pd, "Fusion Risk")
+    add_to_history("Fusion", final_pd, final_h, conf_label)
+    report_path = generate_report_file(report, "CMAFN_Fusion")
+
+    return report, gauge, report_path
+
+
+# ── 8d. Session History & Comparison ───────────────────────
+
+def refresh_history():
+    """Refresh the session history table and comparison chart."""
+    table = get_history_table()
+    chart = generate_comparison_chart(SESSION_HISTORY)
+    return table, chart
+
+
+def clear_history():
+    """Clear all session history."""
+    SESSION_HISTORY.clear()
+    return "History cleared.", None
 
 
 # ════════════════════════════════════════════════════════════════
@@ -1252,7 +1690,20 @@ custom_css = """
 .main-header { text-align: center; margin-bottom: 20px; }
 .tab-nav button { font-size: 16px !important; }
 footer { display: none !important; }
+.viz-image { border-radius: 12px; }
 """
+
+# ── Build example paths ────────────────────────────────────
+hw_example_paths = []
+hw_healthy_dir = ROOT / "handwritten dataset" / "Dataset" / "Dataset" / "Healthy"
+hw_parkinson_dir = ROOT / "handwritten dataset" / "Dataset" / "Dataset" / "Parkinson"
+if hw_healthy_dir.exists():
+    hw_example_paths.append([str(hw_healthy_dir / "Healthy1.png")])
+    hw_example_paths.append([str(hw_healthy_dir / "Healthy5.png")])
+if hw_parkinson_dir.exists():
+    hw_example_paths.append([str(hw_parkinson_dir / "Parkinson1.png")])
+    hw_example_paths.append([str(hw_parkinson_dir / "Parkinson5.png")])
+
 
 with gr.Blocks(css=custom_css, title="Parkinson's Disease Detection", theme=gr.themes.Soft()) as demo:
 
@@ -1281,7 +1732,23 @@ This system employs three deep-learning pipelines:
                 with gr.Column(scale=1):
                     hw_label = gr.Label(label="Classification", num_top_classes=2)
                     hw_text = gr.Markdown(label="Detailed Analysis")
-            hw_btn.click(predict_handwriting, inputs=hw_input, outputs=[hw_label, hw_text])
+            with gr.Row():
+                with gr.Column(scale=1):
+                    hw_gauge = gr.Image(label="Risk Gauge", height=220, elem_classes=["viz-image"])
+                with gr.Column(scale=1):
+                    hw_preview = gr.Image(label="Preprocessing Preview", height=220, elem_classes=["viz-image"])
+            with gr.Row():
+                hw_report_file = gr.File(label="📄 Download Report")
+            hw_btn.click(
+                predict_handwriting, inputs=hw_input,
+                outputs=[hw_label, hw_text, hw_gauge, hw_preview, hw_report_file]
+            )
+            if hw_example_paths:
+                gr.Examples(
+                    examples=hw_example_paths,
+                    inputs=hw_input,
+                    label="📁 Try Example Images",
+                )
             gr.Markdown("""
 ---
 **Tips:** Use clear, well-lit images · Spiral drawings are most informative · Ensure writing fills most of the image
@@ -1300,7 +1767,17 @@ This system employs three deep-learning pipelines:
                 with gr.Column(scale=1):
                     sp_label = gr.Label(label="Classification", num_top_classes=2)
                     sp_text = gr.Markdown(label="Detailed Analysis")
-            sp_btn.click(predict_speech, inputs=sp_input, outputs=[sp_label, sp_text])
+            with gr.Row():
+                with gr.Column(scale=1):
+                    sp_gauge = gr.Image(label="Risk Gauge", height=220, elem_classes=["viz-image"])
+                with gr.Column(scale=1):
+                    sp_audio_viz = gr.Image(label="Waveform & Spectrogram", height=320, elem_classes=["viz-image"])
+            with gr.Row():
+                sp_report_file = gr.File(label="📄 Download Report")
+            sp_btn.click(
+                predict_speech, inputs=sp_input,
+                outputs=[sp_label, sp_text, sp_gauge, sp_audio_viz, sp_report_file]
+            )
             gr.Markdown("""
 ---
 **Tips:** Record in a quiet room · Speak for at least 3-5 seconds · Sustained vowels reveal voice tremor
@@ -1321,11 +1798,38 @@ Single-modality input is supported but less reliable (the model uses learned def
                         sources=["microphone", "upload"],
                     )
             fusion_btn = gr.Button("🧬 Run CMAFN Fusion Analysis", variant="primary", size="lg")
-            fusion_out = gr.Markdown(label="CMAFN Report")
-            fusion_btn.click(predict_fusion, inputs=[fusion_hw, fusion_sp], outputs=fusion_out)
+            with gr.Row():
+                with gr.Column(scale=2):
+                    fusion_out = gr.Markdown(label="CMAFN Report")
+                with gr.Column(scale=1):
+                    fusion_gauge = gr.Image(label="Fusion Risk Gauge", height=220, elem_classes=["viz-image"])
+            with gr.Row():
+                fusion_report_file = gr.File(label="📄 Download Fusion Report")
+            fusion_btn.click(
+                predict_fusion, inputs=[fusion_hw, fusion_sp],
+                outputs=[fusion_out, fusion_gauge, fusion_report_file]
+            )
 
-        # ───────────── TAB 4: About ───────────────────
-        with gr.TabItem("ℹ️ About", id=4):
+        # ───────────── TAB 4: Session History ─────────
+        with gr.TabItem("📊 Session History", id=4):
+            gr.Markdown("""### Analysis History & Trend Tracking
+Track all analyses performed during this session. Compare results over time to monitor changes.
+            """)
+            with gr.Row():
+                history_refresh_btn = gr.Button("🔄 Refresh History", variant="primary")
+                history_clear_btn = gr.Button("🗑️ Clear History", variant="stop")
+            history_table = gr.Markdown(value="No analyses performed yet in this session.")
+            history_chart = gr.Image(label="PD Probability Trend", height=320, elem_classes=["viz-image"])
+            history_refresh_btn.click(refresh_history, outputs=[history_table, history_chart])
+            history_clear_btn.click(clear_history, outputs=[history_table, history_chart])
+            gr.Markdown("""
+---
+**Legend:** 🔴 Handwriting · 🟢 Speech · 🟣 Fusion — Dashed line = 50% decision threshold.
+Run multiple analyses to see trends. History is per-session and not persisted.
+            """)
+
+        # ───────────── TAB 5: About ───────────────────
+        with gr.TabItem("ℹ️ About", id=5):
             # Build dynamic dependency status
             dep_lines = []
             dep_lines.append(f"- **XLS-R (transformers):** {'✅ Available' if TRANSFORMERS_AVAILABLE else '⚠️ Not installed — audio path 1 uses zeros'}")
@@ -1375,6 +1879,19 @@ Single-modality input is supported but less reliable (the model uses learned def
 
 ---
 
+## New Features (v2.1)
+
+| Feature | Description |
+|---|---|
+| 🎯 Risk Gauge | Visual semi-circular gauge showing PD risk level |
+| 🖼️ Preprocessing Preview | See edge detection & stroke heatmap of your input |
+| 📊 Waveform & Spectrogram | Visual analysis of audio characteristics |
+| 📄 Downloadable Reports | Export analysis results as text files |
+| 📈 Session History | Track & compare results across multiple analyses |
+| 🖼️ Example Inputs | Try the system with sample images from the dataset |
+
+---
+
 ## System Status
 
 {dep_status}
@@ -1398,7 +1915,7 @@ If you have concerns about Parkinson's disease, please consult a qualified neuro
 
 ---
 
-**Version:** 2.0.0 | **Last Updated:** February 2026
+**Version:** 2.1.0 | **Last Updated:** February 2026
             """
             gr.Markdown(about_md)
 

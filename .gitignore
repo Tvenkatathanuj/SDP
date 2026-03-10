@@ -2,6 +2,8 @@
 denoised-speech-dataset/
 original-speech-dataset/
 speech/
+handwritten dataset/
+Italian Parkinson's Voice and speech/
 
 # Python
 __pycache__/

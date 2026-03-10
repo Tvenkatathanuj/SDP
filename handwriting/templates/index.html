@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PD Live Translate — Handwriting Analysis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; background: #f5f6fa; color: #1a1a2e; min-height: 100vh; }
+
+        /* ── Header ── */
+        header { background: linear-gradient(135deg, #0d1b4a 0%, #1a237e 50%, #283593 100%); color: #fff; padding: 18px 30px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,.2); position: sticky; top: 0; z-index: 100; }
+        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .logo-area .icon { width: 40px; height: 40px; background: rgba(255,255,255,.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .logo-area h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: .3px; }
+        .logo-area p { font-size: .75rem; opacity: .7; margin-top: 1px; }
+        .header-actions { display: flex; gap: 8px; }
+        .header-btn { padding: 8px 14px; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; background: rgba(255,255,255,.08); color: #fff; cursor: pointer; font-size: .78rem; font-weight: 500; transition: all .15s; display: flex; align-items: center; gap: 5px; }
+        .header-btn:hover { background: rgba(255,255,255,.18); }
+
+        /* ── How It Works Banner ── */
+        .how-it-works { max-width: 1200px; margin: 20px auto 0; padding: 0 16px; }
+        .steps-row { display: flex; gap: 16px; flex-wrap: wrap; }
+        .step-card { flex: 1; min-width: 180px; background: #fff; border-radius: 12px; padding: 18px 16px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,.06); border: 1px solid #eef0f5; position: relative; }
+        .step-card .step-num { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #1a237e; color: #fff; width: 24px; height: 24px; border-radius: 50%; font-size: .72rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+        .step-card .step-icon { font-size: 1.8rem; margin: 8px 0 6px; }
+        .step-card h3 { font-size: .82rem; font-weight: 600; color: #1a237e; }
+        .step-card p { font-size: .72rem; color: #888; margin-top: 4px; line-height: 1.4; }
+
+        /* ── Main Container ── */
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 16px; display: flex; gap: 20px; flex-wrap: wrap; }
+
+        /* ── Panels ── */
+        .panel { background: #fff; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,.06); padding: 22px; flex: 1; min-width: 340px; border: 1px solid #eef0f5; }
+        .panel-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+        .panel-header .panel-icon { width: 32px; height: 32px; background: #eef1ff; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+        .panel-header h2 { font-size: 1rem; font-weight: 600; color: #1a237e; }
+
+        /* ── Toolbar ── */
+        .toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; align-items: center; background: #f8f9fc; padding: 10px 12px; border-radius: 10px; }
+        .tool-group { display: flex; gap: 4px; align-items: center; }
+        .tool-group-label { font-size: .68rem; color: #999; text-transform: uppercase; letter-spacing: .5px; font-weight: 600; margin-right: 4px; }
+        .toolbar button { padding: 6px 12px; border: 1px solid #dde0ea; border-radius: 6px; background: #fff; cursor: pointer; font-size: .78rem; font-weight: 500; transition: all .15s; color: #555; }
+        .toolbar button:hover { background: #eef1ff; border-color: #c5cae9; }
+        .toolbar button.active { background: #1a237e; color: #fff; border-color: #1a237e; }
+        .toolbar input[type=range] { width: 70px; accent-color: #1a237e; }
+        .toolbar .sep { width: 1px; height: 24px; background: #e0e0e0; margin: 0 4px; }
+        .toolbar .color-dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer; transition: transform .1s; }
+        .toolbar .color-dot:hover, .toolbar .color-dot.active { transform: scale(1.15); border-color: #1a237e; }
+
+        /* ── Canvas ── */
+        .canvas-wrap { position: relative; display: block; border: 2px solid #e8eaf0; border-radius: 10px; overflow: hidden; background: #fff; }
+        #drawCanvas { display: block; cursor: crosshair; touch-action: none; width: 100%; height: auto; }
+
+        .canvas-hint { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; text-align: center; color: #ccc; transition: opacity .3s; }
+        .canvas-hint.hidden { opacity: 0; }
+        .canvas-hint .hint-icon { font-size: 2.5rem; margin-bottom: 6px; }
+        .canvas-hint p { font-size: .82rem; }
+
+        /* ── Action Buttons ── */
+        .action-row { display: flex; gap: 10px; margin-top: 14px; }
+        .btn-analyze { flex: 1; padding: 13px; background: linear-gradient(135deg, #1a237e, #3949ab); color: #fff; border: none; border-radius: 10px; font-size: .95rem; font-weight: 600; cursor: pointer; transition: transform .1s, box-shadow .2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-analyze:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(26,35,126,.3); }
+        .btn-analyze:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+        .btn-secondary { padding: 13px 20px; background: #fff; border: 1.5px solid #dde0ea; border-radius: 10px; cursor: pointer; font-size: .85rem; font-weight: 500; color: #555; transition: all .15s; }
+        .btn-secondary:hover { background: #f5f6fa; border-color: #c5cae9; }
+
+        /* ── Upload ── */
+        .upload-area { margin-top: 12px; padding: 18px; border: 2px dashed #d0d4e4; border-radius: 10px; text-align: center; color: #888; font-size: .82rem; cursor: pointer; transition: all .2s; background: #fafbfd; }
+        .upload-area:hover { border-color: #1a237e; background: #f0f1ff; color: #1a237e; }
+        .upload-area input { display: none; }
+        .upload-area.drag-over { border-color: #1a237e; background: #eef1ff; }
+
+        /* ── Right Panel: Results ── */
+        .results-panel { flex: 1; min-width: 340px; }
+
+        /* ── Gauge ── */
+        .gauge-box { text-align: center; padding: 20px 0 10px; }
+        .gauge-box svg { max-width: 260px; }
+        .risk-label { font-size: 1rem; font-weight: 600; color: #666; margin-top: 4px; }
+        .risk-pct { font-size: 2.6rem; font-weight: 800; letter-spacing: -1px; }
+        .status-badge { display: inline-block; padding: 6px 20px; border-radius: 20px; font-size: .85rem; font-weight: 600; margin-top: 8px; }
+        .status-LOW    { background: #e8f5e9; color: #2e7d32; }
+        .status-MODERATE { background: #fff3e0; color: #e65100; }
+        .status-HIGH   { background: #ffebee; color: #c62828; }
+
+        /* ── Interpretation ── */
+        .interpretation { margin: 16px 0; padding: 14px 16px; border-radius: 10px; font-size: .82rem; line-height: 1.6; border-left: 4px solid; }
+        .interp-low { background: #f1f8e9; border-color: #4caf50; color: #33691e; }
+        .interp-moderate { background: #fff8e1; border-color: #ff9800; color: #e65100; }
+        .interp-high { background: #fce4ec; border-color: #f44336; color: #b71c1c; }
+
+        /* ── Score Cards ── */
+        .scores { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 16px 0; }
+        .score-card { background: #f8f9fc; border-radius: 10px; padding: 12px; text-align: center; border: 1px solid #eef0f5; transition: transform .15s; }
+        .score-card:hover { transform: translateY(-2px); }
+        .score-card .label { font-size: .68rem; color: #888; text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
+        .score-card .val { font-size: 1.4rem; font-weight: 700; margin-top: 3px; }
+        .score-card .model-info { font-size: .65rem; color: #bbb; margin-top: 2px; }
+
+        /* ── Confidence Bar ── */
+        .confidence-section { margin: 12px 0; }
+        .confidence-label { font-size: .75rem; color: #888; font-weight: 600; margin-bottom: 6px; display: flex; justify-content: space-between; }
+        .confidence-bar-bg { height: 10px; background: #eef0f5; border-radius: 5px; overflow: hidden; }
+        .confidence-bar { height: 100%; border-radius: 5px; transition: width .8s ease; }
+        .model-agreement { font-size: .72rem; color: #999; margin-top: 4px; }
+
+        /* ── Tabs ── */
+        .tab-row { display: flex; gap: 0; margin: 14px 0 0; border-bottom: 2px solid #eef0f5; }
+        .tab-btn { padding: 8px 16px; background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -2px; cursor: pointer; font-size: .8rem; font-weight: 500; color: #999; transition: all .15s; }
+        .tab-btn:hover { color: #1a237e; }
+        .tab-btn.active { color: #1a237e; border-bottom-color: #1a237e; font-weight: 600; }
+        .tab-content { display: none; padding-top: 12px; }
+        .tab-content.active { display: block; }
+
+        /* ── Features Table ── */
+        .features-table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+        .features-table th { text-align: left; padding: 8px 8px; border-bottom: 2px solid #eef0f5; color: #1a237e; font-size: .7rem; text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
+        .features-table td { padding: 7px 8px; border-bottom: 1px solid #f5f6fa; }
+        .features-table tr:hover { background: #fafbff; }
+        .features-table .bar-cell { width: 40%; }
+        .feat-bar { height: 8px; border-radius: 4px; transition: width .5s ease; }
+        .feat-name { display: flex; align-items: center; gap: 6px; }
+        .feat-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+        /* ── History ── */
+        .history-empty { text-align: center; color: #ccc; padding: 30px; font-size: .82rem; }
+        .history-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f5f6fa; }
+        .history-item:last-child { border-bottom: none; }
+        .history-thumb { width: 48px; height: 48px; border-radius: 8px; border: 1px solid #eee; object-fit: cover; }
+        .history-details { flex: 1; }
+        .history-details .h-risk { font-weight: 700; font-size: .9rem; }
+        .history-details .h-time { font-size: .7rem; color: #bbb; }
+        .history-details .h-status { font-size: .7rem; font-weight: 600; }
+
+        /* ── Placeholder ── */
+        .placeholder { text-align: center; padding: 50px 20px; color: #bbb; }
+        .placeholder .ph-icon { font-size: 3rem; margin-bottom: 10px; opacity: .5; }
+        .placeholder p { font-size: .85rem; line-height: 1.5; }
+        .placeholder .ph-sub { font-size: .75rem; color: #ccc; margin-top: 6px; }
+
+        /* ── Spinner ── */
+        .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin .6s linear infinite; vertical-align: middle; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Progress Steps ── */
+        .analysis-progress { text-align: left; max-width: 280px; margin: 20px auto; }
+        .progress-step { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: .8rem; color: #999; }
+        .progress-step.active { color: #1a237e; font-weight: 600; }
+        .progress-step.done { color: #2e7d32; }
+        .progress-step .p-icon { width: 20px; text-align: center; }
+
+        /* ── PDF Export ── */
+        .export-row { display: flex; gap: 8px; margin-top: 14px; }
+        .btn-export { flex: 1; padding: 9px; background: #f8f9fc; border: 1px solid #dde0ea; border-radius: 8px; cursor: pointer; font-size: .78rem; font-weight: 500; color: #555; transition: all .15s; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .btn-export:hover { background: #eef1ff; border-color: #c5cae9; }
+
+        /* ── Dark Mode ── */
+        body.dark { background: #0f1123; color: #e0e0e0; }
+        body.dark header { background: linear-gradient(135deg, #0a0e2a 0%, #131852 100%); }
+        body.dark .panel { background: #1a1d35; border-color: #2a2e4a; box-shadow: 0 2px 12px rgba(0,0,0,.3); }
+        body.dark .toolbar { background: #141730; }
+        body.dark .toolbar button { background: #1a1d35; border-color: #2a2e4a; color: #ccc; }
+        body.dark .toolbar button.active { background: #3949ab; border-color: #3949ab; }
+        body.dark .canvas-wrap { border-color: #2a2e4a; }
+        body.dark .upload-area { background: #141730; border-color: #2a2e4a; color: #888; }
+        body.dark .step-card { background: #1a1d35; border-color: #2a2e4a; }
+        body.dark .step-card p { color: #888; }
+        body.dark .score-card { background: #141730; border-color: #2a2e4a; }
+        body.dark .features-table td { border-color: #2a2e4a; }
+        body.dark .features-table th { border-color: #2a2e4a; }
+        body.dark .features-table tr:hover { background: #1e2240; }
+        body.dark .tab-row { border-color: #2a2e4a; }
+        body.dark .tab-btn { color: #777; }
+        body.dark .tab-btn.active { color: #7986cb; border-bottom-color: #7986cb; }
+        body.dark .btn-secondary { background: #1a1d35; border-color: #2a2e4a; color: #ccc; }
+        body.dark .btn-export { background: #141730; border-color: #2a2e4a; color: #ccc; }
+        body.dark .confidence-bar-bg { background: #2a2e4a; }
+        body.dark .header-btn { border-color: rgba(255,255,255,.15); }
+
+        /* ── Footer ── */
+        footer { text-align: center; padding: 20px 16px; font-size: .72rem; color: #999; max-width: 1200px; margin: 0 auto; }
+        footer a { color: #1a237e; }
+
+        /* ── Toast ── */
+        .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; background: #1a237e; color: #fff; border-radius: 10px; font-size: .82rem; font-weight: 500; box-shadow: 0 4px 16px rgba(0,0,0,.2); z-index: 1000; transform: translateY(80px); opacity: 0; transition: all .3s; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+
+        @media (max-width: 768px) {
+            header { flex-direction: column; gap: 10px; text-align: center; }
+            .container { flex-direction: column; }
+            .steps-row { flex-direction: column; }
+            .scores { grid-template-columns: 1fr; }
+            #drawCanvas { width: 100% !important; height: auto !important; }
+            .action-row { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-area">
+        <div class="icon">&#129504;</div>
+        <div>
+            <h1>PD Live Translate</h1>
+            <p>AI-Powered Parkinson's Disease Handwriting Screening</p>
+        </div>
+    </div>
+    <div class="header-actions">
+        <button class="header-btn" onclick="toggleDarkMode()" id="darkModeBtn" title="Toggle dark mode">&#127769; Dark</button>
+        <button class="header-btn" onclick="showHelp()" title="How to use">&#10068; Help</button>
+    </div>
+</header>
+
+<!-- How It Works -->
+<div class="how-it-works" id="howItWorks">
+    <div class="steps-row">
+        <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-icon">&#9997;&#65039;</div>
+            <h3>Draw or Upload</h3>
+            <p>Draw a spiral or wave following the guide, or upload an existing handwriting sample</p>
+        </div>
+        <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-icon">&#129302;</div>
+            <h3>AI Analysis</h3>
+            <p>Our ensemble of 10 neural networks analyzes 16 biomarkers from your handwriting</p>
+        </div>
+        <div class="step-card">
+            <div class="step-num">3</div>
+            <div class="step-icon">&#128202;</div>
+            <h3>View Results</h3>
+            <p>See your risk score, detailed model breakdown, and biomarker profile instantly</p>
+        </div>
+        <div class="step-card">
+            <div class="step-num">4</div>
+            <div class="step-icon">&#128229;</div>
+            <h3>Save Report</h3>
+            <p>Download your analysis as an image or track your results over time with history</p>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Left: Drawing Canvas -->
+    <div class="panel">
+        <div class="panel-header">
+            <div class="panel-icon">&#9997;&#65039;</div>
+            <h2>Draw Your Pattern</h2>
+        </div>
+
+        <div class="toolbar">
+            <div class="tool-group">
+                <span class="tool-group-label">Template</span>
+                <button id="spiralBtn" class="active" onclick="setTemplate('spiral')">&#127744; Spiral</button>
+                <button id="waveBtn" onclick="setTemplate('wave')">&#127754; Wave</button>
+                <button id="noneBtn" onclick="setTemplate('none')">&#9999;&#65039; Free</button>
+            </div>
+            <div class="sep"></div>
+            <div class="tool-group">
+                <span class="tool-group-label">Pen</span>
+                <input type="range" id="brushSize" min="2" max="14" value="4" title="Brush size">
+                <span id="brushSizeLabel" style="font-size:.72rem;color:#888;min-width:18px;">4</span>
+            </div>
+            <div class="sep"></div>
+            <div class="tool-group">
+                <div class="color-dot active" style="background:#1a1a2e;" onclick="setPenColor('#1a1a2e', this)" title="Black"></div>
+                <div class="color-dot" style="background:#1565c0;" onclick="setPenColor('#1565c0', this)" title="Blue"></div>
+                <div class="color-dot" style="background:#c62828;" onclick="setPenColor('#c62828', this)" title="Red"></div>
+            </div>
+            <div class="sep"></div>
+            <button onclick="undoStroke()" title="Undo last stroke">&#8617; Undo</button>
+            <button onclick="clearCanvas()" title="Clear canvas">&#128465; Clear</button>
+        </div>
+
+        <div class="canvas-wrap">
+            <canvas id="drawCanvas" width="500" height="500"></canvas>
+            <div class="canvas-hint" id="canvasHint">
+                <div class="hint-icon">&#9997;&#65039;</div>
+                <p>Trace the dotted guide line<br>as accurately as possible</p>
+            </div>
+        </div>
+
+        <div class="action-row">
+            <button id="analyzeBtn" class="btn-analyze" onclick="analyze()">&#128300; Analyze Handwriting</button>
+            <button class="btn-secondary" onclick="downloadCanvas()" title="Save your drawing">&#128190; Save</button>
+        </div>
+
+        <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+            &#128228; <strong>Drag & drop</strong> or click to upload a handwriting image
+            <input type="file" id="fileInput" accept="image/*" onchange="handleUpload(event)">
+        </div>
+    </div>
+
+    <!-- Right: Results -->
+    <div class="panel results-panel" id="resultsPanel">
+        <div class="panel-header">
+            <div class="panel-icon">&#128202;</div>
+            <h2>Analysis Results</h2>
+        </div>
+        <div id="resultsContent">
+            <div class="placeholder">
+                <div class="ph-icon">&#128300;</div>
+                <p>Draw a spiral or wave pattern and click <strong>Analyze Handwriting</strong></p>
+                <p class="ph-sub">The AI ensemble will evaluate tremor, micrographia, and motor control indicators</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <strong>&#9888;&#65039; Disclaimer:</strong> This is a screening tool for <em>research purposes only</em>. It is <strong>not</strong> a substitute for professional medical diagnosis. Please consult a healthcare provider for clinical evaluation.
+    <br>Ensemble: 5&times;Residual-MLP + 5&times;EfficientNet-B0+CBAM with 7-view TTA | 93.57% accuracy | 0.9851 AUC-ROC
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<!-- Help Modal -->
+<div id="helpModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:16px;max-width:520px;width:90%;padding:28px;margin:auto;margin-top:10vh;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <h2 style="font-size:1.1rem;color:#1a237e;">&#10068; How to Use</h2>
+            <button onclick="closeHelp()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#999;">&#10005;</button>
+        </div>
+        <div style="font-size:.85rem;line-height:1.7;color:#555;">
+            <p><strong>&#127919; Goal:</strong> This tool screens for early Parkinson's Disease signs by analyzing handwriting patterns. It detects tremor, slowness, and irregularities in your drawing.</p>
+            <br>
+            <p><strong>&#9997;&#65039; Drawing Tips:</strong></p>
+            <ul style="margin:8px 0 8px 20px;">
+                <li>Use a steady hand and follow the dotted guide</li>
+                <li>Draw at your natural speed — don't rush or go too slow</li>
+                <li>For best results, complete the full spiral (at least 3 loops)</li>
+                <li>Try both spiral and wave patterns for a more complete analysis</li>
+            </ul>
+            <br>
+            <p><strong>&#129302; The AI Models:</strong></p>
+            <ul style="margin:8px 0 8px 20px;">
+                <li><strong>MLP (16 features)</strong> — Analyzes spatial biomarkers like stroke width, curvature, and fractal dimension</li>
+                <li><strong>CNN (EfficientNet-B0+CBAM)</strong> — Analyzes the visual pattern using attention-enhanced deep learning</li>
+                <li><strong>Ensemble</strong> — Combines all models with a meta-learner for the most reliable prediction</li>
+            </ul>
+            <br>
+            <p><strong>&#128200; Understanding Results:</strong></p>
+            <ul style="margin:8px 0 8px 20px;">
+                <li><span style="color:#2e7d32;font-weight:600;">LOW RISK (0-33%)</span> — No significant PD indicators detected</li>
+                <li><span style="color:#e65100;font-weight:600;">MODERATE (33-66%)</span> — Some indicators present, consider further testing</li>
+                <li><span style="color:#c62828;font-weight:600;">HIGH RISK (66-100%)</span> — Significant indicators detected, consult a doctor</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// State
+// ═══════════════════════════════════════════
+const canvas = document.getElementById('drawCanvas');
+const ctx = canvas.getContext('2d');
+let drawing = false;
+let strokes = [];
+let currentStroke = [];
+let template = 'spiral';
+let penColor = '#1a1a2e';
+let analysisHistory = JSON.parse(localStorage.getItem('pdHistory') || '[]');
+
+// ═══════════════════════════════════════════
+// Canvas Drawing
+// ═══════════════════════════════════════════
+function initCanvas() {
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    drawTemplate();
+    updateHint();
+}
+
+function drawTemplate() {
+    if (template === 'none') return;
+    ctx.save();
+    ctx.strokeStyle = '#ddd';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([6, 4]);
+
+    if (template === 'spiral') {
+        ctx.beginPath();
+        const cx = 250, cy = 250;
+        for (let t = 0; t < 6 * Math.PI; t += 0.05) {
+            const r = 10 + 12 * t;
+            const x = cx + r * Math.cos(t);
+            const y = cy + r * Math.sin(t);
+            t === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+    } else if (template === 'wave') {
+        ctx.beginPath();
+        for (let x = 40; x < 460; x++) {
+            const y = 250 + 120 * Math.sin((x - 40) / 66 * Math.PI);
+            x === 40 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+    }
+    ctx.restore();
+}
+
+function setTemplate(t) {
+    template = t;
+    document.querySelectorAll('.tool-group button').forEach(b => {
+        if (b.id === 'spiralBtn' || b.id === 'waveBtn' || b.id === 'noneBtn') b.classList.remove('active');
+    });
+    if (t === 'spiral') document.getElementById('spiralBtn').classList.add('active');
+    else if (t === 'wave') document.getElementById('waveBtn').classList.add('active');
+    else document.getElementById('noneBtn').classList.add('active');
+    redraw();
+}
+
+function setPenColor(color, el) {
+    penColor = color;
+    document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+    el.classList.add('active');
+}
+
+function redraw() {
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    drawTemplate();
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    for (const stroke of strokes) {
+        if (stroke.length < 2) continue;
+        ctx.strokeStyle = stroke[0].color || '#1a1a2e';
+        ctx.lineWidth = stroke[0].size || 4;
+        ctx.beginPath();
+        ctx.moveTo(stroke[0].x, stroke[0].y);
+        for (let i = 1; i < stroke.length; i++) ctx.lineTo(stroke[i].x, stroke[i].y);
+        ctx.stroke();
+    }
+    updateHint();
+}
+
+function updateHint() {
+    const hint = document.getElementById('canvasHint');
+    if (hint) hint.classList.toggle('hidden', strokes.length > 0);
+}
+
+function clearCanvas() {
+    strokes = [];
+    redraw();
+    resetResults();
+}
+
+function resetResults() {
+    document.getElementById('resultsContent').innerHTML = `
+        <div class="placeholder">
+            <div class="ph-icon">&#128300;</div>
+            <p>Draw a spiral or wave pattern and click <strong>Analyze Handwriting</strong></p>
+            <p class="ph-sub">The AI ensemble will evaluate tremor, micrographia, and motor control indicators</p>
+        </div>`;
+}
+
+function undoStroke() {
+    if (strokes.length > 0) {
+        strokes.pop();
+        redraw();
+        showToast('Stroke undone');
+    }
+}
+
+function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    if (e.touches) return { x: (e.touches[0].clientX - rect.left) * scaleX, y: (e.touches[0].clientY - rect.top) * scaleY };
+    return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+}
+
+canvas.addEventListener('mousedown', e => startDraw(e));
+canvas.addEventListener('mousemove', e => draw(e));
+canvas.addEventListener('mouseup', () => endDraw());
+canvas.addEventListener('mouseleave', () => endDraw());
+canvas.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e); }, {passive: false});
+canvas.addEventListener('touchmove', e => { e.preventDefault(); draw(e); }, {passive: false});
+canvas.addEventListener('touchend', e => { e.preventDefault(); endDraw(); }, {passive: false});
+
+function startDraw(e) {
+    drawing = true;
+    const pos = getPos(e);
+    const brushSize = parseInt(document.getElementById('brushSize').value);
+    currentStroke = [{ x: pos.x, y: pos.y, size: brushSize, color: penColor }];
+    updateHint();
+}
+
+function draw(e) {
+    if (!drawing) return;
+    const pos = getPos(e);
+    const brushSize = parseInt(document.getElementById('brushSize').value);
+    currentStroke.push({ x: pos.x, y: pos.y, size: brushSize, color: penColor });
+    if (currentStroke.length >= 2) {
+        const prev = currentStroke[currentStroke.length - 2];
+        ctx.strokeStyle = penColor;
+        ctx.lineWidth = brushSize;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ctx.moveTo(prev.x, prev.y);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+    }
+}
+
+function endDraw() {
+    if (drawing && currentStroke.length > 1) strokes.push(currentStroke);
+    drawing = false;
+    currentStroke = [];
+    updateHint();
+}
+
+// Brush size live label
+document.getElementById('brushSize').addEventListener('input', function() {
+    document.getElementById('brushSizeLabel').textContent = this.value;
+});
+
+// ═══════════════════════════════════════════
+// Drag & Drop Upload
+// ═══════════════════════════════════════════
+const uploadArea = document.getElementById('uploadArea');
+uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
+uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
+uploadArea.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadArea.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) loadImageFile(file);
+});
+
+function handleUpload(e) {
+    const file = e.target.files[0];
+    if (file) loadImageFile(file);
+    e.target.value = '';
+}
+
+function loadImageFile(file) {
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        const img = new Image();
+        img.onload = function() {
+            strokes = [];
+            template = 'none';
+            setTemplate('none');
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+            const w = img.width * scale, h = img.height * scale;
+            const x = (canvas.width - w) / 2, y = (canvas.height - h) / 2;
+            ctx.drawImage(img, x, y, w, h);
+            strokes.push([{x: 0, y: 0, size: 1, color: '#000'}, {x: 1, y: 1, size: 1, color: '#000'}]);
+            updateHint();
+            showToast('Image loaded — click Analyze');
+        };
+        img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+// ═══════════════════════════════════════════
+// Download Canvas
+// ═══════════════════════════════════════════
+function downloadCanvas() {
+    if (strokes.length === 0) { showToast('Nothing to save'); return; }
+    const link = document.createElement('a');
+    link.download = `pd-drawing-${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast('Drawing saved');
+}
+
+// ═══════════════════════════════════════════
+// Analysis
+// ═══════════════════════════════════════════
+async function analyze() {
+    if (strokes.length === 0) {
+        showToast('Please draw a pattern or upload an image first');
+        return;
+    }
+
+    const btn = document.getElementById('analyzeBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Analyzing...';
+
+    document.getElementById('resultsContent').innerHTML = `
+        <div style="padding:30px 20px;text-align:center;">
+            <div class="spinner" style="border-color:#1a237e;border-top-color:transparent;width:36px;height:36px;margin:0 auto 16px;"></div>
+            <div class="analysis-progress">
+                <div class="progress-step active" id="ps1"><span class="p-icon">&#9203;</span> Extracting 16 biomarker features...</div>
+                <div class="progress-step" id="ps2"><span class="p-icon">&#9711;</span> Running MLP ensemble (5 folds)...</div>
+                <div class="progress-step" id="ps3"><span class="p-icon">&#9711;</span> Running CNN ensemble + TTA (35 views)...</div>
+                <div class="progress-step" id="ps4"><span class="p-icon">&#9711;</span> Meta-learner stacking prediction...</div>
+            </div>
+        </div>`;
+
+    // Animate progress steps
+    const steps = ['ps1', 'ps2', 'ps3', 'ps4'];
+    let stepIdx = 0;
+    const stepTimer = setInterval(() => {
+        if (stepIdx < steps.length) {
+            document.getElementById(steps[stepIdx]).classList.remove('active');
+            document.getElementById(steps[stepIdx]).classList.add('done');
+            document.getElementById(steps[stepIdx]).querySelector('.p-icon').innerHTML = '&#10003;';
+            stepIdx++;
+            if (stepIdx < steps.length) {
+                document.getElementById(steps[stepIdx]).classList.add('active');
+                document.getElementById(steps[stepIdx]).querySelector('.p-icon').innerHTML = '&#9203;';
+            }
+        }
+    }, 800);
+
+    try {
+        const dataURL = canvas.toDataURL('image/png');
+        const resp = await fetch('/predict', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: dataURL }),
+        });
+        const result = await resp.json();
+        clearInterval(stepTimer);
+        if (result.error) throw new Error(result.error);
+        renderResults(result);
+        saveToHistory(result, dataURL);
+    } catch (err) {
+        clearInterval(stepTimer);
+        document.getElementById('resultsContent').innerHTML = `
+            <div class="placeholder" style="color:#c62828;">
+                <div class="ph-icon">&#9888;&#65039;</div>
+                <p><strong>Analysis Failed:</strong> ${err.message}</p>
+                <p class="ph-sub">Check your connection and try again</p>
+            </div>`;
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '&#128300; Analyze Handwriting';
+    }
+}
+
+// ═══════════════════════════════════════════
+// Render Results
+// ═══════════════════════════════════════════
+function renderResults(r) {
+    const risk = r.combined_risk;
+    const pct = (risk * 100).toFixed(1);
+    const angle = Math.PI * (1 - risk);
+
+    let color = '#2e7d32', statusClass = 'LOW', interpClass = 'interp-low';
+    if (risk >= 0.66) { color = '#c62828'; statusClass = 'HIGH'; interpClass = 'interp-high'; }
+    else if (risk >= 0.33) { color = '#e65100'; statusClass = 'MODERATE'; interpClass = 'interp-moderate'; }
+
+    const needleX = (130 + 110 * Math.cos(angle)).toFixed(1);
+    const needleY = (140 - 110 * Math.sin(angle)).toFixed(1);
+
+    // Interpretation text
+    const interpTexts = {
+        LOW: 'Your handwriting analysis shows <strong>no significant indicators</strong> of Parkinson\'s Disease. The drawing pattern appears steady with consistent stroke control. This is a positive screening result.',
+        MODERATE: 'Your analysis shows <strong>some potential indicators</strong> that may warrant further evaluation. Consider consulting a healthcare professional for a comprehensive assessment.',
+        HIGH: 'Your analysis shows <strong>significant indicators</strong> consistent with Parkinson\'s Disease patterns. We strongly recommend consulting a neurologist for professional clinical evaluation.'
+    };
+
+    // Model agreement
+    const modelScores = [r.mlp_risk, r.cnn_risk, r.cnn_tta_risk];
+    const avgDev = modelScores.reduce((s, v) => s + Math.abs(v - risk), 0) / modelScores.length;
+    const agreement = Math.max(0, 100 - avgDev * 200).toFixed(0);
+
+    let html = `
+        <div class="gauge-box">
+            <svg viewBox="0 0 260 160" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#4caf50"/>
+                        <stop offset="50%" stop-color="#ff9800"/>
+                        <stop offset="100%" stop-color="#f44336"/>
+                    </linearGradient>
+                </defs>
+                <path d="M 20 140 A 110 110 0 0 1 240 140" fill="none" stroke="#e8f5e9" stroke-width="20" stroke-linecap="round"/>
+                <path d="M 20 140 A 110 110 0 0 1 130 30" fill="none" stroke="#fff3e0" stroke-width="20" stroke-linecap="round"/>
+                <path d="M 20 140 A 110 110 0 0 0 56 52" fill="none" stroke="#ffebee" stroke-width="20" stroke-linecap="round"/>
+                <text x="240" y="158" text-anchor="middle" font-size="9" fill="#2e7d32" font-weight="600">LOW</text>
+                <text x="130" y="22" text-anchor="middle" font-size="9" fill="#e65100" font-weight="600">MODERATE</text>
+                <text x="20" y="158" text-anchor="middle" font-size="9" fill="#c62828" font-weight="600">HIGH</text>
+                <line x1="130" y1="140" x2="${needleX}" y2="${needleY}" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="130" cy="140" r="7" fill="${color}"/>
+                <circle cx="130" cy="140" r="3" fill="#fff"/>
+            </svg>
+            <div class="risk-pct" style="color:${color}">${pct}%</div>
+            <div class="risk-label">Parkinson's Disease Risk Score</div>
+            <span class="status-badge status-${statusClass}">${r.status}</span>
+        </div>
+
+        <div class="interpretation ${interpClass}">
+            ${interpTexts[statusClass]}
+        </div>
+
+        <div class="confidence-section">
+            <div class="confidence-label">
+                <span>Model Confidence</span>
+                <span>${agreement}% agreement</span>
+            </div>
+            <div class="confidence-bar-bg">
+                <div class="confidence-bar" style="width:${agreement}%;background:${color};"></div>
+            </div>
+            <div class="model-agreement">All ${modelScores.length + 1} models (MLP + CNN + CNN-TTA + Ensemble) ${parseInt(agreement) > 70 ? 'strongly agree' : 'show some variance'} on this prediction</div>
+        </div>
+
+        <div class="scores">
+            <div class="score-card">
+                <div class="label">MLP Ensemble</div>
+                <div class="val" style="color:${scoreColor(r.mlp_risk)}">${(r.mlp_risk*100).toFixed(1)}%</div>
+                <div class="model-info">5-fold &times; 16 biomarkers</div>
+            </div>
+            <div class="score-card">
+                <div class="label">CNN Ensemble</div>
+                <div class="val" style="color:${scoreColor(r.cnn_risk)}">${(r.cnn_risk*100).toFixed(1)}%</div>
+                <div class="model-info">5-fold EfficientNet-B0+CBAM</div>
+            </div>
+            <div class="score-card">
+                <div class="label">CNN + TTA</div>
+                <div class="val" style="color:${scoreColor(r.cnn_tta_risk)}">${(r.cnn_tta_risk*100).toFixed(1)}%</div>
+                <div class="model-info">7 augmented views &times; 5 folds</div>
+            </div>
+            <div class="score-card">
+                <div class="label">&#11088; Final Ensemble</div>
+                <div class="val" style="color:${color};font-size:1.6rem">${pct}%</div>
+                <div class="model-info">Meta-learner stacking</div>
+            </div>
+        </div>
+
+        <!-- Tabs: Features / History -->
+        <div class="tab-row">
+            <button class="tab-btn active" onclick="switchTab('features', this)">&#128201; Biomarkers (16)</button>
+            <button class="tab-btn" onclick="switchTab('history', this)">&#128337; History (${analysisHistory.length})</button>
+        </div>
+
+        <div class="tab-content active" id="tab-features">
+            <table class="features-table">
+                <tr><th>Feature</th><th>Value</th><th class="bar-cell">Relative</th></tr>`;
+
+    const feats = Object.entries(r.features);
+    const maxVal = Math.max(...feats.map(f => Math.abs(f[1])), 0.001);
+    feats.sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
+
+    const featColors = {
+        stroke_width_mean: '#42a5f5', stroke_width_std: '#42a5f5',
+        contour_roughness: '#ef5350', direction_changes: '#ef5350',
+        n_components: '#ab47bc', ink_density: '#66bb6a',
+        solidity: '#66bb6a', intensity_variance: '#ffa726',
+        fractal_dimension: '#ab47bc', entropy: '#ffa726',
+        hu_moment_1: '#78909c', hu_moment_2: '#78909c',
+        curvature_mean: '#ec407a', curvature_std: '#ec407a',
+        aspect_ratio: '#26a69a', stroke_regularity: '#26a69a',
+    };
+
+    for (const [name, val] of feats) {
+        const barW = Math.min((Math.abs(val) / maxVal) * 100, 100).toFixed(0);
+        const displayName = name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        const dotColor = featColors[name] || '#c5cae9';
+        html += `<tr>
+            <td><div class="feat-name"><span class="feat-dot" style="background:${dotColor}"></span>${displayName}</div></td>
+            <td style="font-family:'Cascadia Code',monospace;font-size:.76rem;">${val.toFixed(4)}</td>
+            <td class="bar-cell"><div class="feat-bar" style="width:${barW}%;background:${dotColor}40;border-left:3px solid ${dotColor};"></div></td>
+        </tr>`;
+    }
+
+    html += `</table></div>
+
+        <div class="tab-content" id="tab-history">
+            ${renderHistoryTab()}
+        </div>
+
+        <div class="export-row">
+            <button class="btn-export" onclick="downloadReport()">&#128229; Download Report</button>
+            <button class="btn-export" onclick="clearHistory()">&#128465; Clear History</button>
+        </div>
+
+        <p style="margin-top:14px;font-size:.7rem;color:#bbb;text-align:center;">
+            5-fold cross-validated MLP + EfficientNet-B0+CBAM ensemble with 7-view TTA &bull; 93.57% accuracy &bull; 0.9851 AUC-ROC
+        </p>`;
+
+    document.getElementById('resultsContent').innerHTML = html;
+}
+
+function scoreColor(v) {
+    if (v < 0.33) return '#2e7d32';
+    if (v < 0.66) return '#e65100';
+    return '#c62828';
+}
+
+// ═══════════════════════════════════════════
+// Tabs
+// ═══════════════════════════════════════════
+function switchTab(tab, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// ═══════════════════════════════════════════
+// History (localStorage)
+// ═══════════════════════════════════════════
+function saveToHistory(result, thumbnail) {
+    const entry = {
+        time: new Date().toLocaleString(),
+        risk: result.combined_risk,
+        status: result.status,
+        mlp: result.mlp_risk,
+        cnn: result.cnn_risk,
+        tta: result.cnn_tta_risk,
+        thumb: thumbnail.substring(0, 200) + '...',
+    };
+    analysisHistory.unshift(entry);
+    if (analysisHistory.length > 20) analysisHistory.pop();
+    localStorage.setItem('pdHistory', JSON.stringify(analysisHistory));
+}
+
+function renderHistoryTab() {
+    if (analysisHistory.length === 0) return '<div class="history-empty">No analysis history yet.<br>Results will appear here after each analysis.</div>';
+    let html = '';
+    for (const h of analysisHistory) {
+        const color = h.risk < 0.33 ? '#2e7d32' : h.risk < 0.66 ? '#e65100' : '#c62828';
+        html += `<div class="history-item">
+            <div style="width:42px;height:42px;border-radius:8px;background:${color}15;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">
+                ${h.risk < 0.33 ? '&#9989;' : h.risk < 0.66 ? '&#9888;&#65039;' : '&#10060;'}
+            </div>
+            <div class="history-details">
+                <div class="h-risk" style="color:${color}">${(h.risk * 100).toFixed(1)}% — <span class="h-status">${h.status}</span></div>
+                <div class="h-time">${h.time} &bull; MLP: ${(h.mlp*100).toFixed(0)}% &bull; CNN: ${(h.cnn*100).toFixed(0)}% &bull; TTA: ${(h.tta*100).toFixed(0)}%</div>
+            </div>
+        </div>`;
+    }
+    return html;
+}
+
+function clearHistory() {
+    if (!confirm('Clear all analysis history?')) return;
+    analysisHistory = [];
+    localStorage.removeItem('pdHistory');
+    const tab = document.getElementById('tab-history');
+    if (tab) tab.innerHTML = renderHistoryTab();
+    showToast('History cleared');
+}
+
+// ═══════════════════════════════════════════
+// Report Download (canvas snapshot)
+// ═══════════════════════════════════════════
+function downloadReport() {
+    const rp = document.getElementById('resultsContent');
+    if (rp.querySelector('.placeholder')) { showToast('No results to download'); return; }
+
+    // Create a simple text report
+    const data = analysisHistory[0];
+    if (!data) { showToast('No results available'); return; }
+    const lines = [
+        '═══════════════════════════════════════════',
+        '  PD LIVE TRANSLATE — ANALYSIS REPORT',
+        '═══════════════════════════════════════════',
+        '',
+        `Date: ${data.time}`,
+        '',
+        '── RISK ASSESSMENT ──',
+        `Overall Risk: ${(data.risk * 100).toFixed(1)}% (${data.status})`,
+        `MLP Ensemble: ${(data.mlp * 100).toFixed(1)}%`,
+        `CNN Ensemble: ${(data.cnn * 100).toFixed(1)}%`,
+        `CNN + TTA: ${(data.tta * 100).toFixed(1)}%`,
+        '',
+        '── MODEL INFO ──',
+        'Ensemble: 5x Residual-MLP (16 biomarkers) + 5x EfficientNet-B0+CBAM',
+        'TTA: 7 augmented views per fold',
+        'Accuracy: 93.57% | AUC-ROC: 0.9851',
+        '',
+        '── DISCLAIMER ──',
+        'This is a screening tool for research purposes only.',
+        'It is NOT a substitute for professional medical diagnosis.',
+        'Please consult a healthcare provider for clinical evaluation.',
+        '',
+        '═══════════════════════════════════════════',
+    ];
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.download = `pd-report-${Date.now()}.txt`;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+    URL.revokeObjectURL(link.href);
+    showToast('Report downloaded');
+}
+
+// ═══════════════════════════════════════════
+// Dark Mode
+// ═══════════════════════════════════════════
+function toggleDarkMode() {
+    document.body.classList.toggle('dark');
+    const isDark = document.body.classList.contains('dark');
+    localStorage.setItem('pdDarkMode', isDark);
+    document.getElementById('darkModeBtn').innerHTML = isDark ? '&#9728;&#65039; Light' : '&#127769; Dark';
+}
+
+// Restore dark mode preference
+if (localStorage.getItem('pdDarkMode') === 'true') {
+    document.body.classList.add('dark');
+    document.getElementById('darkModeBtn').innerHTML = '&#9728;&#65039; Light';
+}
+
+// ═══════════════════════════════════════════
+// Help Modal
+// ═══════════════════════════════════════════
+function showHelp() {
+    document.getElementById('helpModal').style.display = 'flex';
+}
+function closeHelp() {
+    document.getElementById('helpModal').style.display = 'none';
+}
+document.getElementById('helpModal').addEventListener('click', function(e) {
+    if (e.target === this) closeHelp();
+});
+
+// ═══════════════════════════════════════════
+// Toast Notifications
+// ═══════════════════════════════════════════
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════════════
+// Init
+// ═══════════════════════════════════════════
+initCanvas();
+</script>
+</body>
+</html>
