@@ -3,389 +3,474 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PD Live Translate — Speech Analysis</title>
+    <title>NeuroVoice — Parkinson's Speech Screening</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #4f46e5; --primary-dark: #3730a3; --primary-light: #eef2ff;
+            --accent: #7c3aed; --success: #059669; --warning: #d97706; --danger: #dc2626;
+            --bg: #f8fafc; --surface: #ffffff; --text: #1e293b; --text-secondary: #64748b;
+            --border: #e2e8f0; --radius: 16px;
+            --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,.08);
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; background: #f5f6fa; color: #1a1a2e; min-height: 100vh; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-        /* ── Header ── */
-        header { background: linear-gradient(135deg, #0d1b4a 0%, #1a237e 50%, #283593 100%); color: #fff; padding: 18px 30px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,.2); position: sticky; top: 0; z-index: 100; }
-        .logo-area { display: flex; align-items: center; gap: 12px; }
-        .logo-area .icon { width: 40px; height: 40px; background: rgba(255,255,255,.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
-        .logo-area h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: .3px; }
-        .logo-area p { font-size: .75rem; opacity: .7; margin-top: 1px; }
-        .header-actions { display: flex; gap: 8px; }
-        .header-btn { padding: 8px 14px; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; background: rgba(255,255,255,.08); color: #fff; cursor: pointer; font-size: .78rem; font-weight: 500; transition: all .15s; display: flex; align-items: center; gap: 5px; }
-        .header-btn:hover { background: rgba(255,255,255,.18); }
+        /* ── Nav ── */
+        nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); }
+        .nav-brand { display: flex; align-items: center; gap: 10px; }
+        .nav-brand .icon-box { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.1rem; }
+        .nav-brand h1 { font-size: 1.15rem; font-weight: 700; }
+        .nav-brand h1 span { font-weight: 400; font-size: .8rem; color: var(--text-secondary); }
+        .nav-status { display: flex; align-items: center; gap: 6px; font-size: .78rem; color: var(--text-secondary); }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .status-dot.ok { background: var(--success); box-shadow: 0 0 6px rgba(5,150,105,.4); }
+        .status-dot.err { background: var(--danger); }
+        .status-dot.loading { background: var(--warning); animation: pulse 1.2s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
 
-        /* ── How It Works Banner ── */
-        .how-it-works { max-width: 1200px; margin: 20px auto 0; padding: 0 16px; }
-        .steps-row { display: flex; gap: 16px; flex-wrap: wrap; }
-        .step-card { flex: 1; min-width: 180px; background: #fff; border-radius: 12px; padding: 18px 16px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,.06); border: 1px solid #eef0f5; position: relative; }
-        .step-card .step-num { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #1a237e; color: #fff; width: 24px; height: 24px; border-radius: 50%; font-size: .72rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
-        .step-card .step-icon { font-size: 1.8rem; margin: 8px 0 6px; }
-        .step-card h3 { font-size: .82rem; font-weight: 600; color: #1a237e; }
-        .step-card p { font-size: .72rem; color: #888; margin-top: 4px; line-height: 1.4; }
+        /* ── Hero ── */
+        .hero { max-width: 960px; margin: 32px auto 0; padding: 0 20px; text-align: center; }
+        .hero h2 { font-size: 1.9rem; font-weight: 800; line-height: 1.3; }
+        .hero h2 em { font-style: normal; background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { font-size: .95rem; color: var(--text-secondary); margin-top: 10px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6; }
 
-        /* ── Main Container ── */
-        .container { max-width: 1200px; margin: 20px auto; padding: 0 16px; display: flex; gap: 20px; flex-wrap: wrap; }
+        /* ── Steps ── */
+        .steps { display: flex; gap: 12px; max-width: 720px; margin: 28px auto 0; padding: 0 20px; flex-wrap: wrap; justify-content: center; }
+        .step { flex: 1; min-width: 140px; max-width: 200px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 12px; text-align: center; }
+        .step .s-icon { font-size: 1.5rem; margin-bottom: 6px; }
+        .step .s-num { font-size: .65rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
+        .step h4 { font-size: .82rem; font-weight: 600; margin-top: 2px; }
+        .step p { font-size: .7rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.4; }
 
-        /* ── Panels ── */
-        .panel { background: #fff; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,.06); padding: 22px; flex: 1; min-width: 340px; border: 1px solid #eef0f5; }
-        .panel-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
-        .panel-header .panel-icon { width: 32px; height: 32px; background: #eef1ff; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
-        .panel-header h2 { font-size: 1rem; font-weight: 600; color: #1a237e; }
+        /* ── Main Grid ── */
+        .main { max-width: 960px; margin: 28px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
-        /* ── Upload Area ── */
-        .upload-zone { margin: 20px 0; padding: 60px 20px; border: 3px dashed #d0d4e4; border-radius: 12px; text-align: center; cursor: pointer; transition: all .3s; background: #fafbfd; position: relative; }
-        .upload-zone:hover { border-color: #1a237e; background: #f0f1ff; }
-        .upload-zone.drag-over { border-color: #1a237e; background: #eef1ff; transform: scale(1.02); }
-        .upload-zone .upload-icon { font-size: 3rem; margin-bottom: 12px; opacity: .6; }
-        .upload-zone h3 { font-size: 1.1rem; font-weight: 600; color: #1a237e; margin-bottom: 8px; }
-        .upload-zone p { font-size: .85rem; color: #888; line-height: 1.6; }
-        .upload-zone .file-types { font-size: .75rem; color: #bbb; margin-top: 8px; }
+        /* ── Card ── */
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); }
+        .card-title { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; }
+        .card-title .ct-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: .95rem; }
+        .card-title h3 { font-size: .95rem; font-weight: 600; }
+
+        /* ── Upload Zone ── */
+        .upload-zone { border: 2px dashed var(--border); border-radius: 12px; padding: 40px 20px; text-align: center; cursor: pointer; transition: all .2s; background: #fafbff; }
+        .upload-zone:hover, .upload-zone.drag-over { border-color: var(--primary); background: var(--primary-light); }
+        .upload-zone .uz-icon { font-size: 2.5rem; opacity: .5; }
+        .upload-zone h4 { font-size: .95rem; font-weight: 600; margin-top: 10px; }
+        .upload-zone p { font-size: .8rem; color: var(--text-secondary); margin-top: 6px; line-height: 1.5; }
+        .upload-zone .filetypes { font-size: .7rem; color: #aaa; margin-top: 8px; }
         .upload-zone input { display: none; }
 
-        /* ── Audio Player ── */
-        .audio-player { margin: 20px 0; padding: 16px; background: #f8f9fc; border-radius: 10px; border: 1px solid #eef0f5; }
-        .audio-player audio { width: 100%; margin-top: 8px; }
-        .audio-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .audio-info .filename { font-size: .85rem; font-weight: 600; color: #1a237e; }
-        .audio-info .remove-btn { padding: 4px 10px; background: #ffebee; color: #c62828; border: none; border-radius: 6px; cursor: pointer; font-size: .75rem; font-weight: 500; }
-        .audio-info .remove-btn:hover { background: #ffcdd2; }
+        /* ── Divider ── */
+        .or-divider { display: flex; align-items: center; gap: 10px; margin: 16px 0; font-size: .75rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        .or-divider::before, .or-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-        /* ── Action Buttons ── */
-        .action-row { display: flex; gap: 10px; margin-top: 14px; }
-        .btn-analyze { flex: 1; padding: 13px; background: linear-gradient(135deg, #1a237e, #3949ab); color: #fff; border: none; border-radius: 10px; font-size: .95rem; font-weight: 600; cursor: pointer; transition: transform .1s, box-shadow .2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-analyze:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(26,35,126,.3); }
-        .btn-analyze:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+        /* ── Record ── */
+        .record-section { text-align: center; }
+        .record-btn { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--border); background: var(--surface); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1.8rem; transition: all .2s; box-shadow: var(--shadow); }
+        .record-btn:hover { border-color: var(--danger); transform: scale(1.05); }
+        .record-btn.recording { border-color: var(--danger); background: #fef2f2; animation: rec-pulse 1.2s ease-in-out infinite; }
+        @keyframes rec-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(220,38,38,.3); } 50% { box-shadow: 0 0 0 14px rgba(220,38,38,0); } }
+        .record-label { font-size: .78rem; color: var(--text-secondary); margin-top: 8px; font-weight: 500; }
+        .record-timer { font-size: 1.1rem; font-weight: 700; color: var(--danger); margin-top: 4px; display: none; }
 
-        /* ── Results ── */
-        .results-panel { flex: 1; min-width: 340px; }
-        .placeholder { text-align: center; padding: 50px 20px; color: #bbb; }
-        .placeholder .ph-icon { font-size: 3rem; margin-bottom: 10px; opacity: .5; }
-        .placeholder p { font-size: .85rem; line-height: 1.5; }
+        /* ── Audio Preview ── */
+        .audio-preview { margin-top: 16px; padding: 14px; background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; display: none; }
+        .audio-preview .ap-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .audio-preview .ap-name { font-size: .82rem; font-weight: 600; color: var(--text); }
+        .audio-preview .ap-remove { background: none; border: 1px solid #fca5a5; color: var(--danger); padding: 3px 10px; border-radius: 6px; font-size: .72rem; cursor: pointer; font-weight: 500; }
+        .audio-preview .ap-remove:hover { background: #fef2f2; }
+        .audio-preview audio { width: 100%; height: 36px; margin-top: 4px; }
 
-        /* ── Gauge ── */
-        .gauge-box { text-align: center; padding: 20px 0 10px; }
-        .gauge-box svg { max-width: 260px; }
-        .risk-label { font-size: 1rem; font-weight: 600; color: #666; margin-top: 4px; }
-        .risk-pct { font-size: 2.6rem; font-weight: 800; letter-spacing: -1px; }
-        .status-badge { display: inline-block; padding: 6px 20px; border-radius: 20px; font-size: .85rem; font-weight: 600; margin-top: 8px; }
-        .status-LOW    { background: #e8f5e9; color: #2e7d32; }
-        .status-MODERATE { background: #fff3e0; color: #e65100; }
-        .status-HIGH   { background: #ffebee; color: #c62828; }
+        /* ── Waveform ── */
+        .waveform-container { margin-top: 12px; height: 60px; background: #f1f5f9; border-radius: 8px; overflow: hidden; }
+        .waveform-container canvas { width: 100%; height: 100%; }
 
-        /* ── Interpretation ── */
-        .interpretation { margin: 16px 0; padding: 14px 16px; border-radius: 10px; font-size: .82rem; line-height: 1.6; border-left: 4px solid; }
-        .interp-low { background: #f1f8e9; border-color: #4caf50; color: #33691e; }
-        .interp-moderate { background: #fff8e1; border-color: #ff9800; color: #e65100; }
-        .interp-high { background: #fce4ec; border-color: #f44336; color: #b71c1c; }
-
-        /* ── Score Cards ── */
-        .scores { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 16px 0; }
-        .score-card { background: #f8f9fc; border-radius: 10px; padding: 12px; text-align: center; border: 1px solid #eef0f5; }
-        .score-card .label { font-size: .68rem; color: #888; text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
-        .score-card .val { font-size: 1.4rem; font-weight: 700; margin-top: 3px; }
+        /* ── Analyze Button ── */
+        .btn-analyze { width: 100%; padding: 14px; margin-top: 18px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; border: none; border-radius: 12px; font-size: .95rem; font-weight: 600; cursor: pointer; transition: all .15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-analyze:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(79,70,229,.25); }
+        .btn-analyze:disabled { opacity: .45; cursor: not-allowed; transform: none; }
 
         /* ── Spinner ── */
-        .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin .6s linear infinite; }
+        .spinner { width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* ── Placeholder ── */
+        .placeholder { text-align: center; padding: 60px 20px; }
+        .placeholder .ph-icon { font-size: 3rem; opacity: .3; }
+        .placeholder p { font-size: .85rem; color: #b0b8c8; margin-top: 10px; line-height: 1.6; }
+
+        /* ── Results ── */
+        .result-gauge { text-align: center; padding: 10px 0; }
+        .gauge-ring { width: 180px; height: 180px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-direction: column; position: relative; }
+        .gauge-ring svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+        .gauge-ring .g-pct { font-size: 2.4rem; font-weight: 800; letter-spacing: -1px; z-index: 1; }
+        .gauge-ring .g-label { font-size: .72rem; font-weight: 500; color: var(--text-secondary); z-index: 1; }
+        .status-pill { display: inline-block; padding: 6px 22px; border-radius: 24px; font-size: .82rem; font-weight: 600; margin-top: 12px; }
+        .pill-low { background: #ecfdf5; color: #065f46; }
+        .pill-mod { background: #fffbeb; color: #92400e; }
+        .pill-high { background: #fef2f2; color: #991b1b; }
+
+        .interp-box { margin: 16px 0; padding: 14px 16px; border-radius: 10px; font-size: .82rem; line-height: 1.6; border-left: 4px solid; }
+        .ib-low { background: #f0fdf4; border-color: var(--success); color: #14532d; }
+        .ib-mod { background: #fffbeb; border-color: var(--warning); color: #78350f; }
+        .ib-high { background: #fef2f2; border-color: var(--danger); color: #7f1d1d; }
+
+        /* ── Score Grid ── */
+        .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
+        .sc { background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; padding: 12px; text-align: center; }
+        .sc .sc-label { font-size: .65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
+        .sc .sc-val { font-size: 1.3rem; font-weight: 700; margin-top: 2px; }
+
+        /* ── Voice Features ── */
+        .vf-title { font-size: .82rem; font-weight: 600; margin: 16px 0 10px; display: flex; align-items: center; gap: 6px; }
+        .vf-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .vf-item { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 10px 8px; text-align: center; }
+        .vf-item .vf-label { font-size: .62rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .4px; font-weight: 600; }
+        .vf-item .vf-val { font-size: .95rem; font-weight: 700; margin-top: 2px; color: var(--text); }
+        .vf-item .vf-unit { font-size: .6rem; color: #aaa; }
+
+        /* ── Fold Breakdown ── */
+        .fold-section { margin-top: 16px; padding: 14px; background: #f8fafc; border-radius: 10px; border: 1px solid var(--border); }
+        .fold-title { font-size: .78rem; font-weight: 600; margin-bottom: 8px; }
+        .fold-bar-row { display: flex; align-items: center; gap: 8px; margin: 5px 0; font-size: .78rem; }
+        .fold-bar-row .fb-label { width: 50px; font-weight: 500; color: var(--text-secondary); }
+        .fold-bar-row .fb-track { flex: 1; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .fold-bar-row .fb-fill { height: 100%; border-radius: 4px; transition: width .6s ease; }
+        .fold-bar-row .fb-val { width: 45px; text-align: right; font-weight: 600; font-size: .75rem; }
+
+        /* ── Disclaimer ── */
+        .disclaimer { max-width: 960px; margin: 24px auto 40px; padding: 0 20px; text-align: center; font-size: .72rem; color: #94a3b8; line-height: 1.6; }
+        .disclaimer strong { color: #64748b; }
+
         /* ── Toast ── */
-        .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; background: #1a237e; color: #fff; border-radius: 10px; font-size: .82rem; font-weight: 500; box-shadow: 0 4px 16px rgba(0,0,0,.2); z-index: 1000; transform: translateY(80px); opacity: 0; transition: all .3s; }
-        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(80px); padding: 10px 24px; background: var(--text); color: #fff; border-radius: 10px; font-size: .82rem; font-weight: 500; box-shadow: var(--shadow-lg); z-index: 1000; opacity: 0; transition: all .3s; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-        footer { text-align: center; padding: 20px 16px; font-size: .72rem; color: #999; max-width: 1200px; margin: 0 auto; }
-        footer a { color: #1a237e; }
-
+        /* ── Responsive ── */
         @media (max-width: 768px) {
-            header { flex-direction: column; gap: 10px; text-align: center; }
-            .container { flex-direction: column; }
-            .steps-row { flex-direction: column; }
-            .scores { grid-template-columns: 1fr; }
+            .main { grid-template-columns: 1fr; }
+            .steps { flex-direction: column; align-items: center; }
+            .step { max-width: 100%; }
+            .hero h2 { font-size: 1.4rem; }
+            .vf-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="logo-area">
-        <div class="icon">🎤</div>
-        <div>
-            <h1>PD Live Translate — Speech</h1>
-            <p>AI-Powered Parkinson's Disease Speech Screening</p>
-        </div>
+<nav>
+    <div class="nav-brand">
+        <div class="icon-box">🎤</div>
+        <div><h1>NeuroVoice <span>Speech Screening</span></h1></div>
     </div>
-    <div class="header-actions">
-        <button class="header-btn" onclick="showHelp()" title="How to use">❓ Help</button>
+    <div class="nav-status" id="modelStatus">
+        <div class="status-dot loading" id="statusDot"></div>
+        <span id="statusText">Loading models…</span>
     </div>
-</header>
+</nav>
 
-<!-- How It Works -->
-<div class="how-it-works">
-    <div class="steps-row">
-        <div class="step-card">
-            <div class="step-num">1</div>
-            <div class="step-icon">🎙️</div>
-            <h3>Record or Upload</h3>
-            <p>Upload a voice recording (sustained vowel, sentence, or speech sample)</p>
-        </div>
-        <div class="step-card">
-            <div class="step-num">2</div>
-            <div class="step-icon">🧠</div>
-            <h3>AI Analysis</h3>
-            <p>Our ensemble analyzes acoustic features, MFCC, and spectral patterns</p>
-        </div>
-        <div class="step-card">
-            <div class="step-num">3</div>
-            <div class="step-icon">📊</div>
-            <h3>View Results</h3>
-            <p>See your risk score and detailed model breakdown instantly</p>
-        </div>
-        <div class="step-card">
-            <div class="step-num">4</div>
-            <div class="step-icon">📋</div>
-            <h3>Track Progress</h3>
-            <p>Monitor changes over time and share results with your doctor</p>
-        </div>
-    </div>
+<div class="hero">
+    <h2>Detect Parkinson's from <em>Your Voice</em></h2>
+    <p>Record or upload a short voice sample. Our AI ensemble (XLS-R + Cross-Attention Fusion) analyzes vocal biomarkers to screen for early Parkinson's disease indicators — works in any language.</p>
 </div>
 
-<div class="container">
-    <!-- Left: Upload -->
-    <div class="panel">
-        <div class="panel-header">
-            <div class="panel-icon">🎤</div>
-            <h2>Upload Voice Recording</h2>
+<div class="steps">
+    <div class="step"><div class="s-icon">🎙️</div><div class="s-num">Step 1</div><h4>Record / Upload</h4><p>Say "Ahhh" for 3–5 sec or upload a file</p></div>
+    <div class="step"><div class="s-icon">🧠</div><div class="s-num">Step 2</div><h4>AI Analysis</h4><p>5 models analyze 960+ features</p></div>
+    <div class="step"><div class="s-icon">📊</div><div class="s-num">Step 3</div><h4>Get Results</h4><p>Risk score + vocal feature breakdown</p></div>
+</div>
+
+<div class="main">
+    <!-- ── Left: Input ── -->
+    <div class="card">
+        <div class="card-title">
+            <div class="ct-icon" style="background:var(--primary-light);color:var(--primary);">🎤</div>
+            <h3>Voice Input</h3>
         </div>
 
         <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
-            <div class="upload-icon">🎵</div>
-            <h3>Drop audio file here or click to browse</h3>
-            <p>Upload a clear voice recording for analysis<br>Best results with sustained vowels (e.g., "Ahhh") or reading sentences</p>
-            <p class="file-types">Supported: WAV, MP3, OGG, FLAC, M4A (max 16MB)</p>
+            <div class="uz-icon">📁</div>
+            <h4>Drop audio file here or click to browse</h4>
+            <p>Upload a clear recording — sustained vowel, reading, or conversation</p>
+            <div class="filetypes">WAV · MP3 · OGG · FLAC · M4A (max 16 MB)</div>
             <input type="file" id="fileInput" accept="audio/*" onchange="handleFileSelect(event)">
         </div>
 
-        <div id="audioPlayerContainer" style="display:none;">
-            <div class="audio-player">
-                <div class="audio-info">
-                    <span class="filename" id="fileName"></span>
-                    <button class="remove-btn" onclick="removeAudio()">✕ Remove</button>
-                </div>
-                <audio id="audioPlayer" controls></audio>
-            </div>
+        <div class="or-divider">or record live</div>
+
+        <div class="record-section">
+            <button class="record-btn" id="recordBtn" onclick="toggleRecording()">🎙️</button>
+            <div class="record-label" id="recordLabel">Tap to start recording</div>
+            <div class="record-timer" id="recordTimer">0:00</div>
         </div>
 
-        <div class="action-row">
-            <button id="analyzeBtn" class="btn-analyze" onclick="analyzeAudio()" disabled>
-                🔬 Analyze Voice
-            </button>
+        <div class="audio-preview" id="audioPreview">
+            <div class="ap-header">
+                <span class="ap-name" id="apName">recording.wav</span>
+                <button class="ap-remove" onclick="removeAudio()">✕ Remove</button>
+            </div>
+            <audio id="audioPlayer" controls></audio>
+            <div class="waveform-container"><canvas id="waveformCanvas"></canvas></div>
         </div>
+
+        <button class="btn-analyze" id="analyzeBtn" onclick="analyzeAudio()" disabled>
+            🔬 Analyze Voice
+        </button>
     </div>
 
-    <!-- Right: Results -->
-    <div class="panel results-panel">
-        <div class="panel-header">
-            <div class="panel-icon">📊</div>
-            <h2>Analysis Results</h2>
+    <!-- ── Right: Results ── -->
+    <div class="card">
+        <div class="card-title">
+            <div class="ct-icon" style="background:#f0fdf4;color:var(--success);">📊</div>
+            <h3>Analysis Results</h3>
         </div>
         <div id="resultsContent">
             <div class="placeholder">
-                <div class="ph-icon">🔬</div>
-                <p>Upload a voice recording and click <strong>Analyze Voice</strong></p>
-                <p style="font-size:.75rem;color:#ccc;margin-top:8px;">The AI will evaluate vocal tremor, pitch variation, and speech patterns</p>
+                <div class="ph-icon">🩺</div>
+                <p>Record or upload a voice sample,<br>then tap <strong>Analyze Voice</strong> to see results.</p>
             </div>
         </div>
     </div>
 </div>
 
-<footer>
-    <strong>⚠️ Disclaimer:</strong> This is a screening tool for <em>research purposes only</em>. It is <strong>not</strong> a substitute for professional medical diagnosis. Please consult a healthcare provider for clinical evaluation.
-    <br>Ensemble: XLS-R Multilingual + ML Classifiers | 92%+ accuracy | 0.95+ AUC-ROC
-</footer>
+<div class="disclaimer">
+    <strong>⚠️ Medical Disclaimer:</strong> This screening tool is for <em>research and educational purposes only</em>. It is <strong>not</strong> a substitute for professional medical diagnosis.
+    Always consult a qualified neurologist for clinical evaluation.<br>
+    Model: XLS-R 300M + Cross-Attention Fusion · 5-Fold Ensemble · 91.7% Accuracy · 0.97 AUC-ROC · Patient-Level CV
+</div>
 
 <div class="toast" id="toast"></div>
 
 <script>
 let currentFile = null;
+let mediaRecorder = null;
+let audioChunks = [];
+let recordingStartTime = null;
+let timerInterval = null;
+let audioContext = null;
 
-// Drag & Drop
+// ── Check model health on load ──
+async function checkHealth() {
+    try {
+        const r = await fetch('/health');
+        const d = await r.json();
+        const dot = document.getElementById('statusDot');
+        const txt = document.getElementById('statusText');
+        if (d.models_loaded) {
+            dot.className = 'status-dot ok';
+            txt.textContent = d.model_count + ' models ready';
+        } else {
+            dot.className = 'status-dot err';
+            txt.textContent = d.error || 'Models not loaded';
+        }
+    } catch {
+        document.getElementById('statusDot').className = 'status-dot err';
+        document.getElementById('statusText').textContent = 'Server offline';
+    }
+}
+checkHealth();
+
+// ── Drag & Drop ──
 const uploadZone = document.getElementById('uploadZone');
-uploadZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    uploadZone.classList.add('drag-over');
-});
-uploadZone.addEventListener('dragleave', () => {
-    uploadZone.classList.remove('drag-over');
-});
-uploadZone.addEventListener('drop', (e) => {
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', e => {
     e.preventDefault();
     uploadZone.classList.remove('drag-over');
     const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('audio/')) {
-        loadAudioFile(file);
-    } else {
-        showToast('Please drop an audio file');
-    }
+    if (file && file.type.startsWith('audio/')) loadAudioFile(file);
+    else showToast('Please drop an audio file');
 });
 
-function handleFileSelect(event) {
-    const file = event.target.files[0];
-    if (file) loadAudioFile(file);
-}
+function handleFileSelect(e) { if (e.target.files[0]) loadAudioFile(e.target.files[0]); }
 
 function loadAudioFile(file) {
     currentFile = file;
     const url = URL.createObjectURL(file);
-    
-    document.getElementById('fileName').textContent = file.name;
+    document.getElementById('apName').textContent = file.name;
     document.getElementById('audioPlayer').src = url;
-    document.getElementById('audioPlayerContainer').style.display = 'block';
+    document.getElementById('audioPreview').style.display = 'block';
     document.getElementById('analyzeBtn').disabled = false;
-    
-    showToast('Audio loaded successfully');
+    document.getElementById('uploadZone').style.display = 'none';
+    drawWaveform(file);
+    showToast('✓ Audio loaded');
 }
 
 function removeAudio() {
     currentFile = null;
-    document.getElementById('audioPlayerContainer').style.display = 'none';
+    document.getElementById('audioPreview').style.display = 'none';
+    document.getElementById('uploadZone').style.display = '';
     document.getElementById('analyzeBtn').disabled = true;
     document.getElementById('fileInput').value = '';
     resetResults();
-    showToast('Audio removed');
 }
 
-function resetResults() {
-    document.getElementById('resultsContent').innerHTML = `
-        <div class="placeholder">
-            <div class="ph-icon">🔬</div>
-            <p>Upload a voice recording and click <strong>Analyze Voice</strong></p>
-            <p style="font-size:.75rem;color:#ccc;margin-top:8px;">The AI will evaluate vocal tremor, pitch variation, and speech patterns</p>
-        </div>`;
-}
+// ── Live Recording ──
+async function toggleRecording() {
+    const btn = document.getElementById('recordBtn');
+    const label = document.getElementById('recordLabel');
+    const timer = document.getElementById('recordTimer');
 
-async function analyzeAudio() {
-    if (!currentFile) {
-        showToast('Please upload an audio file first');
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+        btn.classList.remove('recording');
+        btn.textContent = '🎙️';
+        label.textContent = 'Tap to start recording';
+        timer.style.display = 'none';
+        clearInterval(timerInterval);
         return;
     }
 
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 16000, channelCount: 1, echoCancellation: true, noiseSuppression: true } });
+        audioChunks = [];
+        mediaRecorder = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm' });
+
+        mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+        mediaRecorder.onstop = () => {
+            stream.getTracks().forEach(t => t.stop());
+            const blob = new Blob(audioChunks, { type: 'audio/webm' });
+            const file = new File([blob], 'recording.webm', { type: 'audio/webm' });
+            loadAudioFile(file);
+            showToast('✓ Recording saved');
+        };
+
+        mediaRecorder.start(100);
+        btn.classList.add('recording');
+        btn.textContent = '⏹️';
+        label.textContent = 'Recording… tap to stop';
+        recordingStartTime = Date.now();
+        timer.style.display = 'block';
+        timerInterval = setInterval(() => {
+            const sec = Math.floor((Date.now() - recordingStartTime) / 1000);
+            timer.textContent = Math.floor(sec/60) + ':' + String(sec%60).padStart(2,'0');
+            if (sec >= 30) { mediaRecorder.stop(); showToast('Max 30 seconds reached'); }
+        }, 200);
+    } catch (err) {
+        showToast('Microphone access denied');
+    }
+}
+
+// ── Waveform Visualization ──
+function drawWaveform(file) {
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const buffer = await audioContext.decodeAudioData(e.target.result);
+            const data = buffer.getChannelData(0);
+            const canvas = document.getElementById('waveformCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth * 2;
+            canvas.height = canvas.offsetHeight * 2;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const step = Math.ceil(data.length / canvas.width);
+            const mid = canvas.height / 2;
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+            gradient.addColorStop(0, '#818cf8');
+            gradient.addColorStop(0.5, '#6366f1');
+            gradient.addColorStop(1, '#818cf8');
+            ctx.fillStyle = gradient;
+            for (let i = 0; i < canvas.width; i++) {
+                let min = 1, max = -1;
+                for (let j = 0; j < step; j++) {
+                    const val = data[i * step + j] || 0;
+                    if (val < min) min = val;
+                    if (val > max) max = val;
+                }
+                const y = (1 + min) * mid;
+                const h = Math.max(1, (max - min) * mid);
+                ctx.fillRect(i, y, 1, h);
+            }
+        } catch {}
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+// ── Analyze ──
+async function analyzeAudio() {
+    if (!currentFile) return showToast('Upload or record audio first');
     const btn = document.getElementById('analyzeBtn');
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span> Analyzing...';
+    btn.innerHTML = '<span class="spinner"></span> Analyzing…';
+    document.getElementById('resultsContent').innerHTML = '<div style="text-align:center;padding:60px 20px;"><div class="spinner" style="width:32px;height:32px;border-color:var(--border);border-top-color:var(--primary);margin:0 auto;"></div><p style="margin-top:14px;font-size:.85rem;color:var(--text-secondary);">Analyzing voice features…</p><p style="font-size:.72rem;color:#bbb;margin-top:4px;">This may take 15–30 seconds on first run</p></div>';
 
-    const formData = new FormData();
-    formData.append('file', currentFile);
-
+    const form = new FormData();
+    form.append('file', currentFile);
     try {
-        const response = await fetch('/predict', {
-            method: 'POST',
-            body: formData
-        });
+        const res = await fetch('/predict', { method: 'POST', body: form });
+        const data = await res.json();
+        if (data.error) { showToast('Error: ' + data.error); resetResults(); }
+        else { displayResults(data); showToast('✓ Analysis complete'); }
+    } catch (err) { showToast('Error: ' + err.message); resetResults(); }
+    finally { btn.disabled = false; btn.innerHTML = '🔬 Analyze Voice'; }
+}
 
-        const result = await response.json();
-
-        if (result.error) {
-            showToast('Error: ' + result.error);
-            btn.disabled = false;
-            btn.innerHTML = '🔬 Analyze Voice';
-            return;
-        }
-
-        displayResults(result);
-        showToast('Analysis complete!');
-    } catch (error) {
-        showToast('Error: ' + error.message);
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = '🔬 Analyze Voice';
-    }
+function resetResults() {
+    document.getElementById('resultsContent').innerHTML = '<div class="placeholder"><div class="ph-icon">🩺</div><p>Record or upload a voice sample,<br>then tap <strong>Analyze Voice</strong> to see results.</p></div>';
 }
 
 function displayResults(data) {
     const risk = data.combined_risk;
-    const status = data.status.replace(' RISK', '');
-    const confidence = data.confidence || 0.9;
-    
-    let statusClass = 'LOW';
-    let interpClass = 'interp-low';
-    let interpText = 'No significant Parkinson\'s indicators detected in your voice. Your speech patterns appear normal.';
-    let color = '#4caf50';
-    
+    const conf = data.confidence || 0.9;
+    const preds = data.individual_predictions || [];
+    const vf = data.voice_features || {};
+
+    let color, pillClass, ibClass, statusText, interpText;
     if (risk >= 0.66) {
-        statusClass = 'HIGH';
-        interpClass = 'interp-high';
-        interpText = 'Significant Parkinson\'s indicators detected. Please consult a neurologist for comprehensive evaluation.';
-        color = '#f44336';
+        color = 'var(--danger)'; pillClass = 'pill-high'; ibClass = 'ib-high'; statusText = 'HIGH RISK';
+        interpText = 'Significant Parkinson\'s-related vocal patterns detected — sustained vocal tremor, pitch instability, and reduced harmonic-to-noise ratio suggest motor speech involvement. <strong>Please consult a neurologist</strong> for comprehensive evaluation.';
     } else if (risk >= 0.33) {
-        statusClass = 'MODERATE';
-        interpClass = 'interp-moderate';
-        interpText = 'Some Parkinson\'s indicators present. Consider follow-up testing and monitoring.';
-        color = '#ff9800';
+        color = 'var(--warning)'; pillClass = 'pill-mod'; ibClass = 'ib-mod'; statusText = 'MODERATE RISK';
+        interpText = 'Some Parkinson\'s-related indicators are present in your voice — mild pitch variation and possible tremor detected. Consider follow-up testing with a specialist.';
+    } else {
+        color = 'var(--success)'; pillClass = 'pill-low'; ibClass = 'ib-low'; statusText = 'LOW RISK';
+        interpText = 'Your vocal patterns appear within normal ranges. No significant Parkinson\'s indicators detected in this sample. Continue monitoring if you have concerns.';
     }
 
-    const gaugeAngle = -90 + (risk * 180);
-    
-    document.getElementById('resultsContent').innerHTML = `
-        <div class="gauge-box">
-            <svg viewBox="0 0 200 120" style="max-width:260px;">
-                <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#eee" stroke-width="20" stroke-linecap="round"/>
-                <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="${color}" stroke-width="20" stroke-linecap="round"
-                      stroke-dasharray="${risk * 251.2} 251.2" style="transition: stroke-dasharray 1s ease;"/>
-                <circle cx="100" cy="100" r="6" fill="${color}"/>
-                <line x1="100" y1="100" x2="${100 + 70 * Math.cos(gaugeAngle * Math.PI / 180)}" 
-                      y2="${100 + 70 * Math.sin(gaugeAngle * Math.PI / 180)}" 
-                      stroke="${color}" stroke-width="3" stroke-linecap="round"/>
-            </svg>
-            <div class="risk-pct" style="color:${color};">${(risk * 100).toFixed(1)}%</div>
-            <div class="risk-label">Parkinson's Risk Score</div>
-            <div class="status-badge status-${statusClass}">${data.status}</div>
-        </div>
+    const pct = (risk * 100).toFixed(1);
+    const circumference = 2 * Math.PI * 75;
+    const dashoffset = circumference * (1 - risk);
 
-        <div class="interpretation ${interpClass}">
-            <strong>Interpretation:</strong> ${interpText}
-        </div>
+    let foldsHTML = '';
+    preds.forEach((p, i) => {
+        const c = p >= 0.66 ? 'var(--danger)' : p >= 0.33 ? 'var(--warning)' : 'var(--success)';
+        foldsHTML += '<div class="fold-bar-row"><span class="fb-label">Fold ' + (i+1) + '</span><div class="fb-track"><div class="fb-fill" style="width:' + (p*100) + '%;background:' + c + ';"></div></div><span class="fb-val" style="color:' + c + ';">' + (p*100).toFixed(1) + '%</span></div>';
+    });
 
-        <div class="scores">
-            <div class="score-card">
-                <div class="label">Ensemble Risk</div>
-                <div class="val" style="color:${color};">${(risk * 100).toFixed(1)}%</div>
-            </div>
-            <div class="score-card">
-                <div class="label">Confidence</div>
-                <div class="val">${(confidence * 100).toFixed(1)}%</div>
-            </div>
-        </div>
+    let vfHTML = '';
+    if (vf.mean_pitch) {
+        vfHTML = '<div class="vf-title">🔬 Vocal Biomarkers</div><div class="vf-grid">'
+            + '<div class="vf-item"><div class="vf-label">Pitch</div><div class="vf-val">' + vf.mean_pitch + '</div><div class="vf-unit">Hz</div></div>'
+            + '<div class="vf-item"><div class="vf-label">Pitch StdDev</div><div class="vf-val">' + vf.std_pitch + '</div><div class="vf-unit">Hz</div></div>'
+            + '<div class="vf-item"><div class="vf-label">Jitter</div><div class="vf-val">' + vf.jitter + '%</div><div class="vf-unit">local</div></div>'
+            + '<div class="vf-item"><div class="vf-label">Shimmer</div><div class="vf-val">' + vf.shimmer + '%</div><div class="vf-unit">local</div></div>'
+            + '<div class="vf-item"><div class="vf-label">HNR</div><div class="vf-val">' + vf.hnr + '</div><div class="vf-unit">dB</div></div>'
+            + '<div class="vf-item"><div class="vf-label">Spec. Center</div><div class="vf-val">' + vf.spectral_centroid + '</div><div class="vf-unit">Hz</div></div>'
+            + '<div class="vf-item"><div class="vf-label">Formant F1</div><div class="vf-val">' + vf.f1_mean + '</div><div class="vf-unit">Hz</div></div>'
+            + '<div class="vf-item"><div class="vf-label">Formant F2</div><div class="vf-val">' + vf.f2_mean + '</div><div class="vf-unit">Hz</div></div>'
+            + '<div class="vf-item"><div class="vf-label">Duration</div><div class="vf-val">' + vf.duration + '</div><div class="vf-unit">sec</div></div>'
+            + '</div>';
+    }
 
-        <div style="margin-top:20px;padding:14px;background:#f8f9fc;border-radius:10px;font-size:.8rem;">
-            <strong>Model Predictions:</strong>
-            <div style="margin-top:8px;">
-                ${data.individual_predictions.map((p, i) => `
-                    <div style="display:flex;justify-content:space-between;padding:4px 0;">
-                        <span>Fold ${i + 1}:</span>
-                        <span style="font-weight:600;">${(p * 100).toFixed(1)}%</span>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    `;
+    document.getElementById('resultsContent').innerHTML = ''
+        + '<div class="result-gauge"><div class="gauge-ring"><svg width="180" height="180" viewBox="0 0 180 180"><circle cx="90" cy="90" r="75" fill="none" stroke="#e2e8f0" stroke-width="12"/><circle cx="90" cy="90" r="75" fill="none" stroke="' + color + '" stroke-width="12" stroke-linecap="round" stroke-dasharray="' + circumference + '" stroke-dashoffset="' + dashoffset + '" style="transition:stroke-dashoffset 1s ease;"/></svg><div class="g-pct" style="color:' + color + ';">' + pct + '%</div><div class="g-label">PD Risk Score</div></div><div><span class="status-pill ' + pillClass + '">' + statusText + '</span></div></div>'
+        + '<div class="interp-box ' + ibClass + '"><strong>Interpretation:</strong> ' + interpText + '</div>'
+        + '<div class="score-grid"><div class="sc"><div class="sc-label">Ensemble Risk</div><div class="sc-val" style="color:' + color + ';">' + pct + '%</div></div><div class="sc"><div class="sc-label">Confidence</div><div class="sc-val">' + (conf*100).toFixed(1) + '%</div></div></div>'
+        + vfHTML
+        + '<div class="fold-section"><div class="fold-title">📈 Per-Model Breakdown (5-Fold Ensemble)</div>' + foldsHTML + '</div>';
 }
 
-function showToast(message) {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
-}
-
-function showHelp() {
-    alert(`🎤 How to Use:\n\n1. Record or upload a voice sample (sustained vowel "Ahhh" for 3-5 seconds works best)\n2. Click "Analyze Voice" to process\n3. View your risk score and interpretation\n\n📝 Tips:\n- Use a quiet environment\n- Speak naturally at normal volume\n- Sustained vowels provide best results\n- Multiple recordings can help track changes over time\n\n⚠️ This is a screening tool only - consult a doctor for diagnosis.`);
+// ── Toast ──
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
 }
 </script>
-
 </body>
 </html>
