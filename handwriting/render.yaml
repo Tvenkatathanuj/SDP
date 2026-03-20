@@ -2,20 +2,13 @@ services:
   - type: web
     name: pd-handwriting-detection
     runtime: python
-    # ── If your files are at the repo ROOT (not inside a subfolder), remove rootDir ──
-    # rootDir: handwriting   ← only keep this if app.py is inside a 'handwriting/' folder
-    buildCommand: |
-      git lfs install &&
-      git lfs pull &&
-      pip install --upgrade pip &&
-      pip install -r requirements.txt
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
     startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --timeout 180 --workers 1 --preload
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.7"
       - key: PYTHONUNBUFFERED
         value: "1"
-      # Prevents torch from using extra RAM for multiprocessing
       - key: OMP_NUM_THREADS
         value: "1"
       - key: MKL_NUM_THREADS
