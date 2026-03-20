@@ -34,6 +34,27 @@ torch.set_num_threads(1)
 os.environ.setdefault("OMP_NUM_THREADS", "1")
 os.environ.setdefault("MKL_NUM_THREADS", "1")
 
+
+def _find_model_files():
+    """
+    FIX 1: Search multiple locations for .pth/.pkl files.
+    Render clones the whole repo — files may be in a subfolder like 'handwriting/'.
+    """
+    search_dirs = [
+        BASE_DIR,
+        os.path.join(BASE_DIR, "handwriting"),
+        os.path.join(BASE_DIR, "models"),
+        os.path.join(BASE_DIR, ".."),
+        os.path.join(BASE_DIR, "..", "handwriting"),
+    ]
+    for d in search_dirs:
+        d = os.path.abspath(d)
+        if os.path.isdir(d) and os.path.exists(os.path.join(d, "scaler.pkl")):
+            print(f"  [*] Found model files in: {d}")
+            return d
+    print(f"  [!!] Could not find model directory. BASE_DIR contents: {os.listdir(BASE_DIR)}")
+    return BASE_DIR
+
 # ════════════════════════════════════════════════════════════════
 # 16 Spatial Biomarker Feature Extractor
 # ════════════════════════════════════════════════════════════════
@@ -336,11 +357,12 @@ def load_all_models():
     global mlp_models, cnn_models, scaler, meta_model, models_loaded, load_error
 
     print("[*] Loading models...")
+    model_dir = _find_model_files()
 
     try:
         # Load 5 MLP fold models
         for i in range(1, 6):
-            path = os.path.join(BASE_DIR, f"mlp_fold_{i}.pth")
+            path = os.path.join(model_dir, f"mlp_fold_{i}.pth")
             if os.path.exists(path):
                 m = PDDetectionModelV2(input_size=16)
                 # FIX: Use weights_only=True where possible for safety + speed
@@ -357,7 +379,7 @@ def load_all_models():
 
         # Load 5 CNN fold models
         for i in range(1, 6):
-            path = os.path.join(BASE_DIR, f"cnn_fold_{i}.pth")
+            path = os.path.join(model_dir, f"cnn_fold_{i}.pth")
             if os.path.exists(path):
                 m = _build_efficientnet_cbam()
                 state = torch.load(path, map_location=DEVICE, weights_only=False)
@@ -374,7 +396,7 @@ def load_all_models():
                 print(f"  [!!] cnn_fold_{i}.pth NOT FOUND — skipping")
 
         # Load scaler
-        scaler_path = os.path.join(BASE_DIR, "scaler.pkl")
+        scaler_path = os.path.join(model_dir, "scaler.pkl")
         if os.path.exists(scaler_path):
             with open(scaler_path, "rb") as f:
                 scaler = pickle.load(f)
@@ -383,7 +405,7 @@ def load_all_models():
             print("  [!!] scaler.pkl NOT FOUND — MLP predictions will use raw features")
 
         # Load meta-learner (optional — app works without it)
-        meta_path = os.path.join(BASE_DIR, "meta_model.pkl")
+        meta_path = os.path.join(model_dir, "meta_model.pkl")
         if os.path.exists(meta_path):
             with open(meta_path, "rb") as f:
                 meta_model = pickle.load(f)
@@ -421,7 +443,7 @@ def _image_from_base64(data_url):
 def predict_mlp(img_gray):
     """Run MLP ensemble on grayscale image → average probability."""
     if not mlp_models:
-        return 0.5
+        return None  # FIX 3: None signals "no models loaded" vs actual 0.5 prediction
 
     img_resized = cv2.resize(img_gray, (256, 256))
     feats = extract_16_features(img_resized)
@@ -435,6 +457,7 @@ def predict_mlp(img_gray):
     preds = []
     with torch.inference_mode():
         for m in mlp_models:
+            m.eval()  # FIX 2: ensure eval mode — BatchNorm1d must use running stats
             preds.append(m(inp).cpu().item())
     return float(np.mean(preds))
 
@@ -442,11 +465,12 @@ def predict_mlp(img_gray):
 def predict_cnn(img_pil, use_tta=False):
     """Run CNN ensemble on PIL image → average probability."""
     if not cnn_models:
-        return 0.5
+        return None  # FIX 3: None signals "no models loaded" vs actual 0.5 prediction
 
     preds = []
     with torch.inference_mode():
         for m in cnn_models:
+            m.eval()  # FIX 2: ensure eval mode
             if use_tta:
                 for tf in tta_transforms:
                     inp = tf(img_pil).unsqueeze(0).to(DEVICE)
@@ -463,14 +487,29 @@ def predict_ensemble(img_pil):
 
     mlp_risk = predict_mlp(img_gray)
     cnn_risk = predict_cnn(img_pil, use_tta=False)
-    cnn_tta_risk = predict_cnn(img_pil, use_tta=True)
+    cnn_tta_risk = predict_cnn(img_pil, use_tta=True)  # may be None if no CNN models
 
-    if meta_model is not None:
+    # FIX 3: Collect only predictions that actually ran (not None)
+    available = {k: v for k, v in
+                 {"mlp": mlp_risk, "cnn": cnn_risk, "cnn_tta": cnn_tta_risk}.items()
+                 if v is not None}
+
+    if not available:
+        return {
+            "combined_risk": 0.5,
+            "mlp_risk": None, "cnn_risk": None, "cnn_tta_risk": None,
+            "status": "UNKNOWN — no models loaded",
+            "error": "No .pth model files found on disk. Check Git LFS setup.",
+            "features": {},
+        }
+
+    if meta_model is not None and len(available) == 3:
         meta_input = np.array([[mlp_risk, cnn_risk, cnn_tta_risk]])
         combined_risk = float(meta_model.predict_proba(meta_input)[:, 1][0])
     else:
-        # FIX: Weighted fallback — CNN-TTA gets more weight than raw CNN
-        combined_risk = (mlp_risk * 0.35 + cnn_risk * 0.25 + cnn_tta_risk * 0.40)
+        weights = {"mlp": 0.35, "cnn": 0.25, "cnn_tta": 0.40}
+        total_w = sum(weights[k] for k in available)
+        combined_risk = sum(available[k] * weights[k] for k in available) / total_w
 
     img_resized = cv2.resize(img_gray, (256, 256))
     raw_feats = extract_16_features(img_resized)
@@ -485,9 +524,9 @@ def predict_ensemble(img_pil):
 
     return {
         "combined_risk": round(combined_risk, 4),
-        "mlp_risk": round(mlp_risk, 4),
-        "cnn_risk": round(cnn_risk, 4),
-        "cnn_tta_risk": round(cnn_tta_risk, 4),
+        "mlp_risk":     round(mlp_risk,     4) if mlp_risk     is not None else None,
+        "cnn_risk":     round(cnn_risk,     4) if cnn_risk     is not None else None,
+        "cnn_tta_risk": round(cnn_tta_risk, 4) if cnn_tta_risk is not None else None,
         "status": status,
         "features": feature_dict,
     }
@@ -534,14 +573,25 @@ def predict_route():
 
 @app.route("/health")
 def health():
+    """FIX 4: Show which files are actually on disk so you can debug missing models."""
+    model_dir = _find_model_files()
+    try:
+        all_files = os.listdir(model_dir)
+        pth_files = sorted(f for f in all_files if f.endswith(".pth"))
+        pkl_files = sorted(f for f in all_files if f.endswith(".pkl"))
+    except Exception:
+        pth_files = pkl_files = []
     return jsonify({
         "status": "ok",
-        "models_loaded": models_loaded,
-        "mlp_count": len(mlp_models),
-        "cnn_count": len(cnn_models),
-        "meta_model": meta_model is not None,
-        "scaler": scaler is not None,
-        "load_error": load_error,
+        "models_loaded":   models_loaded,
+        "mlp_count":       len(mlp_models),
+        "cnn_count":       len(cnn_models),
+        "meta_model":      meta_model is not None,
+        "scaler":          scaler is not None,
+        "load_error":      load_error,
+        "model_dir":       model_dir,
+        "pth_files_found": pth_files,
+        "pkl_files_found": pkl_files,
     })
 
 
