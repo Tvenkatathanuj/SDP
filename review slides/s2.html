@@ -1,161 +1,605 @@
-<!DOCTYPE html>
-
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=1280, height=720" name="viewport"/>
-<title>Abstract</title>
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
-<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet"/>
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Abstract Overview — Slide</title>
+
+  <style>
+    /* ===== PPT/EXPORT SAFE CANVAS ===== */
+    @page { size: 13.333in 7.5in; margin: 0; } /* 16:9 */
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body { margin: 0; background: #eef2ff; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif; }
+
+    /* Center on screen; export still uses fixed 1280×720 */
+    .stage{
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
     }
-    body {
-        font-family: 'Inter', sans-serif;
-        overflow: hidden;
+
+    .slide{
+      width: 1280px;
+      height: 720px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 22px 60px rgba(15, 23, 42, 0.18);
+      color: #0f172a;
     }
-    .slide-container {
-        width: 1280px;
-        height: 720px;
-        display: flex;
-        flex-direction: column;
-        background: #ffffff;
-        position: relative;
+
+    /* Optional visual scaling only (does NOT change export size) */
+    @media (max-width: 1320px){ .slide{ transform: scale(.92); transform-origin: top left; } }
+    @media (max-width: 1220px){ .slide{ transform: scale(.84); } }
+
+    :root{
+      --blue-900:#0b2a6f;
+      --blue-700:#1d4ed8;
+      --teal-600:#0f766e;
+      --teal-500:#14b8a6;
+      --slate-900:#0f172a;
+      --slate-700:#334155;
+      --slate-500:#64748b;
+      --line:#e5e7eb;
+      --card:#ffffff;
+      --muted:#f8fafc;
     }
-    .header-section {
-        background: #1e3a8a;
-        color: white;
-        padding: 30px 60px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+
+    /* ===== BACKGROUND ACCENTS ===== */
+    .topline{ position:absolute; left:0; top:0; right:0; height:10px; background:var(--blue-900); }
+    .rail{
+      position:absolute; left:0; top:0; bottom:0; width:108px;
+      background:var(--blue-900);
     }
-    .title-text {
-        font-size: 42px;
-        font-weight: 700;
-        letter-spacing: -0.5px;
+    .rail .b1{ position:absolute; left:0; bottom:145px; width:108px; height:165px; background:#1e40af; }
+    .rail .b2{ position:absolute; left:0; bottom:0; width:108px; height:145px; background:var(--teal-500); }
+    .blob1{ position:absolute; right:-190px; top:-170px; width:560px; height:560px; background:#eef2ff; border-radius:999px; }
+    .blob2{ position:absolute; right:150px; top:220px; width:360px; height:360px; background:#ecfeff; border-radius:999px; }
+    .baseband{ position:absolute; left:108px; right:0; bottom:0; height:140px; background:#f8fafc; border-top:1px solid #eef2f7; }
+
+    /* ===== MAIN GRID (prevents overflow) ===== */
+    .content{
+      position: relative;
+      height: 100%;
+      padding-left: 108px;
+      display: grid;
+      grid-template-rows: minmax(auto, 160px) 1fr 70px; /* constrain header growth */
     }
-    .content-area {
-        flex: 1;
-        padding: 25px 65px;
-        background: #f8fafc;
-        display: flex;
-        flex-direction: column;
-        overflow-y: auto;
+
+    .header{
+      padding: 26px 44px 10px 44px;
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 18px;
     }
-    .bullet-item {
-        display: flex;
-        align-items: flex-start;
-        margin-bottom: 11px;
-        background: white;
-        padding: 12px 18px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        border-left: 4px solid #3b82f6;
+
+    .body{
+      padding: 10px 44px 0 44px;
+      display: grid;
+      grid-template-columns: 1.65fr 1fr;
+      gap: 18px;
+      align-items: start;
+      min-height: 0; /* important for grid */
     }
-    .bullet-icon {
-        width: 34px;
-        height: 34px;
-        background: #3b82f6;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 15px;
-        flex-shrink: 0;
-        margin-right: 16px;
+
+    .footer{
+      padding: 0 44px 18px 44px;
+      display:flex;
+      align-items:flex-end;
+      justify-content: space-between;
+      color: var(--slate-500);
+      font-size: 11px;
+      gap: 14px;
     }
-    .bullet-text {
-        flex: 1;
-        font-size: 15.5px;
-        line-height: 1.45;
-        color: #334155;
+
+    /* ===== UI ATOMS ===== */
+    .kicker{
+      font-size: 11px;
+      letter-spacing: 2.4px;
+      text-transform: uppercase;
+      font-weight: 900;
+      color: #1e40af;
     }
-    .footer-bar {
-        background: #1e3a8a;
-        padding: 12px 60px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        color: white;
-        font-size: 14px;
+    .h1{
+      margin-top: 2px;
+      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+      font-size: 42px;
+      line-height: 1.05;
+      font-weight: 800;
+      letter-spacing: -0.6px;
+      color: #0b1220;
     }
-</style>
+
+    .pillrow{ margin-top: 8px; display:flex; gap:10px; flex-wrap:wrap; }
+    .pill{
+      display:flex; align-items:center; gap:8px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 8px 22px rgba(15,23,42,.06);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--slate-700);
+      white-space: nowrap;
+    }
+    .dot{ width:10px; height:10px; border-radius:999px; display:inline-block; }
+    .dot.blue{ background: var(--blue-700); }
+    .dot.teal{ background: var(--teal-500); }
+
+    .card{
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(229,231,235,.95);
+      border-radius: 16px;
+      box-shadow: 0 14px 40px rgba(15,23,42,.08);
+      overflow: hidden;
+    }
+    .header .card{
+      max-height: 200px;
+    }
+    .card .pad{ padding: 16px; }
+    .label{
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 900;
+      color: var(--slate-500);
+    }
+
+    .row2{ display:flex; align-items:center; justify-content: space-between; gap: 10px; }
+    .miniIcon{
+      width: 36px; height: 36px;
+      border-radius: 12px;
+      display:grid; place-items:center;
+      color: #fff;
+      background: var(--blue-900);
+      flex: 0 0 auto;
+    }
+    .svg{ width: 18px; height: 18px; display:block; }
+
+    /* ===== LEFT MAIN CARD ===== */
+    .sectionTitle{
+      font-size: 14px;
+      font-weight: 900;
+      color: #111827;
+    }
+    .item{
+      display:grid;
+      grid-template-columns: 30px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 10px 10px;
+      border: 1px solid #eef2f7;
+      border-radius: 14px;
+      background: #fff;
+    }
+    .ibox{
+      width: 30px; height: 30px; border-radius: 10px;
+      display:grid; place-items:center;
+      border: 1px solid rgba(229,231,235,.9);
+      background: #f8fafc;
+    }
+    .itH{ font-size: 13px; font-weight: 900; color:#0b1220; }
+    .itP{ margin-top: 2px; font-size: 12px; line-height: 1.35; color: var(--slate-700); }
+
+    .modules3{
+      margin-top: 10px;
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+    .module{
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid #eef2f7;
+      background: #f8fafc;
+      min-height: 92px;
+    }
+    .module .mH{ font-size: 12px; font-weight: 900; }
+    .module .mP{ margin-top: 4px; font-size: 11px; line-height: 1.25; color: var(--slate-600,#475569); }
+    .metricPill{
+      margin-top: 8px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(229,231,235,.95);
+      background: #fff;
+      font-size: 11px;
+      font-weight: 900;
+      color: var(--slate-700);
+    }
+
+    /* ===== RIGHT COLUMN (fixed heights to prevent overflow) ===== */
+    .right{
+      display:flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .outcome{
+      padding: 14px;
+    }
+    .kpiGrid{
+      margin-top: 10px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .kpi{
+      border-radius: 14px;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      padding: 10px;
+      min-height: 72px;
+    }
+    .kpi .k1{ font-size: 11px; font-weight: 900; color: var(--slate-500); }
+    .kpi .k2{ margin-top: 4px; font-size: 22px; font-weight: 1000; color:#0b1220; letter-spacing: -0.4px; }
+    .kpi.blue{ background:#eef2ff; border-color:#dbeafe; }
+    .kpi.blue .k2{ color: var(--blue-900); }
+    .kpi.teal{ background:#ecfeff; border-color:#ccfbf1; }
+    .kpi.teal .k2{ color: var(--teal-600); }
+
+    .note{
+      margin-top: 10px;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      color: var(--slate-700);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+    .badge{
+      width: 18px; height: 18px;
+      border-radius: 6px;
+      background:#eef2ff;
+      border:1px solid #dbeafe;
+      flex: 0 0 auto;
+    }
+
+    .why{
+      padding: 14px;
+    }
+    .whyList{
+      margin-top: 10px;
+      display:flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .whyItem{
+      display:grid;
+      grid-template-columns: 26px 1fr;
+      gap:10px;
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid #eef2f7;
+      background: #fff;
+    }
+    .whyItem .wH{ font-size: 12px; font-weight: 900; color:#0b1220; }
+    .whyItem .wP{ margin-top: 2px; font-size: 11px; line-height: 1.25; color: var(--slate-700); }
+
+    .glance{
+      padding: 14px;
+    }
+    .table{
+      margin-top: 10px;
+      display:flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .trow{
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid #eef2f7;
+      background: #fff;
+      font-size: 12px;
+      color: var(--slate-700);
+    }
+    .tleft{ display:flex; flex-direction: column; gap:2px; }
+    .tleft strong{ color:#0b1220; }
+    .score{
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: 1000;
+      font-size: 11px;
+      border:1px solid #e5e7eb;
+      background:#f8fafc;
+      white-space: nowrap;
+    }
+    .score.blue{ background:#eef2ff; border-color:#dbeafe; color:var(--blue-900); }
+    .score.teal{ background:#ecfeff; border-color:#ccfbf1; color:var(--teal-600); }
+    .score.dark{ background:#0f172a; border-color:#0f172a; color:#fff; }
+
+    /* footer nav pill */
+    .next{
+      display:flex; align-items:center; gap:10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 10px 25px rgba(15,23,42,.06);
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--slate-700);
+      white-space: nowrap;
+    }
+  </style>
 </head>
+
 <body>
-<div class="slide-container">
-<div class="header-section">
-<div class="title-text">
-<p><i class="fas fa-file-alt"></i> Abstract</p>
-</div>
-<div style="text-align: right;">
-<p style="font-size: 18px; font-weight: 600;">Multi-Modal PD Detection</p>
-<p style="font-size: 14px; opacity: 0.9;">Senior Design Project</p>
-</div>
-</div>
-<div class="content-area">
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fas fa-brain"></i>
-</div>
-<div class="bullet-text">
-<p><strong>Novel multi-modal deep learning system</strong> for early Parkinson's Disease detection combining handwriting analysis and speech patterns. PD is a progressive neurodegenerative disorder affecting millions worldwide, characterized by motor and non-motor symptoms including tremors, rigidity, bradykinesia, and speech impairments.</p>
-</div>
-</div>
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fas fa-pen"></i>
-</div>
-<div class="bullet-text">
-<p><strong>Handwriting Analysis:</strong> EfficientNet-B4 with Spatial Pyramid Pooling (SPP) and Convolutional Block Attention Module (CBAM) analyzes spiral and wave patterns to detect motor symptoms like tremor and micrographia.</p>
-</div>
-</div>
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fas fa-microphone"></i>
-</div>
-<div class="bullet-text">
-<p><strong>Speech Analysis:</strong> Tri-path architecture combining mel-spectrograms (CNN), MFCC features (MLP), and clinical acoustic markers (jitter, shimmer, HNR, formants - MLP) to identify dysarthria and voice quality degradation.</p>
-</div>
-</div>
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fas fa-balance-scale"></i>
-</div>
-<div class="bullet-text">
-<p><strong>SMOTE Class Balancing:</strong> Addresses severe class imbalance (5.7:1 HC:PD ratio) using SMOTE to generate 332 synthetic Parkinson's samples, ensuring balanced training and preventing majority-class bias.</p>
-</div>
-</div>
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fas fa-layer-group"></i>
-</div>
-<div class="bullet-text">
-<p><strong>Attention-Based Fusion:</strong> Late fusion mechanism with attention adaptively weights features from both modalities, achieving superior accuracy and robustness compared to single-modality approaches.</p>
-</div>
-</div>
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fas fa-check-circle"></i>
-</div>
-<div class="bullet-text">
-<p><strong>LOPO Cross-Validation:</strong> Leave-One-Patient-Out validation ensures generalization across diverse patient populations, providing a non-invasive, accessible, and cost-effective solution for clinical screening and remote monitoring.</p>
-</div>
-</div>
-</div>
-<div class="footer-bar">
-<div>
-<p><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>Slide 2</p>
-</div>
-<div>
-<p>Multi-Modal Parkinson's Disease Detection System</p>
-</div>
-</div>
-</div>
+  <div class="stage">
+    <div class="slide">
+      <div class="topline"></div>
+      <div class="rail"><div class="b1"></div><div class="b2"></div></div>
+      <div class="blob1"></div>
+      <div class="blob2"></div>
+      <div class="baseband"></div>
+
+      <div class="content">
+        <!-- ===== HEADER ===== -->
+        <div class="header">
+          <div>
+            <div class="kicker">Overview</div>
+            <div class="h1">Abstract Overview</div>
+
+            <div class="pillrow">
+              <div class="pill"><span class="dot blue"></span>Parkinson’s Disease (PD) Screening</div>
+              <div class="pill"><span class="dot teal"></span>Handwriting + Speech</div>
+            </div>
+          </div>
+
+          <div class="card outcome" style="width: 340px;">
+            <div class="row2">
+              <div class="label">Key outcome</div>
+              <div class="miniIcon">
+                <svg class="svg" viewBox="0 0 24 24" fill="none">
+                  <path d="M7 17l4-4 3 3 4-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M5 19h14" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="kpiGrid">
+              <div class="kpi blue">
+                <div class="k1">Accuracy</div>
+                <div class="k2">96.94%</div>
+              </div>
+              <div class="kpi teal">
+                <div class="k1">AUC–ROC</div>
+                <div class="k2">0.999</div>
+              </div>
+            </div>
+
+            <div class="note">
+              <div class="badge"></div>
+              <div><strong>Patient-level</strong> stratified <strong>5-fold</strong> cross-validation</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== BODY ===== -->
+        <div class="body">
+          <!-- LEFT -->
+          <div class="card">
+            <div class="pad">
+              <div class="row2">
+                <div class="sectionTitle">What this work addresses</div>
+                <div class="ibox" title="info">
+                  <svg class="svg" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 8h.01" stroke="#334155" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M11 12h1v6h-1" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" stroke="#334155" stroke-width="2"/>
+                  </svg>
+                </div>
+              </div>
+
+              <div style="margin-top:12px; display:flex; flex-direction:column; gap:10px;">
+                <div class="item">
+                  <div class="ibox" style="background:#eef2ff; border-color:#dbeafe;">
+                    <svg class="svg" viewBox="0 0 24 24" fill="none">
+                      <path d="M7 20v-8a5 5 0 0 1 10 0v8" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round"/>
+                      <path d="M9 20h6" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="itH">Challenge</div>
+                    <div class="itP">PD screening can be subjective and costly; early-access tools are limited.</div>
+                  </div>
+                </div>
+
+                <div class="item">
+                  <div class="ibox" style="background:#ecfeff; border-color:#ccfbf1;">
+                    <svg class="svg" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 2v6" stroke="#0f766e" stroke-width="2" stroke-linecap="round"/>
+                      <path d="M8 8l4-2 4 2v6a4 4 0 0 1-8 0V8z" stroke="#0f766e" stroke-width="2"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="itH">Proposal</div>
+                    <div class="itP">A multimodal DL framework combining <strong>handwriting</strong> + <strong>speech</strong> for non-invasive screening.</div>
+                  </div>
+                </div>
+
+                <div class="item">
+                  <div class="ibox">
+                    <svg class="svg" viewBox="0 0 24 24" fill="none">
+                      <path d="M7 7h4v4H7V7zm6 6h4v4h-4v-4z" stroke="#334155" stroke-width="2"/>
+                      <path d="M11 9h2a4 4 0 0 1 4 4" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="itH">Three integrated modules</div>
+
+                    <div class="modules3">
+                      <div class="module" style="background:#eef2ff; border-color:#dbeafe;">
+                        <div class="mH" style="color:var(--blue-900);">Handwriting</div>
+                        <div class="mP">CNN + attention<br/>16 spatial biomarkers</div>
+                        <div class="metricPill"><span class="dot blue"></span>93.6%</div>
+                      </div>
+
+                      <div class="module" style="background:#ecfeff; border-color:#ccfbf1;">
+                        <div class="mH" style="color:var(--teal-600);">Speech</div>
+                        <div class="mP">Embeddings + acoustic<br/>short voice samples</div>
+                        <div class="metricPill"><span class="dot teal"></span>91.7%</div>
+                      </div>
+
+                      <div class="module">
+                        <div class="mH">Fusion (CMAFN)</div>
+                        <div class="mP">Cross-attention + GMU<br/>joint decision</div>
+                        <div class="metricPill"><span class="dot" style="background:#0f172a;"></span>96.9%</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="item">
+                  <div class="ibox" style="background:#ecfdf5; border-color:#bbf7d0;">
+                    <svg class="svg" viewBox="0 0 24 24" fill="none">
+                      <path d="M7 17l5-10 5 10" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M9 17h6" stroke="#166534" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="itH">Deployment</div>
+                    <div class="itP">Designed for interactive <strong>web-based</strong> screening and real-time inference.</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center; gap:12px; color:var(--slate-500); font-size:11px;">
+                <div>Reported study metrics: handwriting (93.6%), speech (91.7%), fusion (96.9%).</div>
+                <div style="display:flex; gap:8px;">
+                  <span class="dot" style="background:var(--blue-900); width:10px; height:10px;"></span>
+                  <span class="dot" style="background:#1e40af; width:10px; height:10px;"></span>
+                  <span class="dot" style="background:var(--teal-500); width:10px; height:10px;"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT -->
+          <div class="right">
+            <div class="card why">
+              <div class="row2">
+                <div class="sectionTitle">Why multimodal?</div>
+                <div class="miniIcon" style="background:var(--blue-900);">
+                  <svg class="svg" viewBox="0 0 24 24" fill="none">
+                    <path d="M10 14a3 3 0 0 1 0-4l1-1a3 3 0 0 1 4 0" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M14 10a3 3 0 0 1 0 4l-1 1a3 3 0 0 1-4 0" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </div>
+              </div>
+
+              <div class="whyList">
+                <div class="whyItem">
+                  <div class="ibox" style="width:26px;height:26px;border-radius:9px;background:#eef2ff;border-color:#dbeafe;">
+                    <svg class="svg" viewBox="0 0 24 24" fill="none">
+                      <path d="M4 20h16" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round"/>
+                      <path d="M7 16l10-10" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="wH">Handwriting</div>
+                    <div class="wP">Captures tremor patterns and fine-motor degradation (e.g., micrographia).</div>
+                  </div>
+                </div>
+
+                <div class="whyItem">
+                  <div class="ibox" style="width:26px;height:26px;border-radius:9px;background:#ecfeff;border-color:#ccfbf1;">
+                    <svg class="svg" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 14a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v4a3 3 0 0 0 3 3z" stroke="#0f766e" stroke-width="2"/>
+                      <path d="M5 11a7 7 0 0 0 14 0" stroke="#0f766e" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="wH">Speech</div>
+                    <div class="wP">Reveals dysarthria / hypophonia via embeddings + acoustic measures.</div>
+                  </div>
+                </div>
+
+                <div class="whyItem" style="background:#eef2ff; border-color:#dbeafe;">
+                  <div class="ibox" style="width:26px;height:26px;border-radius:9px;background:var(--blue-900); border-color:var(--blue-900);">
+                    <svg class="svg" viewBox="0 0 24 24" fill="none">
+                      <path d="M7 7h10v10H7V7z" stroke="white" stroke-width="2"/>
+                      <path d="M7 12h10" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="wH" style="color:var(--blue-900);">CMAFN fusion</div>
+                    <div class="wP" style="color:var(--blue-900);">Cross-attention learns complementary signals across modalities.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card glance">
+              <div class="row2">
+                <div>
+                  <div class="label">Modules at a glance</div>
+                  <div style="margin-top:6px; font-size:13px; font-weight:1000; color:#0b1220;">
+                    Headline: 96.94% accuracy • 0.999 AUC–ROC
+                  </div>
+                </div>
+                <div class="miniIcon" style="background:var(--teal-600);">
+                  <svg class="svg" viewBox="0 0 24 24" fill="none">
+                    <path d="M6 12l4 4 8-8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+
+              <div class="table">
+                <div class="trow">
+                  <div class="tleft">
+                    <strong>Handwriting</strong>
+                    <span style="font-size:11px;color:var(--slate-500)">Spiral / wave drawings</span>
+                  </div>
+                  <div class="score blue">93.6%</div>
+                </div>
+
+                <div class="trow">
+                  <div class="tleft">
+                    <strong>Speech</strong>
+                    <span style="font-size:11px;color:var(--slate-500)">Short voice sample</span>
+                  </div>
+                  <div class="score teal">91.7%</div>
+                </div>
+
+                <div class="trow">
+                  <div class="tleft">
+                    <strong>Fusion (CMAFN)</strong>
+                    <span style="font-size:11px;color:var(--slate-500)">Cross-attn + GMU</span>
+                  </div>
+                  <div class="score dark">96.9%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <div class="footer">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="dot" style="background:#94a3b8; width:10px; height:10px;"></span>
+            <span>Multimodal Parkinson’s Disease Detection using Cross-Modal Attention Fusion</span>
+          </div>
+
+          <div class="next">
+            <span class="dot blue"></span>
+            Next: Problem Statement
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

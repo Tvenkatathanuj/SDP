@@ -3,292 +3,381 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=1280, height=720" name="viewport"/>
-<title>System Architecture Diagram</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    body {
-        font-family: 'Inter', sans-serif;
-        overflow: hidden;
-    }
-    .slide-container {
-        width: 1280px;
-        height: 720px;
-        display: flex;
-        flex-direction: column;
-        background: #ffffff;
-        position: relative;
-    }
-    .header-section {
-        background: #1e3a8a;
-        color: white;
-        padding: 18px 60px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-    .title-text {
-        font-size: 32px;
-        font-weight: 700;
-        letter-spacing: -0.5px;
-    }
-    .content-area {
-        flex: 1;
-        padding: 12px 30px;
-        background: #f8fafc;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-    }
-    .architecture-flow {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        height: 100%;
-    }
-    .flow-row {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 18px;
-    }
-    .module-box {
-        background: white;
-        border-radius: 8px;
-        padding: 10px 14px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-width: 160px;
-        border: 2px solid #3b82f6;
-    }
-    .input-box {
-        background: #dbeafe;
-        border-color: #2563eb;
-        min-width: 200px;
-    }
-    .process-box {
-        background: #fff7ed;
-        border-color: #f59e0b;
-        min-width: 240px;
-    }
-    .fusion-box {
-        background: #f0fdf4;
-        border-color: #10b981;
-        min-width: 280px;
-    }
-    .output-box {
-        background: #fce7f3;
-        border-color: #ec4899;
-        min-width: 220px;
-    }
-    .module-icon {
-        width: 32px;
-        height: 32px;
-        background: #3b82f6;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 16px;
-        margin-bottom: 6px;
-    }
-    .input-icon {
-        background: #2563eb;
-    }
-    .process-icon {
-        background: #f59e0b;
-    }
-    .fusion-icon {
-        background: #10b981;
-    }
-    .output-icon {
-        background: #ec4899;
-    }
-    .module-title {
-        font-size: 13px;
-        font-weight: 700;
-        color: #1e40af;
-        margin-bottom: 3px;
-        text-align: center;
-    }
-    .module-desc {
-        font-size: 10px;
-        color: #475569;
-        text-align: center;
-        line-height: 1.2;
-    }
-    .arrow-down {
-        width: 0;
-        height: 0;
-        border-left: 12px solid transparent;
-        border-right: 12px solid transparent;
-        border-top: 16px solid #64748b;
-        margin: 0 auto;
-    }
-    .arrow-right {
-        width: 0;
-        height: 0;
-        border-top: 10px solid transparent;
-        border-bottom: 10px solid transparent;
-        border-left: 16px solid #64748b;
-    }
-    .footer-bar {
-        background: #1e3a8a;
-        padding: 12px 60px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        color: white;
-        font-size: 14px;
-    }
-    .dual-input {
-        display: flex;
-        gap: 20px;
-    }
-    .speech-paths {
-        display: flex;
-        gap: 12px;
-        margin-top: 6px;
-    }
-    .sub-module {
-        background: #fef3c7;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 9px;
-        font-weight: 600;
-        color: #92400e;
-        border: 2px solid #f59e0b;
-    }
-    .training-note {
-        position: absolute;
-        bottom: 6px;
-        right: 30px;
-        background: #ede9fe;
-        padding: 6px 10px;
-        border-radius: 6px;
-        border: 2px solid #8b5cf6;
-        font-size: 9px;
-        color: #5b21b6;
-        font-weight: 600;
-        max-width: 360px;
-    }
-</style>
+    body { margin: 0; }
+    .slide { width: 1280px; height: 720px; }
+    .font-inter { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    .font-playfair { font-family: "Playfair Display", Georgia, serif; }
+  </style>
 </head>
 <body>
-<div class="slide-container">
-<div class="header-section">
-<div class="title-text">
-<p><i class="fas fa-project-diagram"></i> Proposed System Architecture</p>
+<div class="slide font-inter flex bg-white overflow-hidden">
+<!-- Left accent rail -->
+<div class="h-full w-24 flex flex-col">
+<div class="flex-1 bg-blue-900"></div>
+<div class="h-40 bg-blue-700"></div>
+<div class="h-28 bg-teal-500"></div>
 </div>
-<div style="text-align: right;">
-<p style="font-size: 16px; font-weight: 600;">Multi-Modal Deep Learning Pipeline</p>
+<!-- Main -->
+<div class="flex-1 h-full flex flex-col relative">
+<!-- Subtle background shapes (no gradients) -->
+<div class="absolute inset-0 pointer-events-none">
+<div class="absolute -top-28 -right-24 w-96 h-96 rounded-full bg-blue-50"></div>
+<div class="absolute top-44 right-40 w-64 h-64 rounded-full bg-teal-50"></div>
+<div class="absolute bottom-0 right-0 w-full h-36 bg-gray-50"></div>
+<div class="absolute top-0 left-0 w-full h-2 bg-blue-900"></div>
 </div>
-</div>
-<div class="content-area">
-<div class="architecture-flow">
-<div class="flow-row">
-<div class="dual-input">
-<div class="module-box input-box">
-<div class="module-icon input-icon">
-<i class="fas fa-pen"></i>
-</div>
-<p class="module-title">Handwriting Input</p>
-<p class="module-desc">Spiral &amp; Wave drawings<br/>336×336 RGB images</p>
-</div>
-<div class="module-box input-box">
-<div class="module-icon input-icon">
-<i class="fas fa-microphone"></i>
-</div>
-<p class="module-title">Speech Input</p>
-<p class="module-desc">Audio recordings<br/>5 sec, 16 kHz sampling</p>
-</div>
-</div>
-</div>
-<div class="flow-row">
-<div class="arrow-down"></div>
-<div style="width: 40px;"></div>
-<div class="arrow-down"></div>
-</div>
-<div class="flow-row">
-<div class="module-box process-box">
-<div class="module-icon process-icon">
-<i class="fas fa-brain"></i>
-</div>
-<p class="module-title">Handwriting Module</p>
-<p class="module-desc">EfficientNet-B4 + SPP + CBAM<br/>ImageNet pre-trained<br/>Multi-scale features → embedding</p>
-</div>
-<div class="module-box process-box" style="min-width: 340px;">
-<div class="module-icon process-icon">
-<i class="fas fa-wave-square"></i>
-</div>
-<p class="module-title">Speech Tri-Path Architecture</p>
-<p class="module-desc" style="margin-bottom: 8px;">Parallel feature extraction paths</p>
-<div class="speech-paths">
-<div class="sub-module">
-<p>CNN<br/>Mel-Spec<br/>128 bins</p>
-</div>
-<div class="sub-module">
-<p>MLP<br/>MFCC<br/>80 Stats</p>
-</div>
-<div class="sub-module">
-<p>MLP<br/>14 Clinical<br/>Features</p>
-</div>
-</div>
-</div>
-</div>
-<div class="flow-row">
-<div style="display: flex; align-items: center; gap: 10px;">
-<div class="arrow-down"></div>
-<div style="width: 180px; height: 3px; background: #64748b;"></div>
-</div>
-<div style="display: flex; align-items: center; gap: 10px;">
-<div style="width: 180px; height: 3px; background: #64748b;"></div>
-<div class="arrow-down"></div>
-</div>
-</div>
-<div class="flow-row">
-<div class="module-box fusion-box">
-<div class="module-icon fusion-icon">
-<i class="fas fa-layer-group"></i>
-</div>
-<p class="module-title">Attention-Based Late Fusion</p>
-<p class="module-desc">Adaptive modality weighting<br/>Learns per-patient importance<br/>Concatenate → Dense Layers</p>
-</div>
-</div>
-<div class="flow-row">
-<div class="arrow-down"></div>
-</div>
-<div class="flow-row">
-<div class="module-box output-box">
-<div class="module-icon output-icon">
-<i class="fas fa-chart-line"></i>
-</div>
-<p class="module-title">Binary Classification</p>
-<p class="module-desc">Healthy vs Parkinson's Disease<br/>Probability Score + Confidence Interval</p>
-</div>
-</div>
-</div>
-<div class="training-note">
-<p><i class="fas fa-cog"></i> <strong>Training:</strong> SMOTE balancing (5.7:1→1:1) | LOPO CV | Early stopping (30 epochs, patience=10)</p>
-</div>
-</div>
-<div class="footer-bar">
+<!-- Header -->
+<div class="relative px-12 pt-10 flex items-start justify-between">
 <div>
-<p><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>Slide 8</p>
+<div class="flex items-center space-x-3">
+<div class="w-11 h-11 rounded-xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-pen-ruler text-white text-lg"></i>
+</div>
+<div class="flex flex-col">
+<p class="text-xs uppercase tracking-widest text-blue-800 font-semibold">Feature Engineering</p>
+<p class="font-playfair text-4xl text-gray-900 font-bold leading-tight">Handwriting Biomarkers (16)</p>
+</div>
+</div>
+<div class="mt-3 flex items-center space-x-2">
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm flex items-center space-x-2">
+<i class="fa-solid fa-image text-blue-800 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Spiral / Wave drawings</p>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm flex items-center space-x-2">
+<i class="fa-solid fa-hand text-teal-700 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Captures fine motor degradation</p>
+</div>
+</div>
+</div>
+<!-- Key box -->
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm px-5 py-4 w-96">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">What the 16 biomarkers measure</p>
+<div class="mt-3 grid grid-cols-2 gap-3">
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-3">
+<div class="flex items-center justify-between">
+<p class="text-xs text-blue-900 font-semibold">Motor control</p>
+<i class="fa-solid fa-hand-sparkles text-blue-900 text-sm"></i>
+</div>
+<p class="text-xs text-gray-700 mt-1">Stroke stability &amp; regularity</p>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-3">
+<div class="flex items-center justify-between">
+<p class="text-xs text-teal-800 font-semibold">Complexity</p>
+<i class="fa-solid fa-wave-square text-teal-700 text-sm"></i>
+</div>
+<p class="text-xs text-gray-700 mt-1">Irregularity &amp; tremor signatures</p>
+</div>
+</div>
+<div class="mt-3 flex items-center space-x-2 text-xs text-gray-600">
+<i class="fa-solid fa-circle-info text-blue-800"></i>
+<p class="text-xs">Extracted with OpenCV-based morphological, geometric, statistical, and complexity measures (paper).</p>
+</div>
+</div>
+</div>
+<!-- Content -->
+<div class="relative flex-1 px-12 pt-8 pb-10 flex">
+<!-- Left: Text + feature grid -->
+<div class="flex-1 pr-8 flex flex-col">
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-7">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-gray-800">Biomarker groups used in the handwriting module</p>
+<div class="w-9 h-9 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-layer-group text-gray-700 text-sm"></i>
+</div>
+</div>
+<!-- Grouped feature chips -->
+<div class="mt-6 grid grid-cols-2 gap-4">
+<!-- Group 1 -->
+<div class="rounded-2xl bg-blue-50 border border-blue-100 p-5">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<div class="w-9 h-9 rounded-xl bg-white border border-blue-100 flex items-center justify-center">
+<i class="fa-solid fa-pen-nib text-blue-900"></i>
 </div>
 <div>
-<p>Multi-Modal Parkinson's Disease Detection System</p>
+<p class="text-sm font-extrabold text-blue-900">Stroke &amp; Thickness</p>
+<p class="text-xs text-gray-700 mt-0.5">Consistency of writing pressure / control</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-blue-100">
+<p class="text-xs font-semibold text-blue-900">Examples</p>
+</div>
+</div>
+<div class="mt-4 flex flex-wrap gap-2">
+<div class="px-3 py-2 rounded-xl bg-white border border-blue-100">
+<p class="text-xs font-semibold text-gray-900">Stroke width (mean)</p>
+</div>
+<div class="px-3 py-2 rounded-xl bg-white border border-blue-100">
+<p class="text-xs font-semibold text-gray-900">Stroke width (std)</p>
+</div>
+<div class="px-3 py-2 rounded-xl bg-white border border-blue-100">
+<p class="text-xs font-semibold text-gray-900">Width variability</p>
+</div>
+</div>
+</div>
+<!-- Group 2 -->
+<div class="rounded-2xl bg-teal-50 border border-teal-100 p-5">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<div class="w-9 h-9 rounded-xl bg-white border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-bezier-curve text-teal-700"></i>
+</div>
+<div>
+<p class="text-sm font-extrabold text-teal-800">Geometry &amp; Smoothness</p>
+<p class="text-xs text-gray-700 mt-0.5">Shape irregularities in spiral/wave</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-teal-100">
+<p class="text-xs font-semibold text-teal-800">Examples</p>
+</div>
+</div>
+<div class="mt-4 flex flex-wrap gap-2">
+<div class="px-3 py-2 rounded-xl bg-white border border-teal-100">
+<p class="text-xs font-semibold text-gray-900">Curvature</p>
+</div>
+<div class="px-3 py-2 rounded-xl bg-white border border-teal-100">
+<p class="text-xs font-semibold text-gray-900">Direction changes</p>
+</div>
+<div class="px-3 py-2 rounded-xl bg-white border border-teal-100">
+<p class="text-xs font-semibold text-gray-900">Contour roughness</p>
+</div>
+</div>
+</div>
+<!-- Group 3 -->
+<div class="rounded-2xl bg-gray-50 border border-gray-200 p-5">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<div class="w-9 h-9 rounded-xl bg-white border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-border-all text-gray-700"></i>
+</div>
+<div>
+<p class="text-sm font-extrabold text-gray-900">Density &amp; Components</p>
+<p class="text-xs text-gray-700 mt-0.5">Fragmentation / disconnected ink</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200">
+<p class="text-xs font-semibold text-gray-800">Examples</p>
+</div>
+</div>
+<div class="mt-4 flex flex-wrap gap-2">
+<div class="px-3 py-2 rounded-xl bg-white border border-gray-200">
+<p class="text-xs font-semibold text-gray-900">Connected component density</p>
+</div>
+<div class="px-3 py-2 rounded-xl bg-white border border-gray-200">
+<p class="text-xs font-semibold text-gray-900">Ink / edge density</p>
+</div>
+</div>
+</div>
+<!-- Group 4 -->
+<div class="rounded-2xl bg-white border border-gray-200 p-5">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<div class="w-9 h-9 rounded-xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-signal text-white"></i>
+</div>
+<div>
+<p class="text-sm font-extrabold text-gray-900">Statistics &amp; Complexity</p>
+<p class="text-xs text-gray-700 mt-0.5">Global disorder &amp; shape moments</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-gray-900 border border-gray-900">
+<p class="text-xs font-semibold text-white">Examples</p>
+</div>
+</div>
+<div class="mt-4 flex flex-wrap gap-2">
+<div class="px-3 py-2 rounded-xl bg-gray-50 border border-gray-200">
+<p class="text-xs font-semibold text-gray-900">Entropy</p>
+</div>
+<div class="px-3 py-2 rounded-xl bg-gray-50 border border-gray-200">
+<p class="text-xs font-semibold text-gray-900">Fractal dimension</p>
+</div>
+<div class="px-3 py-2 rounded-xl bg-gray-50 border border-gray-200">
+<p class="text-xs font-semibold text-gray-900">Hu moments</p>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-5 rounded-2xl bg-gray-900 border border-gray-900 p-5">
+<div class="flex items-start justify-between">
+<div class="pr-6">
+<p class="text-xs uppercase tracking-widest text-gray-300 font-semibold">Interpretation</p>
+<p class="mt-2 text-base font-extrabold text-white leading-snug">A compact feature set that quantifies tremor, irregularity, and reduced motor control</p>
+<p class="mt-2 text-sm text-gray-200 leading-relaxed">
+                    These engineered biomarkers complement CNN-learned spatial patterns and help the model capture clinically relevant motor impairment signals.
+                  </p>
+</div>
+<div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center">
+<i class="fa-solid fa-chart-line text-gray-900 text-xl"></i>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer note -->
+<div class="mt-5 flex items-center justify-between">
+<div class="flex items-center space-x-2 text-xs text-gray-500">
+<i class="fa-solid fa-circle-info"></i>
+<p class="text-xs">Feature examples shown; the module uses a total of 16 spatial biomarkers as described in the paper.</p>
+</div>
+<div class="flex items-center space-x-2">
+<div class="w-2.5 h-2.5 rounded-full bg-blue-900"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-blue-700"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-teal-500"></div>
+</div>
+</div>
+</div>
+<!-- Right: Visual representation panel -->
+<div class="w-96 flex flex-col">
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-gray-800">Visual intuition</p>
+<div class="w-9 h-9 rounded-xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-eye text-white text-sm"></i>
+</div>
+</div>
+<!-- Mini "spiral" schematic using simple divs -->
+<div class="mt-5 rounded-2xl bg-gray-50 border border-gray-200 p-5">
+<div class="flex items-center justify-between">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Motor irregularity signals</p>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200">
+<p class="text-xs font-semibold text-gray-800">Concept</p>
+</div>
+</div>
+<div class="mt-4 flex items-center justify-center">
+<div class="w-64 h-64 rounded-2xl bg-white border border-gray-200 flex items-center justify-center relative overflow-hidden">
+<!-- Concentric rings -->
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-56 h-56 rounded-full border-2 border-blue-100"></div>
+</div>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-44 h-44 rounded-full border-2 border-blue-200"></div>
+</div>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-32 h-32 rounded-full border-2 border-blue-300"></div>
+</div>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-20 h-20 rounded-full border-2 border-teal-300"></div>
+</div>
+<!-- "jitter" strokes -->
+<div class="absolute left-10 top-14 w-20 h-1 bg-blue-900 rounded"></div>
+<div class="absolute left-20 top-24 w-16 h-1 bg-blue-700 rounded transform rotate-6"></div>
+<div class="absolute left-28 top-36 w-18 h-1 bg-teal-600 rounded transform -rotate-6"></div>
+<div class="absolute left-24 top-50 w-24 h-1 bg-gray-700 rounded transform rotate-3"></div>
+<div class="absolute bottom-4 left-4 right-4">
+<div class="grid grid-cols-2 gap-2">
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-2">
+<p class="text-xs font-semibold text-blue-900">Curvature</p>
+<p class="text-xs text-gray-600 mt-0.5">jagged turns</p>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-2">
+<p class="text-xs font-semibold text-teal-800">Entropy</p>
+<p class="text-xs text-gray-600 mt-0.5">disorder</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-4 grid grid-cols-2 gap-3">
+<div class="rounded-xl bg-white border border-gray-200 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center">
+<i class="fa-solid fa-ruler-combined text-blue-900"></i>
+</div>
+<div>
+<p class="text-sm font-semibold text-gray-900">Stroke width</p>
+<p class="text-xs text-gray-600 mt-1">Higher variability can indicate impaired control.</p>
+</div>
+</div>
+</div>
+<div class="rounded-xl bg-white border border-gray-200 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-braille text-teal-700"></i>
+</div>
+<div>
+<p class="text-sm font-semibold text-gray-900">Components</p>
+<p class="text-xs text-gray-600 mt-1">Fragmentation affects connected-component density.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick mapping: feature->symptom -->
+<div class="mt-5 rounded-2xl bg-white border border-gray-200 p-5">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Feature → symptom mapping (examples)</p>
+<div class="mt-4 space-y-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center">
+<i class="fa-solid fa-pen-nib text-blue-900 text-xs"></i>
+</div>
+<div>
+<p class="text-xs font-semibold text-gray-900">Stroke width variability</p>
+<p class="text-xs text-gray-600">unstable writing pressure</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-blue-50 border border-blue-100">
+<p class="text-xs font-semibold text-blue-900">Motor</p>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-bezier-curve text-teal-700 text-xs"></i>
+</div>
+<div>
+<p class="text-xs font-semibold text-gray-900">Curvature / roughness</p>
+<p class="text-xs text-gray-600">tremor / irregularity</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-teal-50 border border-teal-100">
+<p class="text-xs font-semibold text-teal-800">Shape</p>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-chart-pie text-gray-700 text-xs"></i>
+</div>
+<div>
+<p class="text-xs font-semibold text-gray-900">Entropy / fractal dim.</p>
+<p class="text-xs text-gray-600">higher drawing disorder</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-gray-900 border border-gray-900">
+<p class="text-xs font-semibold text-white">Complexity</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Navigation chip -->
+<div class="mt-5 flex items-center justify-end">
+<div class="flex items-center space-x-2 bg-white border border-gray-200 rounded-full px-4 py-2 shadow-sm">
+<i class="fa-solid fa-arrow-right text-blue-900 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Next: Speech Module</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<div class="relative px-12 pb-8 flex items-center justify-between">
+<div class="flex items-center space-x-3 text-gray-500">
+<i class="fa-solid fa-file-lines"></i>
+<p class="text-xs">Multimodal Parkinson’s Disease Detection using Cross-Modal Attention Fusion</p>
+</div>
+<div class="flex items-center space-x-2">
+<div class="w-2.5 h-2.5 rounded-full bg-blue-900"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-blue-700"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-teal-500"></div>
+<p class="text-xs text-gray-500 ml-2">VIT-AP • CSE</p>
+</div>
 </div>
 </div>
 </div>

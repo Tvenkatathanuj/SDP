@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    body { margin: 0; }
+    .slide { width: 1280px; height: 720px; }
+    .font-inter { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    .font-playfair { font-family: "Playfair Display", Georgia, serif; }
+  </style>
+</head>
+<body>
+<div class="slide font-inter flex bg-white overflow-hidden">
+<!-- Left accent rail -->
+<div class="h-full w-24 flex flex-col">
+<div class="flex-1 bg-blue-900"></div>
+<div class="h-40 bg-blue-700"></div>
+<div class="h-28 bg-teal-500"></div>
+</div>
+<!-- Main -->
+<div class="flex-1 h-full flex flex-col relative">
+<!-- Subtle background shapes (no gradients) -->
+<div class="absolute inset-0 pointer-events-none">
+<div class="absolute -top-28 -right-24 w-96 h-96 rounded-full bg-blue-50"></div>
+<div class="absolute top-40 right-36 w-72 h-72 rounded-full bg-teal-50"></div>
+<div class="absolute bottom-0 right-0 w-full h-36 bg-gray-50"></div>
+<div class="absolute top-0 left-0 w-full h-2 bg-blue-900"></div>
+</div>
+<!-- Header -->
+<div class="relative px-12 pt-10 flex items-start justify-between">
+<div>
+<div class="flex items-center space-x-3">
+<div class="w-11 h-11 rounded-xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-window-maximize text-white text-lg"></i>
+</div>
+<div class="flex flex-col">
+<p class="text-xs uppercase tracking-widest text-blue-800 font-semibold">Deployment</p>
+<p class="font-playfair text-4xl text-gray-900 font-bold leading-tight">Web Application</p>
+</div>
+</div>
+<div class="mt-3 flex items-center space-x-2">
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm flex items-center space-x-2">
+<i class="fa-brands fa-python text-blue-800 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Flask-based interface</p>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm flex items-center space-x-2">
+<i class="fa-solid fa-bolt text-teal-700 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">&lt; 3s multimodal inference (CPU)</p>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm flex items-center space-x-2">
+<i class="fa-solid fa-box-archive text-gray-700 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">~85 MB (INT8 quantized)</p>
+</div>
+</div>
+</div>
+<!-- Key metrics card -->
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm px-5 py-4 w-96">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">User-facing outcome</p>
+<div class="mt-3 grid grid-cols-3 gap-2">
+<div class="rounded-xl bg-green-50 border border-green-100 p-3">
+<p class="text-xs text-green-800 font-semibold">LOW</p>
+<p class="text-xs text-gray-700 mt-1">risk</p>
+</div>
+<div class="rounded-xl bg-yellow-50 border border-yellow-100 p-3">
+<p class="text-xs text-yellow-800 font-semibold">MODERATE</p>
+<p class="text-xs text-gray-700 mt-1">risk</p>
+</div>
+<div class="rounded-xl bg-red-50 border border-red-100 p-3">
+<p class="text-xs text-red-800 font-semibold">HIGH</p>
+<p class="text-xs text-gray-700 mt-1">risk</p>
+</div>
+</div>
+<div class="mt-3 flex items-center space-x-2 text-xs text-gray-600">
+<i class="fa-solid fa-circle-info text-blue-800"></i>
+<p class="text-xs">Designed for non-invasive screening with handwriting + speech inputs.</p>
+</div>
+</div>
+</div>
+<!-- Body -->
+<div class="relative flex-1 px-12 pt-6 pb-8 flex">
+<!-- Left: App mockup -->
+<div class="flex-1 pr-8 flex flex-col">
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 flex-1 flex flex-col">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<div class="w-9 h-9 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-laptop-medical text-gray-700 text-sm"></i>
+</div>
+<div>
+<p class="text-sm font-semibold text-gray-900">Interactive Screening UI</p>
+<p class="text-xs text-gray-500 mt-0.5">Upload drawings + audio, then run inference</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-gray-50 border border-gray-200">
+<p class="text-xs font-semibold text-gray-800">Demo layout</p>
+</div>
+</div>
+<!-- Mock window -->
+<div class="mt-4 flex-1 rounded-2xl border border-gray-200 bg-gray-50 p-4 flex flex-col">
+<!-- Browser top bar -->
+<div class="flex items-center justify-between bg-white border border-gray-200 rounded-xl px-4 py-3">
+<div class="flex items-center space-x-2">
+<div class="w-3 h-3 rounded-full bg-red-400"></div>
+<div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+<div class="w-3 h-3 rounded-full bg-green-400"></div>
+</div>
+<div class="flex-1 mx-4 rounded-lg bg-gray-50 border border-gray-200 px-3 py-2">
+<p class="text-xs text-gray-600">https://{deployment-url}/screening</p>
+</div>
+<div class="w-10 h-10 rounded-xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-shield-heart text-white text-sm"></i>
+</div>
+</div>
+<!-- App content -->
+<div class="mt-4 flex-1 grid grid-cols-12 gap-4">
+<!-- Left panel: inputs -->
+<div class="col-span-7 bg-white border border-gray-200 rounded-2xl p-5 flex flex-col">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-gray-900">Inputs</p>
+<div class="px-3 py-1 rounded-full bg-blue-50 border border-blue-100">
+<p class="text-xs font-semibold text-blue-900">Handwriting + Speech</p>
+</div>
+</div>
+<div class="mt-4 grid grid-cols-2 gap-4 flex-1">
+<!-- Drawing upload -->
+<div class="rounded-2xl bg-blue-50 border border-blue-100 p-4 flex flex-col">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-xl bg-white border border-blue-100 flex items-center justify-center">
+<i class="fa-solid fa-pen-ruler text-blue-900"></i>
+</div>
+<div>
+<p class="text-sm font-bold text-blue-900">Handwriting</p>
+<p class="text-xs text-blue-900 mt-0.5">Spiral / Wave image</p>
+</div>
+</div>
+<div class="mt-4 flex-1 rounded-2xl bg-white border border-blue-100 p-3 flex items-center justify-center">
+<div class="w-full h-full rounded-xl border-2 border-dashed border-blue-200 flex items-center justify-center">
+<p class="text-xs text-gray-600">Drag &amp; drop image / Browse</p>
+</div>
+</div>
+<div class="mt-3 flex items-center justify-between">
+<div class="px-3 py-1 rounded-full bg-white border border-blue-100">
+<p class="text-xs font-semibold text-blue-900">224×224</p>
+</div>
+<div class="flex items-center space-x-2 text-xs text-blue-900">
+<i class="fa-solid fa-wand-magic-sparkles"></i>
+<p class="text-xs font-semibold">TTA enabled</p>
+</div>
+</div>
+</div>
+<!-- Audio upload -->
+<div class="rounded-2xl bg-teal-50 border border-teal-100 p-4 flex flex-col">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-xl bg-white border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-microphone-lines text-teal-700"></i>
+</div>
+<div>
+<p class="text-sm font-bold text-teal-900">Speech</p>
+<p class="text-xs text-teal-900 mt-0.5">16 kHz, &lt; 8s</p>
+</div>
+</div>
+<div class="mt-4 flex-1 rounded-2xl bg-white border border-teal-100 p-3 flex flex-col justify-between">
+<div class="w-full rounded-xl border-2 border-dashed border-teal-200 p-4">
+<p class="text-xs text-gray-600">Upload .wav / record audio</p>
+</div>
+<div class="mt-3 rounded-xl bg-gray-50 border border-gray-200 p-3">
+<div class="flex items-center justify-between">
+<p class="text-xs font-semibold text-gray-800">Waveform preview (illustrative)</p>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200">
+<p class="text-xs font-semibold text-gray-700">8.0s max</p>
+</div>
+</div>
+<div class="mt-2 flex items-end space-x-1 h-10">
+<div class="w-2 rounded bg-teal-500" style="height: 40%;"></div>
+<div class="w-2 rounded bg-teal-500" style="height: 70%;"></div>
+<div class="w-2 rounded bg-teal-500" style="height: 55%;"></div>
+<div class="w-2 rounded bg-teal-500" style="height: 90%;"></div>
+<div class="w-2 rounded bg-teal-500" style="height: 35%;"></div>
+<div class="w-2 rounded bg-teal-500" style="height: 78%;"></div>
+<div class="w-2 rounded bg-teal-500" style="height: 52%;"></div>
+<div class="w-2 rounded bg-teal-500" style="height: 84%;"></div>
+<div class="w-2 rounded bg-teal-500" style="height: 45%;"></div>
+<div class="w-2 rounded bg-teal-500" style="height: 66%;"></div>
+<div class="w-2 rounded bg-teal-500" style="height: 42%;"></div>
+<div class="w-2 rounded bg-teal-500" style="height: 72%;"></div>
+<div class="w-2 rounded bg-teal-500" style="height: 50%;"></div>
+<div class="w-2 rounded bg-teal-500" style="height: 86%;"></div>
+</div>
+</div>
+</div>
+<div class="mt-3 flex items-center justify-between">
+<div class="px-3 py-1 rounded-full bg-white border border-teal-100">
+<p class="text-xs font-semibold text-teal-900">XLS-R + MFCC</p>
+</div>
+<div class="flex items-center space-x-2 text-xs text-teal-900">
+<i class="fa-solid fa-sliders"></i>
+<p class="text-xs font-semibold">SpecAugment</p>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-4 flex items-center justify-between">
+<div class="flex items-center space-x-2 text-xs text-gray-600">
+<i class="fa-solid fa-lock text-gray-600"></i>
+<p class="text-xs">Runs patient-level screening; does not require neuroimaging.</p>
+</div>
+<div class="flex items-center space-x-2">
+<div class="px-4 py-2 rounded-xl bg-blue-900 text-white flex items-center space-x-2 shadow-sm">
+<i class="fa-solid fa-play text-xs"></i>
+<p class="text-xs font-semibold">Run Prediction</p>
+</div>
+<div class="px-4 py-2 rounded-xl bg-white border border-gray-200 flex items-center space-x-2">
+<i class="fa-solid fa-rotate-right text-xs text-gray-700"></i>
+<p class="text-xs font-semibold text-gray-700">Reset</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Right panel: outputs -->
+<div class="col-span-5 bg-white border border-gray-200 rounded-2xl p-5 flex flex-col">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-gray-900">Result</p>
+<div class="px-3 py-1 rounded-full bg-gray-50 border border-gray-200">
+<p class="text-xs font-semibold text-gray-800">Real-time</p>
+</div>
+</div>
+<div class="mt-4 grid grid-cols-3 gap-3">
+<div class="rounded-2xl bg-blue-50 border border-blue-100 p-4">
+<div class="flex items-center justify-between">
+<p class="text-xs font-semibold text-blue-900">Mode</p>
+<i class="fa-solid fa-layer-group text-blue-900 text-xs"></i>
+</div>
+<p class="mt-2 text-sm font-extrabold text-gray-900">CMAFN (fusion)</p>
+<p class="text-xs text-gray-600 mt-1">HW + Speech</p>
+</div>
+<div class="rounded-2xl bg-gray-50 border border-gray-200 p-4">
+<div class="flex items-center justify-between">
+<p class="text-xs font-semibold text-gray-800">Latency</p>
+<i class="fa-solid fa-stopwatch text-gray-800 text-xs"></i>
+</div>
+<p class="mt-2 text-2xl font-extrabold text-gray-900">&lt; 3s</p>
+<p class="text-xs text-gray-600 mt-1">end-to-end</p>
+</div>
+<div class="rounded-2xl bg-teal-50 border border-teal-100 p-4">
+<div class="flex items-center justify-between">
+<p class="text-xs font-semibold text-teal-900">Confidence</p>
+<i class="fa-solid fa-shield text-teal-700 text-xs"></i>
+</div>
+<p class="mt-2 text-2xl font-extrabold text-teal-900">Calibrated</p>
+<p class="text-xs text-gray-600 mt-1">MC Dropout</p>
+</div>
+</div>
+<div class="mt-4 rounded-2xl bg-gray-900 border border-gray-900 p-5">
+<div class="flex items-start justify-between">
+<div class="pr-4">
+<p class="text-xs uppercase tracking-widest text-gray-300 font-semibold">Risk level</p>
+<p class="mt-2 text-3xl font-extrabold text-white leading-none">MODERATE</p>
+<p class="mt-2 text-sm text-gray-200 leading-relaxed">
+                          Output presented as <span class="font-semibold">LOW / MODERATE / HIGH</span> for screening workflows.
+                        </p>
+</div>
+<div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center">
+<i class="fa-solid fa-triangle-exclamation text-gray-900 text-xl"></i>
+</div>
+</div>
+</div>
+<div class="mt-4 rounded-2xl bg-white border border-gray-200 p-5 flex-1">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-gray-800">Deployment profile</p>
+<div class="w-9 h-9 rounded-xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-server text-white text-sm"></i>
+</div>
+</div>
+<div class="mt-4" style="height: 170px;">
+<canvas id="deployChart"></canvas>
+</div>
+<div class="mt-3 grid grid-cols-2 gap-3">
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Runtime</p>
+<p class="mt-2 text-sm font-extrabold text-gray-900">CPU-friendly</p>
+<p class="text-xs text-gray-600 mt-1">No GPU required (paper)</p>
+</div>
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Packaging</p>
+<p class="mt-2 text-sm font-extrabold text-gray-900">Quantized INT8</p>
+<p class="text-xs text-gray-600 mt-1">~85 MB footprint</p>
+</div>
+</div>
+<div class="mt-3 flex items-center space-x-2 text-xs text-gray-600">
+<i class="fa-solid fa-circle-info text-gray-600"></i>
+<p class="text-xs">Chart shows an approximate deployment view based on reported sizes; values are indicative.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Caption -->
+<div class="mt-4 rounded-xl bg-white border border-gray-200 p-4">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Caption</p>
+<p class="mt-2 text-sm text-gray-700 leading-relaxed">
+                The system is deployed as an interactive <span class="font-semibold text-gray-900">Flask</span> web application supporting
+                <span class="font-semibold text-gray-900">handwriting</span> and <span class="font-semibold text-gray-900">speech</span> uploads.
+                It returns a screening-oriented risk label (<span class="font-semibold text-gray-900">LOW / MODERATE / HIGH</span>) with
+                <span class="font-semibold text-gray-900">CPU-friendly</span> latency (reported &lt; 3 seconds for fusion inference) and
+                a compact footprint when <span class="font-semibold text-gray-900">INT8 quantized (~85 MB)</span>.
+              </p>
+</div>
+</div>
+<div class="mt-4 flex items-center justify-between">
+<div class="flex items-center space-x-2 text-xs text-gray-500">
+<i class="fa-solid fa-circle-info"></i>
+<p class="text-xs">Clinical note: this is a screening tool; confirm diagnosis with professional evaluation.</p>
+</div>
+<div class="flex items-center space-x-2">
+<div class="w-2.5 h-2.5 rounded-full bg-blue-900"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-blue-700"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-teal-500"></div>
+</div>
+</div>
+</div>
+<!-- Right: Feature highlights -->
+<div class="w-96 flex flex-col">
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-gray-800">What the app enables</p>
+<div class="w-9 h-9 rounded-xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-gears text-white text-sm"></i>
+</div>
+</div>
+<div class="mt-5 space-y-3">
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-9 h-9 rounded-xl bg-white border border-blue-100 flex items-center justify-center">
+<i class="fa-solid fa-upload text-blue-900"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold text-blue-900">Simple data capture</p>
+<p class="text-xs text-blue-900 mt-1">Upload spiral/wave images and short speech clips from consumer devices.</p>
+</div>
+</div>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-9 h-9 rounded-xl bg-white border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-diagram-project text-teal-700"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold text-teal-900">Multimodal fusion</p>
+<p class="text-xs text-teal-900 mt-1">CMAFN combines handwriting and speech through cross-attention.</p>
+</div>
+</div>
+</div>
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-9 h-9 rounded-xl bg-white border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-gauge-high text-gray-800"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold text-gray-900">Practical latency</p>
+<p class="text-xs text-gray-700 mt-1">CPU inference reported under 3 seconds for multimodal predictions.</p>
+</div>
+</div>
+</div>
+<div class="rounded-xl bg-gray-900 border border-gray-900 p-4">
+<div class="flex items-start justify-between">
+<div class="pr-3">
+<p class="text-xs uppercase tracking-widest text-gray-300 font-semibold">Deployment ready</p>
+<p class="mt-2 text-sm text-gray-100 leading-relaxed">
+                      Quantized packaging reduces size (~85 MB) and supports scalable web deployment.
+                    </p>
+</div>
+<div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center">
+<i class="fa-solid fa-rocket text-gray-900"></i>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-5 bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Outputs</p>
+<div class="mt-4 space-y-3">
+<div class="flex items-center justify-between rounded-xl bg-white border border-gray-200 p-4">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center">
+<i class="fa-solid fa-user-check text-blue-900"></i>
+</div>
+<div>
+<p class="text-sm font-semibold text-gray-900">Risk label</p>
+<p class="text-xs text-gray-600 mt-0.5">LOW / MODERATE / HIGH</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-blue-50 border border-blue-100">
+<p class="text-xs font-semibold text-blue-900">Screening</p>
+</div>
+</div>
+<div class="flex items-center justify-between rounded-xl bg-white border border-gray-200 p-4">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-chart-simple text-teal-700"></i>
+</div>
+<div>
+<p class="text-sm font-semibold text-gray-900">Confidence</p>
+<p class="text-xs text-gray-600 mt-0.5">Uncertainty via MC Dropout</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-teal-50 border border-teal-100">
+<p class="text-xs font-semibold text-teal-800">Optional</p>
+</div>
+</div>
+<div class="rounded-xl bg-gray-900 border border-gray-900 p-4">
+<div class="flex items-start justify-between">
+<div class="pr-4">
+<p class="text-xs uppercase tracking-widest text-gray-300 font-semibold">Why it matters</p>
+<p class="mt-2 text-sm text-gray-100 leading-relaxed">
+                      A web-based workflow makes multimodal biomarkers accessible for <span class="font-semibold">remote</span> and <span class="font-semibold">low-cost</span> screening.
+                    </p>
+</div>
+<div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center">
+<i class="fa-solid fa-shield-heart text-gray-900"></i>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-5 flex items-center justify-end">
+<div class="flex items-center space-x-2 bg-white border border-gray-200 rounded-full px-4 py-2 shadow-sm">
+<i class="fa-solid fa-arrow-right text-blue-900 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Next: Future Work</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<div class="relative px-12 pb-8 flex items-center justify-between">
+<div class="flex items-center space-x-3 text-gray-500">
+<i class="fa-solid fa-file-lines"></i>
+<p class="text-xs">Multimodal Parkinson’s Disease Detection using Cross-Modal Attention Fusion</p>
+</div>
+<div class="flex items-center space-x-2">
+<div class="w-2.5 h-2.5 rounded-full bg-blue-900"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-blue-700"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-teal-500"></div>
+<p class="text-xs text-gray-500 ml-2">VIT-AP • CSE</p>
+</div>
+</div>
+</div>
+</div>
+<script>
+    const ctx = document.getElementById('deployChart').getContext('2d');
+
+    // Indicative values based on the paper (approximate; used to communicate scale)
+    const labels = ['Quantized', 'Uncompressed'];
+    const sizesMB = [85, 190];
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Deployment size (MB)',
+          data: sizesMB,
+          backgroundColor: ['rgba(20,184,166,0.22)', 'rgba(30,64,175,0.22)'],
+          borderColor: ['rgba(20,184,166,0.75)', 'rgba(30,64,175,0.75)'],
+          borderWidth: 1.4,
+          borderRadius: 12,
+          barThickness: 38
+        }]
+      },
+      options: {
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            backgroundColor: '#111827',
+            titleFont: { family: 'Inter', size: 12, weight: '700' },
+            bodyFont: { family: 'Inter', size: 12, weight: '600' }
+          }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: '#374151', font: { family: 'Inter', size: 11, weight: '700' } }
+          },
+          y: {
+            beginAtZero: true,
+            grid: { color: '#E5E7EB' },
+            ticks: { color: '#6B7280', font: { family: 'Inter', size: 10, weight: '600' } },
+            suggestedMax: 220
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    body { margin: 0; }
+    .slide { width: 1280px; height: 720px; }
+    .font-inter { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    .font-playfair { font-family: "Playfair Display", Georgia, serif; }
+  </style>
+</head>
+<body>
+<div class="slide font-inter flex bg-white overflow-hidden">
+<!-- Left accent rail -->
+<div class="h-full w-24 flex flex-col">
+<div class="flex-1 bg-blue-900"></div>
+<div class="h-40 bg-blue-700"></div>
+<div class="h-28 bg-teal-500"></div>
+</div>
+<!-- Main -->
+<div class="flex-1 h-full flex flex-col relative">
+<!-- Subtle background shapes (no gradients) -->
+<div class="absolute inset-0 pointer-events-none">
+<div class="absolute -top-28 -right-24 w-96 h-96 rounded-full bg-blue-50"></div>
+<div class="absolute top-44 right-40 w-64 h-64 rounded-full bg-teal-50"></div>
+<div class="absolute bottom-0 right-0 w-full h-36 bg-gray-50"></div>
+<div class="absolute top-0 left-0 w-full h-2 bg-blue-900"></div>
+</div>
+<!-- Header -->
+<div class="relative px-12 pt-10 flex items-start justify-between">
+<div>
+<div class="flex items-center space-x-3">
+<div class="w-11 h-11 rounded-xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-route text-white text-lg"></i>
+</div>
+<div class="flex flex-col">
+<p class="text-xs uppercase tracking-widest text-blue-800 font-semibold">Roadmap</p>
+<p class="font-playfair text-4xl text-gray-900 font-bold leading-tight">Future Work</p>
+</div>
+</div>
+<div class="mt-3 flex items-center space-x-2">
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm flex items-center space-x-2">
+<i class="fa-solid fa-seedling text-teal-700 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Extending biomarkers &amp; deployment</p>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm flex items-center space-x-2">
+<i class="fa-solid fa-shield-halved text-blue-800 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Privacy + interpretability</p>
+</div>
+</div>
+</div>
+<!-- Key box -->
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm px-5 py-4 w-96">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Why this matters</p>
+<p class="mt-2 text-sm text-gray-700 leading-relaxed">
+            The current system achieves strong multimodal performance, but real-world screening benefits from
+            <span class="font-semibold text-gray-900">additional modalities</span>, <span class="font-semibold text-gray-900">robust deployment</span>,
+            and <span class="font-semibold text-gray-900">transparent decisions</span>.
+          </p>
+<div class="mt-3 grid grid-cols-3 gap-2">
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-3">
+<p class="text-xs text-blue-900 font-semibold">Scale</p>
+<p class="text-xs text-gray-700 mt-1">mobile &amp; web</p>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-3">
+<p class="text-xs text-teal-800 font-semibold">Generalize</p>
+<p class="text-xs text-gray-700 mt-1">multilingual</p>
+</div>
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-3">
+<p class="text-xs text-gray-900 font-semibold">Trust</p>
+<p class="text-xs text-gray-700 mt-1">explainable</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Content -->
+<div class="relative flex-1 px-12 pt-8 pb-10 flex">
+<!-- Left: Roadmap cards -->
+<div class="flex-1 pr-8 flex flex-col">
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-7 flex-1">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-gray-800">Planned directions</p>
+<div class="w-9 h-9 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-list-check text-gray-700 text-sm"></i>
+</div>
+</div>
+<!-- Grid of items -->
+<div class="mt-6 grid grid-cols-2 gap-4">
+<!-- 1 -->
+<div class="rounded-2xl bg-blue-50 border border-blue-100 p-5">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-3">
+<div class="w-10 h-10 rounded-2xl bg-white border border-blue-100 flex items-center justify-center">
+<i class="fa-solid fa-person-walking text-blue-900"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-extrabold text-blue-900">Add new biomarkers</p>
+<p class="text-xs text-gray-700 mt-1">Gait, wearable sensors, and eye-tracking signals.</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-blue-100">
+<p class="text-xs font-semibold text-blue-900">Multimodal+</p>
+</div>
+</div>
+<div class="mt-4 flex flex-wrap gap-2">
+<div class="px-3 py-2 rounded-xl bg-white border border-blue-100"><p class="text-xs font-semibold text-gray-900">Gait patterns</p></div>
+<div class="px-3 py-2 rounded-xl bg-white border border-blue-100"><p class="text-xs font-semibold text-gray-900">IMU signals</p></div>
+<div class="px-3 py-2 rounded-xl bg-white border border-blue-100"><p class="text-xs font-semibold text-gray-900">Eye movement</p></div>
+</div>
+</div>
+<!-- 2 -->
+<div class="rounded-2xl bg-teal-50 border border-teal-100 p-5">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-3">
+<div class="w-10 h-10 rounded-2xl bg-white border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-clock-rotate-left text-teal-700"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-extrabold text-teal-800">Longitudinal monitoring</p>
+<p class="text-xs text-gray-700 mt-1">Track progression and support staging beyond binary PD/HC.</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-teal-100">
+<p class="text-xs font-semibold text-teal-800">Clinical</p>
+</div>
+</div>
+<div class="mt-4 grid grid-cols-2 gap-2">
+<div class="rounded-xl bg-white border border-teal-100 p-3">
+<p class="text-xs font-semibold text-gray-900">Progression curves</p>
+<p class="text-xs text-gray-600 mt-1">Repeated measures over time</p>
+</div>
+<div class="rounded-xl bg-white border border-teal-100 p-3">
+<p class="text-xs font-semibold text-gray-900">Risk trending</p>
+<p class="text-xs text-gray-600 mt-1">Early-warning screening</p>
+</div>
+</div>
+</div>
+<!-- 3 -->
+<div class="rounded-2xl bg-gray-50 border border-gray-200 p-5">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-3">
+<div class="w-10 h-10 rounded-2xl bg-white border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-network-wired text-gray-800"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-extrabold text-gray-900">Federated learning</p>
+<p class="text-xs text-gray-700 mt-1">Multi-center training while keeping data local.</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-gray-900 border border-gray-900">
+<p class="text-xs font-semibold text-white">Privacy</p>
+</div>
+</div>
+<div class="mt-4 flex items-center space-x-3 text-xs text-gray-600">
+<i class="fa-solid fa-shield text-gray-700"></i>
+<p class="text-xs">Supports collaboration across hospitals without raw data sharing.</p>
+</div>
+</div>
+<!-- 4 -->
+<div class="rounded-2xl bg-white border border-gray-200 p-5">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-3">
+<div class="w-10 h-10 rounded-2xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-eye text-white"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-extrabold text-gray-900">Explainable AI</p>
+<p class="text-xs text-gray-700 mt-1">Attention visualization and Grad-CAM for clinician trust.</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-blue-50 border border-blue-100">
+<p class="text-xs font-semibold text-blue-900">XAI</p>
+</div>
+</div>
+<div class="mt-4 grid grid-cols-2 gap-2">
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-3">
+<p class="text-xs font-semibold text-gray-900">Attention maps</p>
+<p class="text-xs text-gray-600 mt-1">Cross-modal cues</p>
+</div>
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-3">
+<p class="text-xs font-semibold text-gray-900">Grad-CAM</p>
+<p class="text-xs text-gray-600 mt-1">Spatial relevance</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom row: deployment/generalization -->
+<div class="mt-5 grid grid-cols-2 gap-4">
+<div class="rounded-2xl bg-gray-900 border border-gray-900 p-5">
+<div class="flex items-start justify-between">
+<div class="pr-6">
+<p class="text-xs uppercase tracking-widest text-gray-300 font-semibold">Deployment</p>
+<p class="mt-2 text-lg font-extrabold text-white leading-snug">Mobile-ready inference (TFLite)</p>
+<p class="mt-2 text-sm text-gray-200 leading-relaxed">
+                      Optimize for on-device screening and low-latency usage in remote settings.
+                    </p>
+</div>
+<div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center">
+<i class="fa-solid fa-mobile-screen-button text-gray-900 text-xl"></i>
+</div>
+</div>
+<div class="mt-4 flex flex-wrap gap-2">
+<div class="px-3 py-2 rounded-xl bg-white border border-gray-200"><p class="text-xs font-semibold text-gray-900">Quantization</p></div>
+<div class="px-3 py-2 rounded-xl bg-white border border-gray-200"><p class="text-xs font-semibold text-gray-900">CPU/NPU</p></div>
+<div class="px-3 py-2 rounded-xl bg-white border border-gray-200"><p class="text-xs font-semibold text-gray-900">Offline mode</p></div>
+</div>
+</div>
+<div class="rounded-2xl bg-white border border-gray-200 p-5">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-3">
+<div class="w-10 h-10 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-globe text-teal-700"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-extrabold text-gray-900">Multilingual speech extension</p>
+<p class="text-xs text-gray-700 mt-1">Evaluate cross-language generalization beyond a single dataset.</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-teal-50 border border-teal-100">
+<p class="text-xs font-semibold text-teal-800">Generalize</p>
+</div>
+</div>
+<div class="mt-4 bg-gray-50 border border-gray-200 rounded-2xl p-4">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-gray-800">Roadmap emphasis (illustrative)</p>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200">
+<p class="text-xs font-semibold text-gray-700">Priority view</p>
+</div>
+</div>
+<div class="mt-3" style="height: 160px;">
+<canvas id="priorityChart"></canvas>
+</div>
+<p class="text-xs text-gray-500 mt-2">
+                    Note: Values are illustrative to communicate focus areas (not measured outcomes).
+                  </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer note -->
+<div class="mt-5 flex items-center justify-between">
+<div class="flex items-center space-x-2 text-xs text-gray-500">
+<i class="fa-solid fa-circle-info"></i>
+<p class="text-xs">Future directions reflect the paper’s stated limitations and deployment goals.</p>
+</div>
+<div class="flex items-center space-x-2">
+<div class="w-2.5 h-2.5 rounded-full bg-blue-900"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-blue-700"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-teal-500"></div>
+</div>
+</div>
+</div>
+<!-- Right: Simple timeline / phases -->
+<div class="w-96 flex flex-col">
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-gray-800">Implementation phases</p>
+<div class="w-9 h-9 rounded-xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-calendar-check text-white text-sm"></i>
+</div>
+</div>
+<div class="mt-5 space-y-4">
+<div class="rounded-2xl bg-blue-50 border border-blue-100 p-4">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-3">
+<div class="w-9 h-9 rounded-xl bg-white border border-blue-100 flex items-center justify-center">
+<i class="fa-solid fa-vial text-blue-900"></i>
+</div>
+<div>
+<p class="text-sm font-extrabold text-blue-900">Near-term</p>
+<p class="text-xs text-gray-700 mt-1">XAI tooling + improved robustness to noisy inputs.</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-blue-100">
+<p class="text-xs font-semibold text-blue-900">0–3 mo</p>
+</div>
+</div>
+</div>
+<div class="rounded-2xl bg-teal-50 border border-teal-100 p-4">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-3">
+<div class="w-9 h-9 rounded-xl bg-white border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-mobile-screen-button text-teal-700"></i>
+</div>
+<div>
+<p class="text-sm font-extrabold text-teal-800">Mid-term</p>
+<p class="text-xs text-gray-700 mt-1">Mobile deployment via TFLite; multilingual evaluation.</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-teal-100">
+<p class="text-xs font-semibold text-teal-800">3–9 mo</p>
+</div>
+</div>
+</div>
+<div class="rounded-2xl bg-gray-900 border border-gray-900 p-4">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-3">
+<div class="w-9 h-9 rounded-xl bg-white flex items-center justify-center">
+<i class="fa-solid fa-hospital text-gray-900"></i>
+</div>
+<div>
+<p class="text-sm font-extrabold text-white">Long-term</p>
+<p class="text-xs text-gray-200 mt-1">Federated multi-center training + longitudinal studies.</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200">
+<p class="text-xs font-semibold text-gray-900">9+ mo</p>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-5 rounded-2xl bg-white border border-gray-200 p-5">
+<div class="flex items-center justify-between">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Deliverables</p>
+<div class="px-3 py-1 rounded-full bg-gray-50 border border-gray-200">
+<p class="text-xs font-semibold text-gray-700">Targets</p>
+</div>
+</div>
+<div class="mt-4 space-y-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center">
+<i class="fa-solid fa-file-waveform text-blue-900 text-xs"></i>
+</div>
+<div>
+<p class="text-xs font-semibold text-gray-900">Multimodal expansion</p>
+<p class="text-xs text-gray-600">gait/sensors/eye-tracking</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-blue-50 border border-blue-100">
+<p class="text-xs font-semibold text-blue-900">Research</p>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-language text-teal-700 text-xs"></i>
+</div>
+<div>
+<p class="text-xs font-semibold text-gray-900">Generalization</p>
+<p class="text-xs text-gray-600">multilingual speech</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-teal-50 border border-teal-100">
+<p class="text-xs font-semibold text-teal-800">Eval</p>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-shield-halved text-gray-800 text-xs"></i>
+</div>
+<div>
+<p class="text-xs font-semibold text-gray-900">Privacy + trust</p>
+<p class="text-xs text-gray-600">federated learning + XAI</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-gray-900 border border-gray-900">
+<p class="text-xs font-semibold text-white">Deploy</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Navigation chip -->
+<div class="mt-5 flex items-center justify-end">
+<div class="flex items-center space-x-2 bg-white border border-gray-200 rounded-full px-4 py-2 shadow-sm">
+<i class="fa-solid fa-arrow-right text-blue-900 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Next: Conclusion</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<div class="relative px-12 pb-8 flex items-center justify-between">
+<div class="flex items-center space-x-3 text-gray-500">
+<i class="fa-solid fa-file-lines"></i>
+<p class="text-xs">Multimodal Parkinson’s Disease Detection using Cross-Modal Attention Fusion</p>
+</div>
+<div class="flex items-center space-x-2">
+<div class="w-2.5 h-2.5 rounded-full bg-blue-900"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-blue-700"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-teal-500"></div>
+<p class="text-xs text-gray-500 ml-2">VIT-AP • CSE</p>
+</div>
+</div>
+</div>
+</div>
+<script>
+    const pctx = document.getElementById('priorityChart').getContext('2d');
+
+    // Illustrative emphasis scores (0–10) for roadmap categories (not outcomes).
+    const labels = ['Biomarkers+', 'XAI', 'Mobile', 'Multilingual', 'Federated'];
+    const values = [9, 8, 8, 7, 6];
+
+    new Chart(pctx, {
+      type: 'radar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Roadmap emphasis (illustrative)',
+          data: values,
+          backgroundColor: 'rgba(20, 184, 166, 0.12)',
+          borderColor: 'rgba(30, 64, 175, 0.65)',
+          pointBackgroundColor: 'rgba(30, 64, 175, 0.85)',
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          pointRadius: 3.5,
+          borderWidth: 2
+        }]
+      },
+      options: {
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: '#374151',
+              font: { family: 'Inter', size: 11, weight: '600' },
+              boxWidth: 10,
+              boxHeight: 10
+            }
+          },
+          tooltip: { enabled: true }
+        },
+        scales: {
+          r: {
+            suggestedMin: 0,
+            suggestedMax: 10,
+            angleLines: { color: 'rgba(229,231,235,1)' },
+            grid: { color: 'rgba(229,231,235,1)' },
+            pointLabels: { color: '#374151', font: { family: 'Inter', size: 11, weight: '700' } },
+            ticks: {
+              backdropColor: 'transparent',
+              color: '#6B7280',
+              font: { family: 'Inter', size: 10, weight: '600' },
+              stepSize: 2
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

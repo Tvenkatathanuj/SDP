@@ -308,6 +308,44 @@ function removeAudio() {
     resetResults();
 }
 
+// ── WAV Encoding Helper ──
+function encodeWAV(audioBuffer) {
+    const numChannels = 1;
+    const sampleRate = audioBuffer.sampleRate;
+    const format = 1; // PCM
+    const bitDepth = 16;
+    const channelData = audioBuffer.getChannelData(0);
+    const dataLength = channelData.length * (bitDepth / 8);
+    const buffer = new ArrayBuffer(44 + dataLength);
+    const view = new DataView(buffer);
+
+    function writeString(offset, str) {
+        for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+    }
+
+    writeString(0, 'RIFF');
+    view.setUint32(4, 36 + dataLength, true);
+    writeString(8, 'WAVE');
+    writeString(12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, format, true);
+    view.setUint16(22, numChannels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * numChannels * (bitDepth / 8), true);
+    view.setUint16(32, numChannels * (bitDepth / 8), true);
+    view.setUint16(34, bitDepth, true);
+    writeString(36, 'data');
+    view.setUint32(40, dataLength, true);
+
+    let offset = 44;
+    for (let i = 0; i < channelData.length; i++) {
+        const s = Math.max(-1, Math.min(1, channelData[i]));
+        view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+        offset += 2;
+    }
+    return new Blob([buffer], { type: 'audio/wav' });
+}
+
 // ── Live Recording ──
 async function toggleRecording() {
     const btn = document.getElementById('recordBtn');
@@ -330,12 +368,26 @@ async function toggleRecording() {
         mediaRecorder = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm' });
 
         mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
-        mediaRecorder.onstop = () => {
+        mediaRecorder.onstop = async () => {
             stream.getTracks().forEach(t => t.stop());
-            const blob = new Blob(audioChunks, { type: 'audio/webm' });
-            const file = new File([blob], 'recording.webm', { type: 'audio/webm' });
-            loadAudioFile(file);
-            showToast('✓ Recording saved');
+            const webmBlob = new Blob(audioChunks, { type: 'audio/webm' });
+
+            // Convert WebM to WAV so librosa can read it without ffmpeg
+            try {
+                if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const arrayBuffer = await webmBlob.arrayBuffer();
+                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                const wavBlob = encodeWAV(audioBuffer);
+                const file = new File([wavBlob], 'recording.wav', { type: 'audio/wav' });
+                loadAudioFile(file);
+                showToast('✓ Recording saved');
+            } catch (convErr) {
+                console.error('WAV conversion failed:', convErr);
+                // Fallback: send as webm anyway
+                const file = new File([webmBlob], 'recording.webm', { type: 'audio/webm' });
+                loadAudioFile(file);
+                showToast('✓ Recording saved (webm)');
+            }
         };
 
         mediaRecorder.start(100);

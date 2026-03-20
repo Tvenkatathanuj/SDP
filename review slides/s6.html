@@ -1,244 +1,392 @@
-<!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=1280, height=720" name="viewport"/>
-<title>Literature Review: Multi-Modal and Recent Trends</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    body {
-        font-family: 'Inter', sans-serif;
-        overflow: hidden;
-    }
-    .slide-container {
-        width: 1280px;
-        height: 720px;
-        display: flex;
-        flex-direction: column;
-        background: #ffffff;
-        position: relative;
-    }
-    .header-section {
-        background: #1e3a8a;
-        color: white;
-        padding: 30px 60px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-    .title-text {
-        font-size: 38px;
-        font-weight: 700;
-        letter-spacing: -0.5px;
-    }
-    .content-area {
-        flex: 1;
-        padding: 26px 46px;
-        background: #f8fafc;
-        display: flex;
-        flex-direction: column;
-        overflow: auto;
-    }
-    .table-container {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-        overflow: hidden;
-    }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    thead {
-        background: #1e3a8a;
-        color: white;
-    }
-    th {
-        padding: 12px 14px;
-        text-align: left;
-        font-size: 15px;
-        font-weight: 700;
-        border-bottom: 3px solid #3b82f6;
-    }
-    th:first-child {
-        width: 50px;
-        text-align: center;
-    }
-    th:nth-child(2) {
-        width: 40%;
-    }
-    th:nth-child(3) {
-        width: 25%;
-    }
-    th:nth-child(4) {
-        width: 25%;
-    }
-    th:last-child {
-        width: 10%;
-        text-align: center;
-    }
-    tbody tr {
-        border-bottom: 1px solid #e2e8f0;
-    }
-    tbody tr:nth-child(even) {
-        background: #f8fafc;
-    }
-    tbody tr:nth-child(odd) {
-        background: white;
-    }
-    tbody tr:hover {
-        background: #e0f2fe;
-    }
-    td {
-        padding: 10px 14px;
-        font-size: 14px;
-        color: #334155;
-        line-height: 1.4;
-    }
-    td:first-child {
-        text-align: center;
-        font-weight: 700;
-        color: #1e40af;
-        font-size: 16px;
-    }
-    td:last-child {
-        text-align: center;
-        font-weight: 700;
-        color: #059669;
-        font-size: 17px;
-    }
-    .method-text {
-        font-weight: 600;
-        color: #1e40af;
-    }
-    .dataset-text {
-        color: #475569;
-    }
-    .footer-bar {
-        background: #1e3a8a;
-        padding: 12px 60px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        color: white;
-        font-size: 14px;
-    }
-    .subtitle-badge {
-        background: #3b82f6;
-        color: white;
-        padding: 6px 16px;
-        border-radius: 20px;
-        font-size: 14px;
-        font-weight: 600;
-    }
-</style>
+    body { margin: 0; }
+    .slide { width: 1280px; height: 720px; }
+    .font-inter { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    .font-playfair { font-family: "Playfair Display", Georgia, serif; }
+  </style>
 </head>
 <body>
-<div class="slide-container">
-<div class="header-section">
-<div class="title-text">
-<p><i class="fas fa-layer-group"></i> Existing Systems: Multi-Modal & Recent Approaches</p>
+<div class="slide font-inter flex bg-white overflow-hidden">
+<!-- Left accent rail -->
+<div class="h-full w-24 flex flex-col">
+<div class="flex-1 bg-blue-900"></div>
+<div class="h-40 bg-blue-700"></div>
+<div class="h-28 bg-teal-500"></div>
 </div>
-<div style="text-align: right;">
-<div class="subtitle-badge">
-<p>Tables 3 & 4</p>
+<!-- Main -->
+<div class="flex-1 h-full flex flex-col relative">
+<!-- Subtle background shapes (no gradients) -->
+<div class="absolute inset-0 pointer-events-none">
+<div class="absolute -top-28 -right-24 w-96 h-96 rounded-full bg-blue-50"></div>
+<div class="absolute top-44 right-44 w-64 h-64 rounded-full bg-teal-50"></div>
+<div class="absolute bottom-0 right-0 w-full h-36 bg-gray-50"></div>
+<div class="absolute top-0 left-0 w-full h-2 bg-blue-900"></div>
 </div>
-</div>
-</div>
-<div class="content-area">
-<div class="table-container">
-<table>
-<thead>
-<tr>
-<th><p>Sl No.</p></th>
-<th><p>Title and Year</p></th>
-<th><p>Methodology</p></th>
-<th><p>Dataset</p></th>
-<th><p>Acc</p></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><p>17</p></td>
-<td><p>"Multi-Modal PD Detection: Gait + Speech" (2023)</p></td>
-<td><p><span class="method-text">Late Fusion CNN + LSTM</span></p></td>
-<td><p><span class="dataset-text">Custom Multi-Modal Dataset</span></p></td>
-<td><p>91.2%</p></td>
-</tr>
-<tr>
-<td><p>18</p></td>
-<td><p>"Handwriting + MRI Fusion for PD Diagnosis" (2022)</p></td>
-<td><p><span class="method-text">Early Fusion ResNet + 3D-CNN</span></p></td>
-<td><p><span class="dataset-text">Clinical Multi-Modal Data</span></p></td>
-<td><p>90.7%</p></td>
-</tr>
-<tr>
-<td><p>19</p></td>
-<td><p>"Speech + Facial Expression Analysis for PD" (2024)</p></td>
-<td><p><span class="method-text">Attention-Based Multi-Modal Fusion</span></p></td>
-<td><p><span class="dataset-text">Video + Audio (320 patients)</span></p></td>
-<td><p>93.1%</p></td>
-</tr>
-<tr>
-<td><p>20</p></td>
-<td><p>"Triple-Modal PD Detection: Gait+Speech+Handwriting" (2023)</p></td>
-<td><p><span class="method-text">Hierarchical Fusion Network</span></p></td>
-<td><p><span class="dataset-text">Custom Dataset (280 subjects)</span></p></td>
-<td><p>94.3%</p></td>
-</tr>
-<tr>
-<td><p>21</p></td>
-<td><p>"Meta-Learning for Multi-Modal PD Classification" (2024)</p></td>
-<td><p><span class="method-text">MAML on Speech + Handwriting</span></p></td>
-<td><p><span class="dataset-text">Combined Datasets</span></p></td>
-<td><p>92.8%</p></td>
-</tr>
-<tr>
-<td><p>22</p></td>
-<td><p>"Graph Neural Network for Multi-Feature PD Analysis" (2023)</p></td>
-<td><p><span class="method-text">GNN on Feature Correlation Graph</span></p></td>
-<td><p><span class="dataset-text">Multi-Modal Clinical Data</span></p></td>
-<td><p>91.5%</p></td>
-</tr>
-<tr>
-<td><p>23</p></td>
-<td><p>"Federated Learning for Privacy-Preserving PD Detection" (2024)</p></td>
-<td><p><span class="method-text">Federated ResNet on Handwriting</span></p></td>
-<td><p><span class="dataset-text">Distributed (1,500 samples)</span></p></td>
-<td><p>88.8%</p></td>
-</tr>
-<tr>
-<td><p>24</p></td>
-<td><p>"Self-Supervised Learning for PD Speech Analysis" (2023)</p></td>
-<td><p><span class="method-text">SimCLR Pre-training + Fine-tuning</span></p></td>
-<td><p><span class="dataset-text">Unlabeled + Labeled Speech</span></p></td>
-<td><p>86.4%</p></td>
-</tr>
-<tr>
-<td><p>25</p></td>
-<td><p>"Edge Computing for Real-Time PD Screening" (2024)</p></td>
-<td><p><span class="method-text">MobileNetV3 on Spiral Drawings</span></p></td>
-<td><p><span class="dataset-text">NewHandPD (Edge Deployment)</span></p></td>
-<td><p>85.6%</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="footer-bar">
+<!-- Header -->
+<div class="relative px-12 pt-10 flex items-start justify-between">
 <div>
-<p><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>Slide 6</p>
+<div class="flex items-center space-x-3">
+<div class="w-11 h-11 rounded-xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-diagram-project text-white text-lg"></i>
 </div>
+<div class="flex flex-col">
+<p class="text-xs uppercase tracking-widest text-blue-800 font-semibold">Architecture</p>
+<p class="font-playfair text-4xl text-gray-900 font-bold leading-tight">System Overview</p>
+</div>
+</div>
+<div class="mt-3 flex items-center space-x-2">
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm flex items-center space-x-2">
+<i class="fa-solid fa-pen-nib text-blue-800 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Handwriting (Spiral/Wave)</p>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm flex items-center space-x-2">
+<i class="fa-solid fa-microphone-lines text-teal-700 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Speech (16 kHz, &lt; 8s)</p>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm flex items-center space-x-2">
+<i class="fa-solid fa-wand-magic-sparkles text-gray-700 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">CMAFN Fusion</p>
+</div>
+</div>
+</div>
+<!-- Deployment card -->
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm px-5 py-4 w-96">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Deployment &amp; Practicality</p>
+<div class="mt-3 grid grid-cols-2 gap-3">
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-3">
+<p class="text-xs text-blue-900 font-semibold">Interface</p>
+<p class="text-sm text-blue-900 font-extrabold mt-1">Flask Web App</p>
+<p class="text-xs text-gray-700 mt-1">Interactive screening workflow</p>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-3">
+<p class="text-xs text-teal-800 font-semibold">Compute</p>
+<p class="text-sm text-teal-800 font-extrabold mt-1">CPU-friendly</p>
+<p class="text-xs text-gray-700 mt-1">Designed for real-time inference</p>
+</div>
+</div>
+<div class="mt-3 flex items-center space-x-2 text-xs text-gray-600">
+<i class="fa-solid fa-user-shield text-blue-800"></i>
+<p class="text-xs text-gray-600">Validation: patient-level stratified 5-fold CV (no leakage)</p>
+</div>
+</div>
+</div>
+<!-- Content -->
+<div class="relative flex-1 px-12 pt-8 pb-10 flex">
+<!-- Left: Flow diagram panel -->
+<div class="flex-1 pr-8 flex flex-col">
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-7 flex-1">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-gray-800">End-to-end data flow</p>
+<div class="w-9 h-9 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-arrow-right-arrow-left text-gray-700 text-sm"></i>
+</div>
+</div>
+<!-- Inputs -->
+<div class="mt-6 flex items-center justify-between">
+<div class="w-64 bg-gray-50 border border-gray-200 rounded-2xl p-4">
+<div class="flex items-start justify-between">
+<div class="pr-3">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Input 1</p>
+<p class="mt-1 text-sm font-extrabold text-gray-900">Handwriting Image</p>
+<p class="mt-1 text-xs text-gray-600">Spiral / Wave drawing</p>
+</div>
+<div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center">
+<i class="fa-solid fa-image text-blue-900"></i>
+</div>
+</div>
+<div class="mt-3 flex flex-wrap gap-2">
+<div class="px-2.5 py-1 rounded-full bg-white border border-gray-200">
+<p class="text-xs font-semibold text-gray-700">224×224</p>
+</div>
+<div class="px-2.5 py-1 rounded-full bg-white border border-gray-200">
+<p class="text-xs font-semibold text-gray-700">TTA (optional)</p>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-center justify-center w-24">
+<div class="w-12 h-12 rounded-2xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-right-long text-white text-lg"></i>
+</div>
+<p class="mt-2 text-xs text-gray-500 font-semibold">Encode</p>
+</div>
+<div class="w-64 bg-gray-50 border border-gray-200 rounded-2xl p-4">
+<div class="flex items-start justify-between">
+<div class="pr-3">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Input 2</p>
+<p class="mt-1 text-sm font-extrabold text-gray-900">Speech Audio</p>
+<p class="mt-1 text-xs text-gray-600">16 kHz, &lt; 8 seconds</p>
+</div>
+<div class="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-waveform text-teal-800"></i>
+</div>
+</div>
+<div class="mt-3 flex flex-wrap gap-2">
+<div class="px-2.5 py-1 rounded-full bg-white border border-gray-200">
+<p class="text-xs font-semibold text-gray-700">Pad/Trim</p>
+</div>
+<div class="px-2.5 py-1 rounded-full bg-white border border-gray-200">
+<p class="text-xs font-semibold text-gray-700">SpecAug (train)</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Modules row -->
+<div class="mt-7 flex items-center justify-between">
+<!-- Handwriting module -->
+<div class="w-80 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+<div class="flex items-center justify-between">
 <div>
-<p>Multi-Modal Parkinson's Disease Detection System</p>
+<p class="text-xs uppercase tracking-widest text-blue-800 font-semibold">Module A</p>
+<p class="mt-1 text-lg font-extrabold text-gray-900">Handwriting Analysis</p>
+</div>
+<div class="w-11 h-11 rounded-2xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-pen-nib text-white"></i>
+</div>
+</div>
+<div class="mt-4 space-y-2">
+<div class="flex items-center space-x-2">
+<div class="w-7 h-7 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center">
+<i class="fa-solid fa-list-ul text-blue-900 text-xs"></i>
+</div>
+<p class="text-sm text-gray-700"><span class="font-semibold text-gray-900">16 spatial biomarkers</span></p>
+</div>
+<div class="flex items-center space-x-2">
+<div class="w-7 h-7 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center">
+<i class="fa-solid fa-network-wired text-blue-900 text-xs"></i>
+</div>
+<p class="text-sm text-gray-700">MLP + EfficientNet (CBAM)</p>
+</div>
+<div class="flex items-center space-x-2">
+<div class="w-7 h-7 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center">
+<i class="fa-solid fa-layer-group text-blue-900 text-xs"></i>
+</div>
+<p class="text-sm text-gray-700">Meta-learner: Logistic Regression</p>
+</div>
+</div>
+<div class="mt-4 flex items-center justify-between">
+<div class="px-3 py-1 rounded-full bg-blue-50 border border-blue-100">
+<p class="text-xs font-semibold text-blue-900">Acc ≈ 93.6%</p>
+</div>
+<div class="flex items-center space-x-2 text-xs text-gray-500">
+<i class="fa-solid fa-shield-heart text-blue-800"></i>
+<p class="text-xs">Non-invasive</p>
+</div>
+</div>
+</div>
+<!-- Fusion block with arrows around -->
+<div class="flex flex-col items-center justify-center w-32">
+<div class="w-12 h-12 rounded-2xl bg-gray-900 flex items-center justify-center">
+<i class="fa-solid fa-arrows-turn-to-dots text-white text-lg"></i>
+</div>
+<p class="mt-2 text-xs text-gray-600 font-semibold">Cross-modal</p>
+<p class="text-xs text-gray-500">interaction</p>
+</div>
+<!-- Speech module -->
+<div class="w-80 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+<div class="flex items-center justify-between">
+<div>
+<p class="text-xs uppercase tracking-widest text-teal-700 font-semibold">Module B</p>
+<p class="mt-1 text-lg font-extrabold text-gray-900">Speech Analysis</p>
+</div>
+<div class="w-11 h-11 rounded-2xl bg-teal-600 flex items-center justify-center">
+<i class="fa-solid fa-microphone-lines text-white"></i>
+</div>
+</div>
+<div class="mt-4 space-y-2">
+<div class="flex items-center space-x-2">
+<div class="w-7 h-7 rounded-lg bg-teal-50 border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-brain text-teal-800 text-xs"></i>
+</div>
+<p class="text-sm text-gray-700"><span class="font-semibold text-gray-900">XLS-R</span> embeddings + BiLSTM</p>
+</div>
+<div class="flex items-center space-x-2">
+<div class="w-7 h-7 rounded-lg bg-teal-50 border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-chart-area text-teal-800 text-xs"></i>
+</div>
+<p class="text-sm text-gray-700">Mel-spectrogram CNN + MFCC</p>
+</div>
+<div class="flex items-center space-x-2">
+<div class="w-7 h-7 rounded-lg bg-teal-50 border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-sliders text-teal-800 text-xs"></i>
+</div>
+<p class="text-sm text-gray-700">Acoustic measures (Praat)</p>
+</div>
+</div>
+<div class="mt-4 flex items-center justify-between">
+<div class="px-3 py-1 rounded-full bg-teal-50 border border-teal-100">
+<p class="text-xs font-semibold text-teal-800">Acc ≈ 91.7%</p>
+</div>
+<div class="flex items-center space-x-2 text-xs text-gray-500">
+<i class="fa-solid fa-headphones text-teal-700"></i>
+<p class="text-xs">Accessible</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Fusion module (center) -->
+<div class="mt-7 flex items-center justify-center">
+<div class="w-full bg-gray-900 border border-gray-900 rounded-2xl p-6">
+<div class="flex items-start justify-between">
+<div class="pr-6">
+<p class="text-xs uppercase tracking-widest text-gray-300 font-semibold">Module C</p>
+<p class="mt-1 text-2xl font-extrabold text-white">Cross-Modal Attention Fusion Network (CMAFN)</p>
+<p class="mt-2 text-sm text-gray-200 leading-relaxed">
+                      Bidirectional cross-attention (Handwriting ↔ Speech) with a Gated Multimodal Unit (GMU) learns complementary biomarker interactions.
+                    </p>
+<div class="mt-4 flex flex-wrap gap-2">
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200">
+<p class="text-xs font-semibold text-gray-800">Cross-attention</p>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200">
+<p class="text-xs font-semibold text-gray-800">GMU fusion</p>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200">
+<p class="text-xs font-semibold text-gray-800">Modality dropout (robust)</p>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200">
+<p class="text-xs font-semibold text-gray-800">Uncertainty (MC Dropout)</p>
+</div>
+</div>
+</div>
+<div class="w-14 h-14 rounded-2xl bg-white flex items-center justify-center">
+<i class="fa-solid fa-atom text-gray-900 text-2xl"></i>
+</div>
+</div>
+<div class="mt-5 grid grid-cols-3 gap-3">
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
+<p class="text-xs text-blue-900 font-semibold">Fusion Accuracy</p>
+<p class="mt-1 text-2xl font-extrabold text-blue-900">96.94%</p>
+<p class="text-xs text-gray-700 mt-1">Reported in study</p>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-4">
+<p class="text-xs text-teal-800 font-semibold">AUC-ROC</p>
+<p class="mt-1 text-2xl font-extrabold text-teal-800">0.999</p>
+<p class="text-xs text-gray-700 mt-1">Near-perfect separability</p>
+</div>
+<div class="rounded-xl bg-white border border-gray-200 p-4">
+<p class="text-xs text-gray-600 font-semibold">Output</p>
+<p class="mt-1 text-base font-extrabold text-gray-900">PD vs Healthy</p>
+<p class="text-xs text-gray-600 mt-1">Screening prediction</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom note -->
+<div class="mt-5 flex items-center justify-between">
+<div class="flex items-center space-x-2 text-xs text-gray-500">
+<i class="fa-solid fa-circle-info"></i>
+<p class="text-xs">Three-module design supports unimodal or multimodal inference depending on available inputs.</p>
+</div>
+<div class="flex items-center space-x-2">
+<div class="w-2.5 h-2.5 rounded-full bg-blue-900"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-blue-700"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-teal-500"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: Implementation notes / stack -->
+<div class="w-96 flex flex-col">
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-gray-800">Implementation stack</p>
+<div class="w-9 h-9 rounded-xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-screwdriver-wrench text-white text-sm"></i>
+</div>
+</div>
+<div class="mt-5 space-y-3">
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-9 h-9 rounded-xl bg-white border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-cubes text-gray-700"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold text-gray-900">Encoders</p>
+<p class="text-xs text-gray-600 mt-1">EfficientNet (handwriting) + XLS-R (speech)</p>
+</div>
+</div>
+</div>
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-9 h-9 rounded-xl bg-white border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-shuffle text-gray-700"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold text-gray-900">Fusion</p>
+<p class="text-xs text-gray-600 mt-1">Transformer cross-attention + GMU gating</p>
+</div>
+</div>
+</div>
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-9 h-9 rounded-xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-laptop-medical text-white"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold text-blue-900">Deployment</p>
+<p class="text-xs text-blue-900 mt-1">Web-based screening app for real-time inference</p>
+</div>
+</div>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-9 h-9 rounded-xl bg-white border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-shield-heart text-teal-800"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold text-teal-800">Reliability</p>
+<p class="text-xs text-gray-700 mt-1">Patient-level splits + augmentation for robustness</p>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-5 rounded-2xl bg-white border border-gray-200 p-4">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">What this enables</p>
+<div class="mt-3 space-y-2">
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-check text-green-700 text-xs"></i>
+<p class="text-xs text-gray-700">Use one modality when the other is unavailable</p>
+</div>
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-check text-green-700 text-xs"></i>
+<p class="text-xs text-gray-700">Learn complementary symptom interactions with attention</p>
+</div>
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-check text-green-700 text-xs"></i>
+<p class="text-xs text-gray-700">Scalable screening for clinical and remote workflows</p>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-5 bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Next</p>
+<p class="mt-2 text-lg font-extrabold text-gray-900 leading-snug">Handwriting Module (details)</p>
+<div class="mt-3 flex items-center space-x-2 text-xs text-gray-600">
+<i class="fa-solid fa-arrow-right text-blue-900"></i>
+<p class="text-xs text-gray-600">Dual-pathway ensemble + 16 biomarkers</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<div class="relative px-12 pb-8 flex items-center justify-between">
+<div class="flex items-center space-x-3 text-gray-500">
+<i class="fa-solid fa-file-lines"></i>
+<p class="text-xs">Multimodal Parkinson’s Disease Detection using Cross-Modal Attention Fusion</p>
+</div>
+<div class="flex items-center space-x-2 bg-white border border-gray-200 rounded-full px-4 py-2 shadow-sm">
+<i class="fa-solid fa-arrow-right text-blue-900 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Next: Handwriting Module</p>
+</div>
 </div>
 </div>
 </div>

@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMAFN — Multimodal Parkinson's Detection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --primary-light: #eef2ff;
+            --primary-50: #f5f3ff;
+            --accent: #7c3aed;
+            --success: #059669;
+            --success-light: #d1fae5;
+            --warning: #d97706;
+            --warning-light: #fef3c7;
+            --danger: #dc2626;
+            --danger-light: #fee2e2;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --surface-alt: #f1f5f9;
+            --text: #0f172a;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.04);
+            --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5; }
+
+        /* ── Header ── */
+        .header { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); color: #fff; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo-icon { width: 36px; height: 36px; background: rgba(255,255,255,0.12); backdrop-filter: blur(8px); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 1px solid rgba(255,255,255,0.1); }
+        .logo h1 { font-size: 1.15rem; font-weight: 700; letter-spacing: -0.3px; }
+        .logo p { font-size: 0.68rem; opacity: 0.6; font-weight: 400; margin-top: 1px; }
+        .header-status { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; }
+        .status-pill { display: flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 20px; font-weight: 500; font-size: 0.72rem; }
+        .status-pill.ok { background: rgba(5,150,105,0.15); color: #6ee7b7; }
+        .status-pill.loading { background: rgba(251,191,36,0.15); color: #fcd34d; }
+        .status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+        .status-dot.ok { background: #34d399; box-shadow: 0 0 6px rgba(52,211,153,0.5); }
+        .status-dot.loading { background: #fbbf24; animation: pulse 1.5s ease-in-out infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.85); } }
+
+        /* ── Container ── */
+        .container { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
+
+        /* ── Hero Banner ── */
+        .hero { margin-top: 20px; background: linear-gradient(135deg, var(--primary-light), #ede9fe); border: 1px solid #c7d2fe; border-radius: var(--radius); padding: 20px 24px; display: flex; gap: 16px; align-items: flex-start; }
+        .hero-icon { font-size: 1.8rem; flex-shrink: 0; margin-top: 2px; }
+        .hero h3 { font-size: 0.95rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 6px; }
+        .hero p { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.65; }
+        .hero strong { color: var(--primary-dark); font-weight: 600; }
+
+        /* ── Two-Panel Grid ── */
+        .panel-grid { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 860px) { .panel-grid { grid-template-columns: 1fr; } }
+
+        .panel { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); overflow: hidden; transition: box-shadow var(--transition); }
+        .panel:hover { box-shadow: var(--shadow-lg); }
+        .panel-head { padding: 16px 20px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 10px; }
+        .panel-head .icon { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+        .panel-head .icon.hw { background: #eef2ff; }
+        .panel-head .icon.audio { background: #ecfdf5; }
+        .panel-head h2 { font-size: 0.95rem; font-weight: 600; }
+        .panel-head .chip { font-size: 0.64rem; background: var(--surface-alt); color: var(--text-secondary); padding: 3px 10px; border-radius: 12px; font-weight: 500; margin-left: auto; }
+        .panel-body { padding: 16px 20px 20px; }
+
+        /* ── Canvas ── */
+        .toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; align-items: center; background: var(--surface-alt); padding: 8px 12px; border-radius: var(--radius-sm); }
+        .toolbar .tbtn { padding: 6px 14px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); cursor: pointer; font-size: 0.76rem; font-weight: 500; transition: all var(--transition); color: var(--text-secondary); }
+        .toolbar .tbtn:hover { background: var(--primary-light); border-color: #c7d2fe; color: var(--primary); }
+        .toolbar .tbtn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .toolbar input[type=range] { width: 64px; accent-color: var(--primary); }
+        .toolbar .sep { width: 1px; height: 22px; background: var(--border); margin: 0 2px; }
+        .toolbar label { font-size: 0.7rem; color: var(--text-muted); }
+
+        .canvas-wrap { position: relative; border: 2px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; background: #fff; transition: border-color var(--transition); }
+        .canvas-wrap:hover { border-color: #c7d2fe; }
+        .canvas-wrap.drawing { border-color: var(--primary); }
+        #drawCanvas { display: block; cursor: crosshair; touch-action: none; width: 100%; height: auto; }
+        .canvas-hint { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); pointer-events: none; text-align: center; color: var(--text-muted); transition: opacity 0.3s; }
+        .canvas-hint.hidden { opacity: 0; }
+        .canvas-hint .hint-icon { font-size: 2.4rem; margin-bottom: 6px; }
+        .canvas-hint p { font-size: 0.8rem; }
+
+        /* ── Upload Areas ── */
+        .upload-area { margin-top: 12px; padding: 16px; border: 2px dashed var(--border); border-radius: var(--radius-sm); text-align: center; color: var(--text-muted); font-size: 0.8rem; cursor: pointer; transition: all var(--transition); background: var(--surface-alt); }
+        .upload-area:hover, .upload-area.drag-over { border-color: var(--primary); background: var(--primary-50); color: var(--primary); }
+        .upload-area input { display: none; }
+        .upload-area .upload-icon { font-size: 1.6rem; display: block; margin-bottom: 6px; }
+        .upload-preview { margin-top: 6px; font-size: 0.75rem; color: var(--success); font-weight: 600; }
+
+        /* ── Audio Controls ── */
+        .audio-actions { margin-top: 14px; display: flex; gap: 8px; align-items: center; }
+        .btn-record { padding: 10px 20px; border: 1.5px solid var(--danger); border-radius: 9px; background: var(--surface); color: var(--danger); cursor: pointer; font-size: 0.82rem; font-weight: 600; transition: all var(--transition); display: flex; align-items: center; gap: 7px; }
+        .btn-record:hover { background: var(--danger-light); }
+        .btn-record.recording { background: var(--danger); color: #fff; animation: pulse-rec 1.2s infinite; }
+        @keyframes pulse-rec { 0%,100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.3); } 50% { box-shadow: 0 0 0 8px rgba(220,38,38,0); } }
+        .rec-time { font-size: 0.82rem; color: var(--text-secondary); display: none; align-items: center; gap: 5px; font-variant-numeric: tabular-nums; }
+        .rec-time.visible { display: flex; }
+
+        .tips-card { margin-top: 16px; padding: 14px 16px; background: var(--surface-alt); border-radius: var(--radius-sm); border: 1px solid var(--border-light); }
+        .tips-card h4 { font-size: 0.8rem; font-weight: 600; color: var(--primary-dark); margin-bottom: 6px; }
+        .tips-card ul { font-size: 0.74rem; color: var(--text-secondary); line-height: 1.8; padding-left: 16px; }
+
+        .warning-card { margin-top: 12px; padding: 12px 16px; background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius-sm); }
+        .warning-card p { font-size: 0.72rem; color: #92400e; line-height: 1.55; }
+
+        /* ── Analyze Button ── */
+        .action-row { margin-top: 20px; }
+        .btn-analyze { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all var(--transition); display: flex; align-items: center; justify-content: center; gap: 10px; letter-spacing: -0.2px; }
+        .btn-analyze:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 25px rgba(79,70,229,0.3); }
+        .btn-analyze:active:not(:disabled) { transform: translateY(0); }
+        .btn-analyze:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-analyze .spinner { display: none; width: 20px; height: 20px; border: 2.5px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+        .btn-analyze.loading .spinner { display: inline-block; }
+        .btn-analyze.loading .btn-label { display: none; }
+        .btn-analyze.loading::after { content: 'Analyzing...'; font-weight: 600; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Progress Steps ── */
+        .progress-bar { display: none; margin-top: 12px; }
+        .progress-bar.visible { display: block; }
+        .progress-track { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); border-radius: 2px; transition: width 0.4s ease; width: 0%; }
+        .progress-steps { display: flex; justify-content: space-between; margin-top: 8px; }
+        .progress-step { font-size: 0.68rem; color: var(--text-muted); font-weight: 500; transition: color 0.3s; }
+        .progress-step.active { color: var(--primary); font-weight: 600; }
+        .progress-step.done { color: var(--success); }
+
+        /* ══════════ Results ══════════ */
+        .results { margin-top: 24px; padding-bottom: 40px; display: none; animation: fadeUp 0.5s ease; }
+        .results.visible { display: block; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+        .result-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-xl); border: 1px solid var(--border); overflow: hidden; }
+        .result-header { padding: 20px 24px 12px; text-align: center; border-bottom: 1px solid var(--border-light); }
+        .result-header h2 { font-size: 1.05rem; font-weight: 700; color: var(--text); }
+        .modality-chips { display: flex; gap: 6px; justify-content: center; margin-top: 8px; }
+        .modality-chip { padding: 3px 12px; border-radius: 14px; font-size: 0.7rem; font-weight: 600; }
+        .modality-chip.hw { background: #eef2ff; color: #4338ca; }
+        .modality-chip.au { background: #ecfdf5; color: #047857; }
+
+        .result-body { padding: 24px; }
+
+        /* Gauge */
+        .gauge-section { text-align: center; margin-bottom: 20px; }
+        .gauge-wrap { position: relative; width: 220px; height: 130px; margin: 0 auto; }
+        .gauge-wrap svg { width: 220px; height: 130px; }
+        .gauge-bg { fill: none; stroke: #f1f5f9; stroke-width: 16; }
+        .gauge-fill { fill: none; stroke-width: 16; stroke-linecap: round; transition: stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1), stroke 0.6s; }
+        .gauge-label { position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); text-align: center; }
+        .gauge-label .val { font-size: 2.4rem; font-weight: 900; letter-spacing: -1px; line-height: 1; }
+        .gauge-label .unit { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+
+        .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 8px 24px; border-radius: 24px; font-size: 0.88rem; font-weight: 700; margin-top: 10px; }
+        .status-badge.low { background: var(--success-light); color: var(--success); }
+        .status-badge.moderate { background: var(--warning-light); color: var(--warning); }
+        .status-badge.high { background: var(--danger-light); color: var(--danger); }
+
+        .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; }
+        .stat-card { background: var(--surface-alt); border-radius: var(--radius-sm); padding: 14px; text-align: center; border: 1px solid var(--border-light); }
+        .stat-card .stat-label { font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
+        .stat-card .stat-val { font-size: 1.3rem; font-weight: 800; margin-top: 4px; color: var(--text); }
+
+        /* Detail Cards */
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+        @media (max-width: 860px) { .detail-grid { grid-template-columns: 1fr; } .stats-row { grid-template-columns: 1fr 1fr; } }
+
+        .detail-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-sm); border: 1px solid var(--border); padding: 18px 20px; }
+        .detail-card h3 { font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+        .detail-card h3 .dicon { font-size: 1rem; }
+
+        .bar-item { margin-bottom: 12px; }
+        .bar-item:last-child { margin-bottom: 0; }
+        .bar-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .bar-head .name { font-size: 0.76rem; font-weight: 500; color: var(--text-secondary); }
+        .bar-head .pct { font-size: 0.76rem; font-weight: 700; }
+        .bar-track { height: 8px; background: var(--surface-alt); border-radius: 4px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 4px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+
+        .fold-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+        .fold-item { flex: 1; min-width: 60px; padding: 10px 8px; border-radius: 9px; text-align: center; background: var(--surface-alt); border: 1px solid var(--border-light); transition: all var(--transition); }
+        .fold-item .fold-num { font-size: 0.64rem; color: var(--text-muted); text-transform: uppercase; font-weight: 500; }
+        .fold-item .fold-val { font-size: 1rem; font-weight: 700; margin-top: 2px; }
+
+        .voice-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.78rem; }
+        .voice-table th { text-align: left; padding: 8px 10px; color: var(--text-muted); font-weight: 500; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border); }
+        .voice-table td { padding: 8px 10px; border-bottom: 1px solid var(--border-light); }
+        .voice-table td:last-child { font-weight: 700; text-align: right; }
+        .voice-table tr:last-child td { border-bottom: none; }
+
+        .interpretation { margin-top: 0; }
+        .interpretation p { font-size: 0.76rem; color: var(--text-secondary); line-height: 1.65; }
+        .interpretation p + p { margin-top: 8px; }
+        .interpretation strong { color: var(--text); }
+
+        /* ── Footer ── */
+        footer { text-align: center; padding: 24px 20px; font-size: 0.7rem; color: var(--text-muted); border-top: 1px solid var(--border-light); margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <!-- ══════════ Header ══════════ -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">🧬</div>
+            <div>
+                <h1>CMAFN Fusion</h1>
+                <p>Cross-Modal Attention Fusion Network</p>
+            </div>
+        </div>
+        <div class="header-status">
+            <div class="status-pill loading" id="statusPill">
+                <span class="status-dot loading" id="statusDot"></span>
+                <span id="statusText">Loading models…</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- ══════════ Hero ══════════ -->
+        <div class="hero">
+            <div class="hero-icon">🔬</div>
+            <div>
+                <h3>Multimodal Parkinson's Disease Risk Assessment</h3>
+                <p>Provide a <strong>handwriting sample</strong> (draw or upload) and/or a <strong>speech recording</strong> (upload or record live).
+                   The CMAFN model fuses both modalities via cross-modal transformer attention for improved detection accuracy.
+                   <strong>Both inputs recommended</strong> — single-modality analysis is also supported.</p>
+            </div>
+        </div>
+
+        <!-- ══════════ Input Panels ══════════ -->
+        <div class="panel-grid">
+            <!-- Handwriting -->
+            <div class="panel">
+                <div class="panel-head">
+                    <div class="icon hw">🖊️</div>
+                    <h2>Handwriting Input</h2>
+                    <span class="chip">EfficientNet-B4 + CBAM</span>
+                </div>
+                <div class="panel-body">
+                    <div class="toolbar">
+                        <button class="tbtn" onclick="setTemplate('spiral')" id="btnSpiral">Spiral</button>
+                        <button class="tbtn" onclick="setTemplate('wave')" id="btnWave">Wave</button>
+                        <span class="sep"></span>
+                        <label>Size</label>
+                        <input type="range" id="brushSize" min="1" max="12" value="3" oninput="brushRadius=this.value">
+                        <span class="sep"></span>
+                        <button class="tbtn" onclick="clearCanvas()">Clear</button>
+                    </div>
+                    <div class="canvas-wrap" id="canvasWrap">
+                        <canvas id="drawCanvas" width="500" height="500"></canvas>
+                        <div class="canvas-hint" id="canvasHint">
+                            <div class="hint-icon">✏️</div>
+                            <p>Draw a spiral or wave pattern</p>
+                        </div>
+                    </div>
+                    <div class="upload-area" id="hwUploadArea">
+                        <span class="upload-icon">📁</span>
+                        <span>Or upload an image &mdash; click or drag &amp; drop</span>
+                        <input type="file" id="hwFileInput" accept="image/*">
+                        <div class="upload-preview" id="hwPreview"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audio -->
+            <div class="panel">
+                <div class="panel-head">
+                    <div class="icon audio">🎤</div>
+                    <h2>Speech Input</h2>
+                    <span class="chip">XLS-R 300M + SE</span>
+                </div>
+                <div class="panel-body">
+                    <div class="upload-area" id="audioUploadArea" style="padding: 28px 16px;">
+                        <span class="upload-icon">🎵</span>
+                        <span>Upload a speech audio file (WAV, MP3, OGG, FLAC)</span>
+                        <input type="file" id="audioFileInput" accept=".wav,.mp3,.ogg,.flac,.m4a,.webm,audio/*">
+                        <div class="upload-preview" id="audioPreview"></div>
+                    </div>
+                    <div class="audio-actions">
+                        <button class="btn-record" id="btnRecord" onclick="toggleRecording()">
+                            <span id="recIcon">🔴</span> <span id="recText">Record Speech</span>
+                        </button>
+                        <span class="rec-time" id="recTime">
+                            ⏱ <span id="recTimer">0:00</span>
+                        </span>
+                    </div>
+                    <div class="tips-card">
+                        <h4>💡 Tips for Best Results</h4>
+                        <ul>
+                            <li>Speak naturally for at least 3–5 seconds</li>
+                            <li>Read a passage aloud or sustain a vowel (&ldquo;aaah&rdquo;)</li>
+                            <li>Minimize background noise</li>
+                            <li>For handwriting, draw a complete spiral or wave pattern</li>
+                        </ul>
+                    </div>
+                    <div class="warning-card">
+                        <p><strong>⚠ Research Tool</strong> — This is an experimental AI model for research purposes only. Results should not be used for medical diagnosis. Always consult a healthcare professional.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════ Analyze ══════════ -->
+        <div class="action-row">
+            <button class="btn-analyze" id="btnAnalyze" onclick="analyze()">
+                <span class="btn-label">🔬 Analyze with CMAFN Fusion</span>
+                <span class="spinner"></span>
+            </button>
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+                <div class="progress-steps">
+                    <span class="progress-step" id="step1">Preprocessing</span>
+                    <span class="progress-step" id="step2">Feature Extraction</span>
+                    <span class="progress-step" id="step3">Fusion Analysis</span>
+                    <span class="progress-step" id="step4">Ensemble</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════ Results ══════════ -->
+        <div class="results" id="resultsArea">
+            <div class="result-card">
+                <div class="result-header">
+                    <h2>Fusion Analysis Result</h2>
+                    <div class="modality-chips" id="modalityChips"></div>
+                </div>
+                <div class="result-body">
+                    <div class="gauge-section">
+                        <div class="gauge-wrap">
+                            <svg viewBox="0 0 220 130">
+                                <path d="M22 110 A88 88 0 0 1 198 110" class="gauge-bg"/>
+                                <path d="M22 110 A88 88 0 0 1 198 110" class="gauge-fill" id="gaugeFill"
+                                      stroke-dasharray="276.5" stroke-dashoffset="276.5"/>
+                            </svg>
+                            <div class="gauge-label">
+                                <div class="val" id="gaugeValue">—</div>
+                                <div class="unit">PD Risk Score</div>
+                            </div>
+                        </div>
+                        <div id="statusBadge"></div>
+                    </div>
+
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-label">Confidence</div>
+                            <div class="stat-val" id="confValue">—</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Uncertainty</div>
+                            <div class="stat-val" id="uncValue">—</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Ensemble Folds</div>
+                            <div class="stat-val" id="foldCount">—</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-grid">
+                <div class="detail-card">
+                    <h3><span class="dicon">📊</span> Modality Contributions</h3>
+                    <div class="bar-item">
+                        <div class="bar-head"><span class="name">🖊️ Handwriting</span><span class="pct" id="hwBarVal">—</span></div>
+                        <div class="bar-track"><div class="bar-fill" id="hwBar" style="width:0;background:var(--primary)"></div></div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-head"><span class="name">🎤 Speech Audio</span><span class="pct" id="audioBarVal">—</span></div>
+                        <div class="bar-track"><div class="bar-fill" id="audioBar" style="width:0;background:#059669"></div></div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-head"><span class="name">🧬 Fused (CMAFN)</span><span class="pct" id="fusedBarVal">—</span></div>
+                        <div class="bar-track"><div class="bar-fill" id="fusedBar" style="width:0;background:var(--accent)"></div></div>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="dicon">🔢</span> Fold Predictions</h3>
+                    <div class="fold-grid" id="foldGrid"></div>
+                </div>
+
+                <div class="detail-card" id="voiceCard" style="display:none">
+                    <h3><span class="dicon">🎤</span> Voice Features</h3>
+                    <table class="voice-table" id="voiceTable">
+                        <thead><tr><th>Feature</th><th>Value</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="dicon">💡</span> How to Read This</h3>
+                    <div class="interpretation">
+                        <p><strong>Risk Score:</strong> Higher percentage = higher predicted risk of Parkinson's indicators. Scores below 33% are considered low risk, 33–66% moderate, and above 66% high risk.</p>
+                        <p><strong>Confidence:</strong> High confidence with low uncertainty means the 5 ensemble folds agree closely, increasing reliability.</p>
+                        <p><strong>Modality Bars:</strong> Compare individual handwriting and audio scores with the fused score to see each modality's influence.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>CMAFN — Cross-Modal Attention Fusion Network &middot; 5-Fold Ensemble &middot; Research Use Only</footer>
+
+    <script>
+    /* ═══════════════ Canvas ═══════════════ */
+    const canvas = document.getElementById('drawCanvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false, brushRadius = 3, hasDrawn = false;
+
+    function initCanvas() { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+    initCanvas();
+
+    function setTemplate(type) {
+        clearCanvas();
+        ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
+        const cx = 250, cy = 250;
+        if (type === 'spiral') {
+            ctx.beginPath();
+            for (let t = 0; t < 6 * Math.PI; t += 0.05) {
+                const r = 10 + 18 * t;
+                ctx.lineTo(cx + r * Math.cos(t), cy + r * Math.sin(t));
+            }
+            ctx.stroke();
+            document.getElementById('btnSpiral').classList.add('active');
+            document.getElementById('btnWave').classList.remove('active');
+        } else {
+            ctx.beginPath();
+            for (let x = 50; x < 450; x++) ctx.lineTo(x, cy + 60 * Math.sin((x - 50) / 40));
+            ctx.stroke();
+            document.getElementById('btnWave').classList.add('active');
+            document.getElementById('btnSpiral').classList.remove('active');
+        }
+    }
+
+    function clearCanvas() {
+        initCanvas();
+        hasDrawn = false;
+        document.getElementById('canvasHint').classList.remove('hidden');
+        document.getElementById('hwPreview').textContent = '';
+        document.getElementById('hwFileInput').value = '';
+        document.getElementById('canvasWrap').classList.remove('drawing');
+    }
+
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const sx = canvas.width / rect.width, sy = canvas.height / rect.height;
+        const t = e.touches ? e.touches[0] : e;
+        return { x: (t.clientX - rect.left) * sx, y: (t.clientY - rect.top) * sy };
+    }
+
+    function startDraw(e) {
+        drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y);
+        document.getElementById('canvasWrap').classList.add('drawing');
+    }
+    function doDraw(e) {
+        if (!drawing) return;
+        const p = getPos(e);
+        ctx.strokeStyle = '#0f172a'; ctx.lineWidth = brushRadius; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.lineTo(p.x, p.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(p.x, p.y);
+        if (!hasDrawn) { hasDrawn = true; document.getElementById('canvasHint').classList.add('hidden'); }
+    }
+    function stopDraw() { drawing = false; document.getElementById('canvasWrap').classList.remove('drawing'); }
+
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', doDraw);
+    canvas.addEventListener('mouseup', stopDraw);
+    canvas.addEventListener('mouseleave', stopDraw);
+    canvas.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e); }, { passive: false });
+    canvas.addEventListener('touchmove', e => { e.preventDefault(); doDraw(e); }, { passive: false });
+    canvas.addEventListener('touchend', stopDraw);
+
+    /* ═══════════════ File Uploads ═══════════════ */
+    function setupUpload(areaId, inputId, previewId, type) {
+        const area = document.getElementById(areaId);
+        const input = document.getElementById(inputId);
+        area.addEventListener('click', () => input.click());
+        area.addEventListener('dragover', e => { e.preventDefault(); area.classList.add('drag-over'); });
+        area.addEventListener('dragleave', () => area.classList.remove('drag-over'));
+        area.addEventListener('drop', e => { e.preventDefault(); area.classList.remove('drag-over'); if (e.dataTransfer.files.length) { input.files = e.dataTransfer.files; onFileChange(inputId, previewId, type); } });
+        input.addEventListener('change', () => onFileChange(inputId, previewId, type));
+    }
+    function onFileChange(inputId, previewId, type) {
+        const input = document.getElementById(inputId);
+        const preview = document.getElementById(previewId);
+        if (input.files.length) {
+            const f = input.files[0];
+            preview.innerHTML = '✅ ' + f.name;
+            if (type === 'audio') recordedBlob = null;
+        }
+    }
+    setupUpload('hwUploadArea', 'hwFileInput', 'hwPreview', 'image');
+    setupUpload('audioUploadArea', 'audioFileInput', 'audioPreview', 'audio');
+
+    /* ═══════════════ WAV Encoding Helper ═══════════════ */
+    function encodeWAV(audioBuffer) {
+        const numChannels = 1;
+        const sampleRate = audioBuffer.sampleRate;
+        const format = 1;
+        const bitDepth = 16;
+        const channelData = audioBuffer.getChannelData(0);
+        const dataLength = channelData.length * (bitDepth / 8);
+        const buffer = new ArrayBuffer(44 + dataLength);
+        const view = new DataView(buffer);
+        function writeString(offset, str) {
+            for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+        }
+        writeString(0, 'RIFF');
+        view.setUint32(4, 36 + dataLength, true);
+        writeString(8, 'WAVE');
+        writeString(12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, format, true);
+        view.setUint16(22, numChannels, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * numChannels * (bitDepth / 8), true);
+        view.setUint16(32, numChannels * (bitDepth / 8), true);
+        view.setUint16(34, bitDepth, true);
+        writeString(36, 'data');
+        view.setUint32(40, dataLength, true);
+        let offset = 44;
+        for (let i = 0; i < channelData.length; i++) {
+            const s = Math.max(-1, Math.min(1, channelData[i]));
+            view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+            offset += 2;
+        }
+        return new Blob([buffer], { type: 'audio/wav' });
+    }
+
+    let wavAudioContext = null;
+
+    /* ═══════════════ Audio Recording ═══════════════ */
+    let mediaRecorder = null, recordedChunks = [], recordedBlob = null, recInterval = null, recSeconds = 0;
+
+    function toggleRecording() {
+        if (mediaRecorder && mediaRecorder.state === 'recording') { mediaRecorder.stop(); return; }
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+            recordedChunks = [];
+            mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+            mediaRecorder.ondataavailable = e => { if (e.data.size) recordedChunks.push(e.data); };
+            mediaRecorder.onstop = async () => {
+                stream.getTracks().forEach(t => t.stop());
+                const webmBlob = new Blob(recordedChunks, { type: 'audio/webm' });
+                // Convert WebM to WAV so librosa can read it without ffmpeg
+                try {
+                    if (!wavAudioContext) wavAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const arrayBuffer = await webmBlob.arrayBuffer();
+                    const audioBuffer = await wavAudioContext.decodeAudioData(arrayBuffer);
+                    recordedBlob = encodeWAV(audioBuffer);
+                } catch (e) {
+                    console.error('WAV conversion failed, using webm:', e);
+                    recordedBlob = webmBlob;
+                }
+                document.getElementById('audioPreview').innerHTML = '🎙 Recorded ' + recSeconds + 's';
+                document.getElementById('btnRecord').classList.remove('recording');
+                document.getElementById('recIcon').textContent = '🔴';
+                document.getElementById('recText').textContent = 'Record Speech';
+                document.getElementById('recTime').classList.remove('visible');
+                clearInterval(recInterval);
+                document.getElementById('audioFileInput').value = '';
+            };
+            mediaRecorder.start();
+            recSeconds = 0;
+            document.getElementById('btnRecord').classList.add('recording');
+            document.getElementById('recIcon').textContent = '⏹';
+            document.getElementById('recText').textContent = 'Stop';
+            document.getElementById('recTime').classList.add('visible');
+            recInterval = setInterval(() => {
+                recSeconds++;
+                const m = Math.floor(recSeconds / 60), s = recSeconds % 60;
+                document.getElementById('recTimer').textContent = m + ':' + String(s).padStart(2, '0');
+            }, 1000);
+        }).catch(() => alert('Microphone access was denied.'));
+    }
+
+    /* ═══════════════ Health Check ═══════════════ */
+    function checkHealth() {
+        fetch('/health').then(r => r.json()).then(d => {
+            const pill = document.getElementById('statusPill');
+            const dot = document.getElementById('statusDot');
+            const txt = document.getElementById('statusText');
+            if (d.status === 'ok') {
+                pill.className = 'status-pill ok'; dot.className = 'status-dot ok';
+                txt.textContent = d.fusion_models + ' fold models ready';
+            } else {
+                pill.className = 'status-pill loading'; dot.className = 'status-dot loading';
+                txt.textContent = 'Loading models…';
+                setTimeout(checkHealth, 3000);
+            }
+        }).catch(() => setTimeout(checkHealth, 3000));
+    }
+    checkHealth();
+
+    /* ═══════════════ Progress Animation ═══════════════ */
+    let progressAnim = null;
+    function startProgress() {
+        const bar = document.getElementById('progressBar');
+        const fill = document.getElementById('progressFill');
+        bar.classList.add('visible');
+        fill.style.width = '0%';
+        const steps = ['step1','step2','step3','step4'];
+        steps.forEach(s => { document.getElementById(s).className = 'progress-step'; });
+        let pct = 0, step = 0;
+        const targets = [25, 55, 80, 95];
+        progressAnim = setInterval(() => {
+            if (step < 4 && pct >= targets[step]) {
+                document.getElementById(steps[step]).classList.add('active');
+                if (step > 0) document.getElementById(steps[step-1]).className = 'progress-step done';
+                step++;
+            }
+            pct = Math.min(pct + (step < 2 ? 2 : 0.8), 95);
+            fill.style.width = pct + '%';
+        }, 200);
+    }
+    function stopProgress() {
+        if (progressAnim) clearInterval(progressAnim);
+        const fill = document.getElementById('progressFill');
+        fill.style.width = '100%';
+        ['step1','step2','step3','step4'].forEach(s => { document.getElementById(s).className = 'progress-step done'; });
+        setTimeout(() => { document.getElementById('progressBar').classList.remove('visible'); }, 800);
+    }
+
+    /* ═══════════════ Analyze ═══════════════ */
+    function analyze() {
+        const hwInput = document.getElementById('hwFileInput');
+        const audioInput = document.getElementById('audioFileInput');
+        const hasCanvas = hasDrawn;
+        const hasFile = hwInput.files.length > 0;
+        const hasAudioFile = audioInput.files.length > 0;
+        const hasRec = !!recordedBlob;
+
+        if (!hasCanvas && !hasFile && !hasAudioFile && !hasRec) {
+            alert('Please provide at least a handwriting drawing/image or a speech recording.');
+            return;
+        }
+
+        const fd = new FormData();
+        if (hasCanvas) fd.append('image_data', canvas.toDataURL('image/png'));
+        else if (hasFile) fd.append('image_file', hwInput.files[0]);
+        if (hasRec) fd.append('audio_file', recordedBlob, 'recording.wav');
+        else if (hasAudioFile) fd.append('audio_file', audioInput.files[0]);
+
+        const btn = document.getElementById('btnAnalyze');
+        btn.classList.add('loading'); btn.disabled = true;
+        startProgress();
+
+        fetch('/predict', { method: 'POST', body: fd })
+            .then(r => r.json())
+            .then(data => {
+                btn.classList.remove('loading'); btn.disabled = false; stopProgress();
+                if (data.error) { alert(data.error); return; }
+                showResults(data);
+            })
+            .catch(err => {
+                btn.classList.remove('loading'); btn.disabled = false; stopProgress();
+                alert('Analysis failed: ' + err.message);
+            });
+    }
+
+    /* ═══════════════ Display Results ═══════════════ */
+    function riskColor(v) {
+        if (v < 0.33) return 'var(--success)';
+        if (v < 0.66) return 'var(--warning)';
+        return 'var(--danger)';
+    }
+
+    function showResults(data) {
+        const area = document.getElementById('resultsArea');
+        area.classList.add('visible');
+        setTimeout(() => area.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+
+        const risk = data.combined_risk, pct = Math.round(risk * 100);
+        const arc = 276.5;
+
+        // Gauge
+        document.getElementById('gaugeFill').style.strokeDashoffset = arc * (1 - risk);
+        document.getElementById('gaugeFill').style.stroke = riskColor(risk);
+        document.getElementById('gaugeValue').textContent = pct + '%';
+        document.getElementById('gaugeValue').style.color = riskColor(risk);
+
+        // Badge
+        let cls = 'low', ico = '✅';
+        if (risk >= 0.66) { cls = 'high'; ico = '⚠️'; }
+        else if (risk >= 0.33) { cls = 'moderate'; ico = '🔶'; }
+        document.getElementById('statusBadge').innerHTML = '<span class="status-badge ' + cls + '">' + ico + ' ' + data.status + '</span>';
+
+        // Stats
+        document.getElementById('confValue').textContent = Math.round(data.confidence * 100) + '%';
+        document.getElementById('uncValue').textContent = (data.uncertainty * 100).toFixed(1) + '%';
+        document.getElementById('foldCount').textContent = data.fold_predictions.length;
+
+        // Modality chips
+        const chips = document.getElementById('modalityChips');
+        chips.innerHTML = '';
+        (data.modalities_used || []).forEach(m => {
+            const el = document.createElement('span');
+            el.className = 'modality-chip ' + (m === 'handwriting' ? 'hw' : 'au');
+            el.textContent = m === 'handwriting' ? '🖊️ Handwriting' : '🎤 Audio';
+            chips.appendChild(el);
+        });
+
+        // Bars
+        setBar('hwBar', 'hwBarVal', data.hw_risk);
+        setBar('audioBar', 'audioBarVal', data.audio_risk);
+        setBar('fusedBar', 'fusedBarVal', data.combined_risk);
+
+        // Fold grid
+        const fg = document.getElementById('foldGrid');
+        fg.innerHTML = '';
+        data.fold_predictions.forEach((p, i) => {
+            const d = document.createElement('div');
+            d.className = 'fold-item';
+            d.innerHTML = '<div class="fold-num">Fold ' + (i + 1) + '</div><div class="fold-val" style="color:' + riskColor(p) + '">' + Math.round(p * 100) + '%</div>';
+            fg.appendChild(d);
+        });
+
+        // Voice features
+        const vc = document.getElementById('voiceCard');
+        if (data.voice_features) {
+            vc.style.display = '';
+            const tbody = document.querySelector('#voiceTable tbody');
+            tbody.innerHTML = '';
+            const names = { mean_pitch: 'Mean Pitch', std_pitch: 'Pitch Variation', jitter: 'Jitter', shimmer: 'Shimmer', hnr: 'HNR' };
+            const units = { mean_pitch: ' Hz', std_pitch: ' Hz', jitter: '%', shimmer: '%', hnr: ' dB' };
+            Object.entries(data.voice_features).forEach(([k, v]) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = '<td>' + (names[k] || k) + '</td><td>' + v + (units[k] || '') + '</td>';
+                tbody.appendChild(tr);
+            });
+        } else { vc.style.display = 'none'; }
+    }
+
+    function setBar(barId, valId, risk) {
+        const pct = Math.round(risk * 100);
+        document.getElementById(barId).style.width = pct + '%';
+        document.getElementById(barId).style.background = riskColor(risk);
+        document.getElementById(valId).textContent = pct + '%';
+        document.getElementById(valId).style.color = riskColor(risk);
+    }
+    </script>
+</body>
+</html>

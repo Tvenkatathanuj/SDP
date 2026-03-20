@@ -3,358 +3,289 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=1280, height=720" name="viewport"/>
-<title>Expected Performance and Evaluation</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    body {
-        font-family: 'Inter', sans-serif;
-        overflow: hidden;
-    }
-    .slide-container {
-        width: 1280px;
-        height: 720px;
-        display: flex;
-        flex-direction: column;
-        background: #ffffff;
-        position: relative;
-    }
-    .header-section {
-        background: #1e3a8a;
-        color: white;
-        padding: 20px 50px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-    .title-text {
-        font-size: 32px;
-        font-weight: 700;
-        letter-spacing: -0.5px;
-    }
-    .content-area {
-        flex: 1;
-        padding: 14px 35px;
-        background: #f8fafc;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-    .section-row {
-        display: flex;
-        gap: 25px;
-    }
-    .baseline-section {
-        flex: 1;
-        display: flex;
-        gap: 12px;
-    }
-    .baseline-card {
-        flex: 1;
-        background: white;
-        border-radius: 8px;
-        padding: 10px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-        border-top: 3px solid #3b82f6;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    .baseline-icon {
-        width: 42px;
-        height: 42px;
-        background: #dbeafe;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #2563eb;
-        font-size: 20px;
-        margin-bottom: 8px;
-    }
-    .baseline-title {
-        font-size: 15px;
-        font-weight: 700;
-        color: #1e40af;
-        margin-bottom: 6px;
-        text-align: center;
-    }
-    .baseline-model {
-        font-size: 12px;
-        color: #64748b;
-        margin-bottom: 8px;
-        text-align: center;
-    }
-    .baseline-accuracy {
-        font-size: 32px;
-        font-weight: 800;
-        color: #2563eb;
-        margin-bottom: 4px;
-    }
-    .section-header {
-        font-size: 18px;
-        font-weight: 700;
-        color: #1e40af;
-        margin-bottom: 8px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .target-section {
-        background: white;
-        border-radius: 8px;
-        padding: 10px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-        border-top: 3px solid #10b981;
-    }
-    .kpi-grid {
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 8px;
-        margin-top: 6px;
-    }
-    .kpi-card {
-        background: #f0fdf4;
-        border: 2px solid #86efac;
-        border-radius: 8px;
-        padding: 12px 10px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    .kpi-icon {
-        width: 30px;
-        height: 30px;
-        background: #10b981;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 14px;
-        margin-bottom: 7px;
-    }
-    .kpi-value {
-        font-size: 26px;
-        font-weight: 800;
-        color: #059669;
-        margin-bottom: 4px;
-    }
-    .kpi-label {
-        font-size: 12px;
-        font-weight: 600;
-        color: #166534;
-        text-align: center;
-    }
-    .eval-section {
-        background: white;
-        border-radius: 8px;
-        padding: 10px 14px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-        border-left: 3px solid #8b5cf6;
-    }
-    .eval-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-        margin-top: 4px;
-    }
-    .eval-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        background: #faf5ff;
-        padding: 8px 12px;
-        border-radius: 6px;
-        border: 2px solid #e9d5ff;
-    }
-    .eval-icon {
-        width: 28px;
-        height: 28px;
-        background: #8b5cf6;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 12px;
-        flex-shrink: 0;
-    }
-    .eval-text {
-        flex: 1;
-    }
-    .eval-text p {
-        font-size: 12px;
-        color: #334155;
-        line-height: 1.3;
-    }
-    .eval-text strong {
-        color: #6b21a8;
-        font-weight: 700;
-    }
-    .footer-bar {
-        background: #1e3a8a;
-        padding: 10px 50px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        color: white;
-        font-size: 13px;
-    }
-    .comparison-arrow {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        color: #10b981;
-        font-weight: 800;
-    }
+  body { margin: 0; }
+  .slide { width: 1280px; height: 720px; }
+  .font-inter { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+  .font-playfair { font-family: "Playfair Display", Georgia, serif; }
 </style>
 </head>
 <body>
-<div class="slide-container">
-<div class="header-section">
-<div class="title-text">
-<p><i class="fas fa-chart-bar"></i> Expected Performance and Evaluation</p>
+<div class="slide font-inter flex bg-white overflow-hidden">
+<!-- Left accent rail -->
+<div class="h-full w-24 flex flex-col">
+<div class="flex-1 bg-blue-900"></div>
+<div class="h-40 bg-blue-700"></div>
+<div class="h-28 bg-teal-500"></div>
 </div>
-<div style="text-align: right;">
-<p style="font-size: 16px; font-weight: 600;">LOPO Cross-Validation Results</p>
+<!-- Main -->
+<div class="flex-1 h-full flex flex-col relative">
+<!-- Subtle background shapes -->
+<div class="absolute inset-0 pointer-events-none">
+<div class="absolute -top-28 -right-24 w-96 h-96 rounded-full bg-blue-50"></div>
+<div class="absolute top-44 right-40 w-64 h-64 rounded-full bg-teal-50"></div>
+<div class="absolute bottom-0 right-0 w-full h-36 bg-gray-50"></div>
+<div class="absolute top-0 left-0 w-full h-2 bg-blue-900"></div>
 </div>
-</div>
-<div class="content-area">
+<!-- Header -->
+<div class="relative px-12 pt-10 flex items-start justify-between">
 <div>
-<p class="section-header"><i class="fas fa-layer-group"></i> Single-Modality Baselines</p>
-<div class="baseline-section">
-<div class="baseline-card">
-<div class="baseline-icon">
-<i class="fas fa-pen"></i>
+<div class="flex items-center space-x-3">
+<div class="w-11 h-11 rounded-xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-sliders text-white text-lg"></i>
 </div>
-<p class="baseline-title">Handwriting-Only</p>
-<p class="baseline-model">ResNet18</p>
-<p class="baseline-accuracy">89-93%</p>
-<p style="font-size: 12px; color: #64748b;">Accuracy Range</p>
+<div class="flex flex-col">
+<p class="text-xs uppercase tracking-widest text-blue-800 font-semibold">Experimental Setup</p>
+<p class="font-playfair text-4xl text-gray-900 font-bold leading-tight">Training Strategy</p>
 </div>
-<div class="baseline-card">
-<div class="baseline-icon">
-<i class="fas fa-microphone"></i>
 </div>
-<p class="baseline-title">Speech-Only</p>
-<p class="baseline-model">Tri-Path CNN</p>
-<p class="baseline-accuracy">87-91%</p>
-<p style="font-size: 12px; color: #64748b;">Accuracy Range</p>
+<div class="mt-3 flex items-center space-x-2">
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm flex items-center space-x-2">
+<i class="fa-solid fa-bolt text-blue-800 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">AdamW + OneCycleLR</p>
 </div>
-<div class="comparison-arrow">
-<i class="fas fa-arrow-right"></i>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm flex items-center space-x-2">
+<i class="fa-solid fa-shield-halved text-teal-700 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Focal Loss + Label Smoothing</p>
 </div>
 </div>
 </div>
-<div class="target-section">
-<p class="section-header"><i class="fas fa-bullseye"></i> Multi-Modal Target Metrics (LOPO Cross-Validation)</p>
-<div class="kpi-grid">
-<div class="kpi-card">
-<div class="kpi-icon">
-<i class="fas fa-check-circle"></i>
+<!-- Key Outcome -->
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm px-5 py-4 w-80">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Key Practices</p>
+<div class="mt-3 space-y-3">
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-3">
+<div class="flex items-center justify-between">
+<p class="text-xs text-blue-900 font-semibold">Generalization</p>
+<i class="fa-solid fa-seedling text-blue-900 text-xs"></i>
 </div>
-<p class="kpi-value">≥95%</p>
-<p class="kpi-label">Accuracy</p>
+<p class="text-sm text-blue-900 font-extrabold mt-1">Augmentation + Regularization</p>
 </div>
-<div class="kpi-card">
-<div class="kpi-icon">
-<i class="fas fa-search"></i>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-3">
+<div class="flex items-center justify-between">
+<p class="text-xs text-teal-800 font-semibold">Clinical Validity</p>
+<i class="fa-solid fa-user-shield text-teal-800 text-xs"></i>
 </div>
-<p class="kpi-value">≥93%</p>
-<p class="kpi-label">Sensitivity (Recall)</p>
-</div>
-<div class="kpi-card">
-<div class="kpi-icon">
-<i class="fas fa-shield-alt"></i>
-</div>
-<p class="kpi-value">≥96%</p>
-<p class="kpi-label">Specificity</p>
-</div>
-<div class="kpi-card">
-<div class="kpi-icon">
-<i class="fas fa-balance-scale"></i>
-</div>
-<p class="kpi-value">≥0.94</p>
-<p class="kpi-label">F1-Score</p>
-</div>
-<div class="kpi-card">
-<div class="kpi-icon">
-<i class="fas fa-chart-area"></i>
-</div>
-<p class="kpi-value">≥0.97</p>
-<p class="kpi-label">AUC-ROC</p>
-</div>
-</div>
-</div>
-<div class="eval-section">
-<p class="section-header"><i class="fas fa-clipboard-check"></i> Evaluation Metrics &amp; Analysis Approach</p>
-<div class="eval-grid">
-<div class="eval-item">
-<div class="eval-icon">
-<i class="fas fa-table"></i>
-</div>
-<div class="eval-text">
-<p><strong>Confusion Matrix:</strong> Per-class performance analysis</p>
-</div>
-</div>
-<div class="eval-item">
-<div class="eval-icon">
-<i class="fas fa-chart-line"></i>
-</div>
-<div class="eval-text">
-<p><strong>ROC/PR Curves:</strong> Threshold optimization</p>
-</div>
-</div>
-<div class="eval-item">
-<div class="eval-icon">
-<i class="fas fa-sync-alt"></i>
-</div>
-<div class="eval-text">
-<p><strong>Calibration:</strong> Probability reliability</p>
-</div>
-</div>
-<div class="eval-item">
-<div class="eval-icon">
-<i class="fas fa-user"></i>
-</div>
-<div class="eval-text">
-<p><strong>Per-Patient Analysis:</strong> Individual performance</p>
-</div>
-</div>
-<div class="eval-item">
-<div class="eval-icon">
-<i class="fas fa-flask"></i>
-</div>
-<div class="eval-text">
-<p><strong>Ablation Studies:</strong> No-SMOTE, no-attention</p>
-</div>
-</div>
-<div class="eval-item">
-<div class="eval-icon">
-<i class="fas fa-eye"></i>
-</div>
-<div class="eval-text">
-<p><strong>Explainability:</strong> Grad-CAM, attention maps</p>
+<p class="text-sm text-teal-800 font-extrabold mt-1">Patient-level 5-fold CV</p>
 </div>
 </div>
 </div>
 </div>
+<!-- Content -->
+<div class="relative flex-1 px-12 pt-8 pb-10 flex">
+<!-- Left bullets -->
+<div class="flex-1 pr-8 flex flex-col">
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-7">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-gray-800">Deep learning optimization &amp; robustness</p>
+<div class="flex items-center space-x-2">
+<div class="w-8 h-8 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-gears text-gray-700 text-sm"></i>
 </div>
-<div class="footer-bar">
+</div>
+</div>
+<div class="mt-5 space-y-4">
+<!-- Optimizer -->
+<div class="flex items-start space-x-3">
+<div class="mt-1 w-8 h-8 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center">
+<i class="fa-solid fa-gauge-high text-blue-900 text-sm"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold text-gray-900">Optimizer &amp; schedule</p>
+<p class="text-sm text-gray-700 mt-1">AdamW with learning rates in the range <span class="font-semibold text-gray-900">3×10⁻⁵ to 5×10⁻⁵</span>, using <span class="font-semibold text-gray-900">OneCycleLR</span> (cosine annealing).</p>
+<div class="mt-2 flex flex-wrap gap-2">
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200">
+<p class="text-xs text-gray-700 font-semibold">Gradient clipping (max norm 1.0)</p>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200">
+<p class="text-xs text-gray-700 font-semibold">Early stopping (patience 10–12)</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Loss -->
+<div class="flex items-start space-x-3">
+<div class="mt-1 w-8 h-8 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-scale-balanced text-teal-700 text-sm"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold text-gray-900">Loss &amp; regularization</p>
+<p class="text-sm text-gray-700 mt-1">Focal loss (α = 0.5–0.75, γ = 2.0–3.0) with <span class="font-semibold text-gray-900">label smoothing</span> to improve calibration and handle class imbalance.</p>
+<div class="mt-2 grid grid-cols-2 gap-3">
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-3">
+<p class="text-xs text-gray-500 font-semibold uppercase tracking-widest">Speech</p>
+<p class="text-xs text-gray-700 mt-1">Effective batch size 32</p>
+</div>
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-3">
+<p class="text-xs text-gray-500 font-semibold uppercase tracking-widest">Fusion</p>
+<p class="text-xs text-gray-700 mt-1">Modality dropout for robustness</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Augmentation -->
+<div class="flex items-start space-x-3">
+<div class="mt-1 w-8 h-8 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-wand-magic-sparkles text-gray-700 text-sm"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold text-gray-900">Data augmentation</p>
+<div class="mt-2 grid grid-cols-2 gap-3">
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-3">
+<p class="text-xs text-blue-900 font-semibold">Handwriting (images)</p>
+<ul class="mt-2 space-y-1">
+<li class="flex items-start space-x-2">
+<i class="fa-solid fa-check text-blue-900 text-xs mt-0.5"></i>
+<p class="text-xs text-gray-700">Flip, rotation ±10°, brightness jitter</p>
+</li>
+<li class="flex items-start space-x-2">
+<i class="fa-solid fa-check text-blue-900 text-xs mt-0.5"></i>
+<p class="text-xs text-gray-700">Mixup + test-time augmentation (7 transforms)</p>
+</li>
+</ul>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-3">
+<p class="text-xs text-teal-800 font-semibold">Speech (audio)</p>
+<ul class="mt-2 space-y-1">
+<li class="flex items-start space-x-2">
+<i class="fa-solid fa-check text-teal-800 text-xs mt-0.5"></i>
+<p class="text-xs text-gray-700">SpecAugment (time/freq masking), VTLP</p>
+</li>
+<li class="flex items-start space-x-2">
+<i class="fa-solid fa-check text-teal-800 text-xs mt-0.5"></i>
+<p class="text-xs text-gray-700">Test-time augmentation (5× augmented inference)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-5 flex items-center justify-between">
+<div class="flex items-center space-x-2 text-xs text-gray-500">
+<i class="fa-solid fa-circle-info"></i>
+<p class="text-xs">Training details summarized from the study’s Experimental Setup section.</p>
+</div>
+<div class="flex items-center space-x-2">
+<div class="w-2.5 h-2.5 rounded-full bg-blue-900"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-blue-700"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-teal-500"></div>
+</div>
+</div>
+</div>
+<!-- Right visual summary -->
+<div class="w-96 flex flex-col">
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-gray-800">Classical ML ensemble</p>
+<div class="w-9 h-9 rounded-xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-layer-group text-white text-sm"></i>
+</div>
+</div>
+<div class="mt-5 space-y-4">
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-chart-simple text-blue-900 text-sm"></i>
+</div>
 <div>
-<p><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>Slide 13</p>
+<p class="text-sm font-semibold text-gray-900">Model stack</p>
+<p class="text-xs text-gray-600 mt-1">Random Forest, SVM, Gradient Boosting, XGBoost, LightGBM.</p>
+</div>
+</div>
+</div>
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-compress text-teal-700 text-sm"></i>
 </div>
 <div>
-<p>Multi-Modal Parkinson's Disease Detection System</p>
+<p class="text-sm font-semibold text-gray-900">Feature prep</p>
+<p class="text-xs text-gray-600 mt-1">Standardization + PCA (retain 99.5–99.9% variance) to a 512-d representation.</p>
+</div>
+</div>
+</div>
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-people-arrows text-gray-700 text-sm"></i>
+</div>
+<div>
+<p class="text-sm font-semibold text-gray-900">Imbalance handling</p>
+<p class="text-xs text-gray-600 mt-1">SMOTE oversampling for class balancing in classical ML pipeline.</p>
+</div>
+</div>
+</div>
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-8 h-8 rounded-lg bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-code-branch text-white text-sm"></i>
+</div>
+<div>
+<p class="text-sm font-semibold text-blue-900">Meta-learner</p>
+<p class="text-xs text-blue-900 mt-1">Ridge-regularized logistic regression combines DL + ML predictions with threshold tuning via F1-macro search.</p>
+</div>
+</div>
+</div>
+<div class="rounded-xl bg-white border border-gray-200 p-4">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Operational Notes</p>
+<div class="mt-2 space-y-2">
+<div class="flex items-start space-x-2">
+<i class="fa-solid fa-circle-check text-teal-700 text-xs mt-0.5"></i>
+<p class="text-xs text-gray-600">Parallel DL + ML ensembles improve robustness across tasks.</p>
+</div>
+<div class="flex items-start space-x-2">
+<i class="fa-solid fa-circle-check text-teal-700 text-xs mt-0.5"></i>
+<p class="text-xs text-gray-600">Patient-level grouping avoids speaker leakage across folds.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-5 bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">At a glance</p>
+<div class="mt-4 grid grid-cols-2 gap-3">
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-3">
+<p class="text-xs text-blue-900 font-semibold">Learning Rate</p>
+<p class="text-lg text-blue-900 font-extrabold mt-1">3e-5–5e-5</p>
+<p class="text-xs text-gray-600 mt-1">AdamW</p>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-3">
+<p class="text-xs text-teal-800 font-semibold">Loss</p>
+<p class="text-lg text-teal-800 font-extrabold mt-1">Focal</p>
+<p class="text-xs text-gray-600 mt-1">+ label smoothing</p>
+</div>
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-3">
+<p class="text-xs text-gray-900 font-semibold">Augmentation</p>
+<p class="text-lg text-gray-900 font-extrabold mt-1">TTA</p>
+<p class="text-xs text-gray-600 mt-1">Images &amp; audio</p>
+</div>
+<div class="rounded-xl bg-gray-900 border border-gray-900 p-3">
+<p class="text-xs text-white font-semibold">CV</p>
+<p class="text-lg text-white font-extrabold mt-1">5-fold</p>
+<p class="text-xs text-gray-200 mt-1">Patient-level</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<div class="relative px-12 pb-8 flex items-center justify-between">
+<div class="flex items-center space-x-3 text-gray-500">
+<i class="fa-solid fa-file-lines"></i>
+<p class="text-xs">Multimodal Parkinson’s Disease Detection using Cross-Modal Attention Fusion</p>
+</div>
+<div class="flex items-center space-x-2 bg-white border border-gray-200 rounded-full px-4 py-2 shadow-sm">
+<i class="fa-solid fa-arrow-right text-blue-900 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Next: Results by Module</p>
+</div>
 </div>
 </div>
 </div>

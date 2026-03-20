@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroScreen — Parkinson's Disease Detection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a237e; --primary-light: #eef1ff; --primary-grad: linear-gradient(135deg, #0d1b4a, #1a237e, #283593);
+            --accent: #3949ab; --success: #2e7d32; --warning: #e65100; --danger: #c62828;
+            --bg: #f5f6fa; --surface: #ffffff; --text: #1a1a2e; --text-secondary: #64748b;
+            --border: #e8eaf0; --radius: 14px;
+            --shadow: 0 2px 12px rgba(0,0,0,.06); --shadow-lg: 0 10px 25px rgba(0,0,0,.1);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+        /* ── Header ── */
+        header { background: var(--primary-grad); color: #fff; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,.2); position: sticky; top: 0; z-index: 100; }
+        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .logo-area .icon { width: 40px; height: 40px; background: rgba(255,255,255,.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+        .logo-area h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: .3px; }
+        .logo-area p { font-size: .72rem; opacity: .7; margin-top: 1px; }
+        .header-actions { display: flex; gap: 8px; align-items: center; }
+        .header-btn { padding: 7px 14px; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; background: rgba(255,255,255,.08); color: #fff; cursor: pointer; font-size: .78rem; font-weight: 500; transition: all .15s; display: flex; align-items: center; gap: 5px; }
+        .header-btn:hover { background: rgba(255,255,255,.18); }
+        .nav-status { display: flex; align-items: center; gap: 6px; font-size: .75rem; opacity: .8; margin-right: 8px; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .status-dot.ok { background: #4caf50; box-shadow: 0 0 6px rgba(76,175,80,.5); }
+        .status-dot.err { background: var(--danger); }
+        .status-dot.loading { background: #ffa726; animation: pulse 1.2s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+        /* ── Mode Tabs ── */
+        .mode-tabs { max-width: 1200px; margin: 20px auto 0; padding: 0 16px; display: flex; gap: 0; }
+        .mode-tab { flex: 1; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border); cursor: pointer; font-size: .9rem; font-weight: 600; color: var(--text-secondary); text-align: center; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .mode-tab:first-child { border-radius: var(--radius) 0 0 0; }
+        .mode-tab:last-child { border-radius: 0 var(--radius) 0 0; }
+        .mode-tab:not(:first-child) { border-left: none; }
+        .mode-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .mode-tab:not(.active):hover { background: var(--primary-light); color: var(--primary); }
+        .mode-tab .tab-icon { font-size: 1.3rem; }
+        .mode-tab .tab-meta { font-size: .65rem; font-weight: 400; opacity: .7; display: block; margin-top: 2px; }
+
+        /* ── Mode Content ── */
+        .mode-content { display: none; }
+        .mode-content.active { display: block; }
+
+        /* ── Steps ── */
+        .steps-row { max-width: 1200px; margin: 16px auto 0; padding: 0 16px; display: flex; gap: 12px; flex-wrap: wrap; }
+        .step-card { flex: 1; min-width: 140px; background: var(--surface); border-radius: 12px; padding: 16px 14px; text-align: center; box-shadow: var(--shadow); border: 1px solid var(--border); position: relative; }
+        .step-card .step-num { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; width: 22px; height: 22px; border-radius: 50%; font-size: .68rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+        .step-card .step-icon { font-size: 1.6rem; margin: 6px 0 4px; }
+        .step-card h3 { font-size: .8rem; font-weight: 600; color: var(--primary); }
+        .step-card p { font-size: .7rem; color: var(--text-secondary); margin-top: 3px; line-height: 1.4; }
+
+        /* ── Main Container ── */
+        .container { max-width: 1200px; margin: 16px auto 0; padding: 0 16px; display: flex; gap: 20px; flex-wrap: wrap; }
+
+        /* ── Panels ── */
+        .panel { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; flex: 1; min-width: 340px; border: 1px solid var(--border); }
+        .panel-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+        .panel-header .panel-icon { width: 32px; height: 32px; background: var(--primary-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+        .panel-header h2 { font-size: 1rem; font-weight: 600; color: var(--primary); }
+
+        /* ── Toolbar (Handwriting) ── */
+        .toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; align-items: center; background: #f8f9fc; padding: 10px 12px; border-radius: 10px; }
+        .tool-group { display: flex; gap: 4px; align-items: center; }
+        .tool-group-label { font-size: .68rem; color: #999; text-transform: uppercase; letter-spacing: .5px; font-weight: 600; margin-right: 4px; }
+        .toolbar button { padding: 6px 12px; border: 1px solid #dde0ea; border-radius: 6px; background: #fff; cursor: pointer; font-size: .78rem; font-weight: 500; transition: all .15s; color: #555; }
+        .toolbar button:hover { background: var(--primary-light); border-color: #c5cae9; }
+        .toolbar button.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .toolbar input[type=range] { width: 70px; accent-color: var(--primary); }
+        .toolbar .sep { width: 1px; height: 24px; background: #e0e0e0; margin: 0 4px; }
+        .toolbar .color-dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer; transition: transform .1s; }
+        .toolbar .color-dot:hover, .toolbar .color-dot.active { transform: scale(1.15); border-color: var(--primary); }
+
+        /* ── Canvas ── */
+        .canvas-wrap { position: relative; display: block; border: 2px solid var(--border); border-radius: 10px; overflow: hidden; background: #fff; }
+        #drawCanvas { display: block; cursor: crosshair; touch-action: none; width: 100%; height: auto; }
+        .canvas-hint { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; text-align: center; color: #ccc; transition: opacity .3s; }
+        .canvas-hint.hidden { opacity: 0; }
+        .canvas-hint .hint-icon { font-size: 2.5rem; margin-bottom: 6px; }
+        .canvas-hint p { font-size: .82rem; }
+
+        /* ── Action Buttons ── */
+        .action-row { display: flex; gap: 10px; margin-top: 14px; }
+        .btn-analyze { flex: 1; padding: 13px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; border: none; border-radius: 10px; font-size: .95rem; font-weight: 600; cursor: pointer; transition: transform .1s, box-shadow .2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-analyze:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(26,35,126,.3); }
+        .btn-analyze:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+        .btn-secondary { padding: 13px 20px; background: #fff; border: 1.5px solid #dde0ea; border-radius: 10px; cursor: pointer; font-size: .85rem; font-weight: 500; color: #555; transition: all .15s; }
+        .btn-secondary:hover { background: #f5f6fa; border-color: #c5cae9; }
+
+        /* ── Upload Areas ── */
+        .upload-area { margin-top: 12px; padding: 18px; border: 2px dashed #d0d4e4; border-radius: 10px; text-align: center; color: #888; font-size: .82rem; cursor: pointer; transition: all .2s; background: #fafbfd; }
+        .upload-area:hover { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+        .upload-area input { display: none; }
+        .upload-area.drag-over { border-color: var(--primary); background: var(--primary-light); }
+
+        .upload-zone { border: 2px dashed var(--border); border-radius: 12px; padding: 32px 20px; text-align: center; cursor: pointer; transition: all .2s; background: #fafbfd; }
+        .upload-zone:hover, .upload-zone.drag-over { border-color: var(--primary); background: var(--primary-light); }
+        .upload-zone .uz-icon { font-size: 2.2rem; opacity: .5; }
+        .upload-zone h4 { font-size: .9rem; font-weight: 600; margin-top: 8px; }
+        .upload-zone p { font-size: .78rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
+        .upload-zone .filetypes { font-size: .68rem; color: #aaa; margin-top: 6px; }
+        .upload-zone input { display: none; }
+
+        /* ── Recording ── */
+        .or-divider { display: flex; align-items: center; gap: 10px; margin: 14px 0; font-size: .72rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        .or-divider::before, .or-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+        .record-section { text-align: center; }
+        .record-btn { width: 72px; height: 72px; border-radius: 50%; border: 3px solid var(--border); background: var(--surface); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1.6rem; transition: all .2s; box-shadow: var(--shadow); }
+        .record-btn:hover { border-color: var(--danger); transform: scale(1.05); }
+        .record-btn.recording { border-color: var(--danger); background: #fef2f2; animation: rec-pulse 1.2s ease-in-out infinite; }
+        @keyframes rec-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(198,40,40,.3); } 50% { box-shadow: 0 0 0 14px rgba(198,40,40,0); } }
+        .record-label { font-size: .78rem; color: var(--text-secondary); margin-top: 8px; font-weight: 500; }
+        .record-timer { font-size: 1.1rem; font-weight: 700; color: var(--danger); margin-top: 4px; display: none; }
+
+        /* ── Audio Preview ── */
+        .audio-preview { margin-top: 14px; padding: 14px; background: #f8f9fc; border: 1px solid var(--border); border-radius: 10px; display: none; }
+        .audio-preview .ap-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .audio-preview .ap-name { font-size: .82rem; font-weight: 600; }
+        .audio-preview .ap-remove { background: none; border: 1px solid #fca5a5; color: var(--danger); padding: 3px 10px; border-radius: 6px; font-size: .72rem; cursor: pointer; font-weight: 500; }
+        .audio-preview .ap-remove:hover { background: #fef2f2; }
+        .audio-preview audio { width: 100%; height: 36px; margin-top: 4px; }
+        .waveform-container { margin-top: 8px; height: 50px; background: #f1f5f9; border-radius: 8px; overflow: hidden; }
+        .waveform-container canvas { width: 100%; height: 100%; }
+
+        /* ── Results (shared) ── */
+        .placeholder { text-align: center; padding: 50px 20px; color: #bbb; }
+        .placeholder .ph-icon { font-size: 3rem; margin-bottom: 10px; opacity: .5; }
+        .placeholder p { font-size: .85rem; line-height: 1.5; }
+        .placeholder .ph-sub { font-size: .75rem; color: #ccc; margin-top: 6px; }
+
+        /* ── Gauge ── */
+        .gauge-box { text-align: center; padding: 16px 0 8px; }
+        .gauge-box svg { max-width: 260px; }
+        .risk-label { font-size: .95rem; font-weight: 600; color: #666; margin-top: 4px; }
+        .risk-pct { font-size: 2.4rem; font-weight: 800; letter-spacing: -1px; }
+        .status-badge { display: inline-block; padding: 6px 20px; border-radius: 20px; font-size: .82rem; font-weight: 600; margin-top: 8px; }
+        .status-LOW { background: #e8f5e9; color: var(--success); }
+        .status-MODERATE { background: #fff3e0; color: var(--warning); }
+        .status-HIGH { background: #ffebee; color: var(--danger); }
+
+        /* ── Interpretation ── */
+        .interpretation { margin: 14px 0; padding: 14px 16px; border-radius: 10px; font-size: .82rem; line-height: 1.6; border-left: 4px solid; }
+        .interp-low { background: #f1f8e9; border-color: #4caf50; color: #33691e; }
+        .interp-moderate { background: #fff8e1; border-color: #ff9800; color: var(--warning); }
+        .interp-high { background: #fce4ec; border-color: #f44336; color: #b71c1c; }
+
+        /* ── Score Cards ── */
+        .scores { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 14px 0; }
+        .score-card { background: #f8f9fc; border-radius: 10px; padding: 12px; text-align: center; border: 1px solid var(--border); transition: transform .15s; }
+        .score-card:hover { transform: translateY(-2px); }
+        .score-card .label { font-size: .65rem; color: #888; text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
+        .score-card .val { font-size: 1.3rem; font-weight: 700; margin-top: 3px; }
+        .score-card .model-info { font-size: .62rem; color: #bbb; margin-top: 2px; }
+
+        /* ── Confidence Bar ── */
+        .confidence-section { margin: 12px 0; }
+        .confidence-label { font-size: .75rem; color: #888; font-weight: 600; margin-bottom: 6px; display: flex; justify-content: space-between; }
+        .confidence-bar-bg { height: 10px; background: #eef0f5; border-radius: 5px; overflow: hidden; }
+        .confidence-bar { height: 100%; border-radius: 5px; transition: width .8s ease; }
+        .model-agreement { font-size: .72rem; color: #999; margin-top: 4px; }
+
+        /* ── Tabs (Features / History) ── */
+        .tab-row { display: flex; gap: 0; margin: 14px 0 0; border-bottom: 2px solid var(--border); }
+        .tab-btn { padding: 8px 16px; background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -2px; cursor: pointer; font-size: .8rem; font-weight: 500; color: #999; transition: all .15s; }
+        .tab-btn:hover { color: var(--primary); }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+        .tab-content { display: none; padding-top: 12px; }
+        .tab-content.active { display: block; }
+
+        /* ── Features Table ── */
+        .features-table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+        .features-table th { text-align: left; padding: 8px; border-bottom: 2px solid var(--border); color: var(--primary); font-size: .7rem; text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
+        .features-table td { padding: 7px 8px; border-bottom: 1px solid #f5f6fa; }
+        .features-table tr:hover { background: #fafbff; }
+        .features-table .bar-cell { width: 40%; }
+        .feat-bar { height: 8px; border-radius: 4px; transition: width .5s ease; }
+        .feat-name { display: flex; align-items: center; gap: 6px; }
+        .feat-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+        /* ── Voice Features Grid ── */
+        .vf-title { font-size: .82rem; font-weight: 600; margin: 14px 0 8px; display: flex; align-items: center; gap: 6px; }
+        .vf-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .vf-item { background: #f8f9fc; border: 1px solid var(--border); border-radius: 8px; padding: 10px 8px; text-align: center; }
+        .vf-item .vf-label { font-size: .62rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .4px; font-weight: 600; }
+        .vf-item .vf-val { font-size: .95rem; font-weight: 700; margin-top: 2px; }
+        .vf-item .vf-unit { font-size: .6rem; color: #aaa; }
+
+        /* ── Fold Breakdown ── */
+        .fold-section { margin-top: 14px; padding: 14px; background: #f8f9fc; border-radius: 10px; border: 1px solid var(--border); }
+        .fold-title { font-size: .78rem; font-weight: 600; margin-bottom: 8px; }
+        .fold-bar-row { display: flex; align-items: center; gap: 8px; margin: 5px 0; font-size: .78rem; }
+        .fold-bar-row .fb-label { width: 50px; font-weight: 500; color: var(--text-secondary); }
+        .fold-bar-row .fb-track { flex: 1; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .fold-bar-row .fb-fill { height: 100%; border-radius: 4px; transition: width .6s ease; }
+        .fold-bar-row .fb-val { width: 45px; text-align: right; font-weight: 600; font-size: .75rem; }
+
+        /* ── History ── */
+        .history-empty { text-align: center; color: #ccc; padding: 30px; font-size: .82rem; }
+        .history-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f5f6fa; }
+        .history-item:last-child { border-bottom: none; }
+
+        /* ── Export ── */
+        .export-row { display: flex; gap: 8px; margin-top: 14px; }
+        .btn-export { flex: 1; padding: 9px; background: #f8f9fc; border: 1px solid #dde0ea; border-radius: 8px; cursor: pointer; font-size: .78rem; font-weight: 500; color: #555; transition: all .15s; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .btn-export:hover { background: var(--primary-light); border-color: #c5cae9; }
+
+        /* ── Spinner ── */
+        .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite; vertical-align: middle; }
+        .spinner-dark { border-color: var(--border); border-top-color: var(--primary); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Progress Steps ── */
+        .analysis-progress { text-align: left; max-width: 280px; margin: 20px auto; }
+        .progress-step { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: .8rem; color: #999; }
+        .progress-step.active { color: var(--primary); font-weight: 600; }
+        .progress-step.done { color: var(--success); }
+        .progress-step .p-icon { width: 20px; text-align: center; }
+
+        /* ── Dark Mode ── */
+        body.dark { --bg: #0f1123; --surface: #1a1d35; --text: #e0e0e0; --text-secondary: #999; --border: #2a2e4a; --primary-light: #1e2240; }
+        body.dark header { background: linear-gradient(135deg, #0a0e2a, #131852); }
+        body.dark .toolbar { background: #141730; }
+        body.dark .toolbar button { background: var(--surface); border-color: var(--border); color: #ccc; }
+        body.dark .toolbar button.active { background: var(--accent); border-color: var(--accent); }
+        body.dark .mode-tab:not(.active) { background: var(--surface); color: var(--text-secondary); border-color: var(--border); }
+        body.dark .mode-tab:not(.active):hover { background: var(--primary-light); }
+        body.dark .score-card { background: #141730; border-color: var(--border); }
+        body.dark .features-table td { border-color: var(--border); }
+        body.dark .features-table th { border-color: var(--border); }
+        body.dark .features-table tr:hover { background: #1e2240; }
+        body.dark .tab-row { border-color: var(--border); }
+        body.dark .tab-btn { color: #777; }
+        body.dark .tab-btn.active { color: #7986cb; border-bottom-color: #7986cb; }
+        body.dark .btn-secondary { background: var(--surface); border-color: var(--border); color: #ccc; }
+        body.dark .btn-export { background: #141730; border-color: var(--border); color: #ccc; }
+        body.dark .confidence-bar-bg { background: var(--border); }
+        body.dark .upload-area, body.dark .upload-zone { background: #141730; border-color: var(--border); color: #888; }
+        body.dark .audio-preview { background: #141730; border-color: var(--border); }
+        body.dark .fold-section { background: #141730; border-color: var(--border); }
+        body.dark .vf-item { background: #141730; border-color: var(--border); }
+        body.dark .canvas-wrap { border-color: var(--border); }
+        body.dark .step-card { background: var(--surface); border-color: var(--border); }
+        body.dark .step-card p { color: #888; }
+        body.dark .header-btn { border-color: rgba(255,255,255,.15); }
+        body.dark .waveform-container { background: var(--border); }
+
+        /* ── Footer ── */
+        footer { text-align: center; padding: 20px 16px 30px; font-size: .72rem; color: #999; max-width: 1200px; margin: 0 auto; }
+
+        /* ── Toast ── */
+        .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; background: var(--primary); color: #fff; border-radius: 10px; font-size: .82rem; font-weight: 500; box-shadow: var(--shadow-lg); z-index: 1000; transform: translateY(80px); opacity: 0; transition: all .3s; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+
+        @media (max-width: 768px) {
+            header { flex-direction: column; gap: 10px; text-align: center; }
+            .container { flex-direction: column; }
+            .steps-row { flex-direction: column; }
+            .scores { grid-template-columns: 1fr; }
+            .vf-grid { grid-template-columns: 1fr 1fr; }
+            #drawCanvas { width: 100% !important; height: auto !important; }
+            .action-row { flex-direction: column; }
+            .mode-tabs { flex-direction: column; }
+            .mode-tab { border-radius: 0 !important; }
+            .mode-tab:not(:first-child) { border-left: 1px solid var(--border) !important; border-top: none; }
+            .mode-tab:first-child { border-radius: var(--radius) var(--radius) 0 0 !important; }
+            .mode-tab:last-child { border-radius: 0 0 var(--radius) var(--radius) !important; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-area">
+        <div class="icon">&#129504;</div>
+        <div>
+            <h1>NeuroScreen</h1>
+            <p>AI-Powered Parkinson's Disease Detection</p>
+        </div>
+    </div>
+    <div class="header-actions">
+        <div class="nav-status">
+            <div class="status-dot loading" id="statusDot"></div>
+            <span id="statusText">Checking models&hellip;</span>
+        </div>
+        <button class="header-btn" onclick="toggleDarkMode()" id="darkModeBtn">&#127769; Dark</button>
+    </div>
+</header>
+
+<!-- ── Mode Selector ── -->
+<div class="mode-tabs">
+    <div class="mode-tab active" onclick="switchMode('handwriting')" id="modeTabHW">
+        <span class="tab-icon">&#9997;&#65039;</span>
+        <div>Handwriting Analysis<span class="tab-meta">MLP + EfficientNet-B0 + CBAM &bull; 93.6% Acc</span></div>
+    </div>
+    <div class="mode-tab" onclick="switchMode('speech')" id="modeTabSP">
+        <span class="tab-icon">&#127908;</span>
+        <div>Speech Analysis<span class="tab-meta">XLS-R 300M + Cross-Attention Fusion &bull; 91.7% Acc</span></div>
+    </div>
+    <div class="mode-tab" onclick="switchMode('fusion')" id="modeTabFU">
+        <span class="tab-icon">&#129516;</span>
+        <div>Fusion Analysis<span class="tab-meta">CMAFN &bull; Cross-Modal Attention &bull; 5-Fold</span></div>
+    </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- HANDWRITING MODE                                     -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="mode-content active" id="mode-handwriting">
+    <div class="steps-row">
+        <div class="step-card"><div class="step-num">1</div><div class="step-icon">&#9997;&#65039;</div><h3>Draw or Upload</h3><p>Draw a spiral/wave or upload a handwriting image</p></div>
+        <div class="step-card"><div class="step-num">2</div><div class="step-icon">&#129302;</div><h3>AI Analysis</h3><p>10 neural networks analyze 16 biomarkers</p></div>
+        <div class="step-card"><div class="step-num">3</div><div class="step-icon">&#128202;</div><h3>View Results</h3><p>Risk score, model breakdown & biomarker profile</p></div>
+    </div>
+
+    <div class="container">
+        <!-- Left: Drawing Canvas -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-icon">&#9997;&#65039;</div>
+                <h2>Draw Your Pattern</h2>
+            </div>
+
+            <div class="toolbar">
+                <div class="tool-group">
+                    <span class="tool-group-label">Template</span>
+                    <button id="spiralBtn" class="active" onclick="setTemplate('spiral')">&#127744; Spiral</button>
+                    <button id="waveBtn" onclick="setTemplate('wave')">&#127754; Wave</button>
+                    <button id="noneBtn" onclick="setTemplate('none')">&#9999;&#65039; Free</button>
+                </div>
+                <div class="sep"></div>
+                <div class="tool-group">
+                    <span class="tool-group-label">Pen</span>
+                    <input type="range" id="brushSize" min="2" max="14" value="4" title="Brush size">
+                    <span id="brushSizeLabel" style="font-size:.72rem;color:#888;min-width:18px;">4</span>
+                </div>
+                <div class="sep"></div>
+                <div class="tool-group">
+                    <div class="color-dot active" style="background:#1a1a2e;" onclick="setPenColor('#1a1a2e', this)" title="Black"></div>
+                    <div class="color-dot" style="background:#1565c0;" onclick="setPenColor('#1565c0', this)" title="Blue"></div>
+                    <div class="color-dot" style="background:#c62828;" onclick="setPenColor('#c62828', this)" title="Red"></div>
+                </div>
+                <div class="sep"></div>
+                <button onclick="undoStroke()" title="Undo last stroke">&#8617; Undo</button>
+                <button onclick="clearCanvas()" title="Clear canvas">&#128465; Clear</button>
+            </div>
+
+            <div class="canvas-wrap">
+                <canvas id="drawCanvas" width="500" height="500"></canvas>
+                <div class="canvas-hint" id="canvasHint">
+                    <div class="hint-icon">&#9997;&#65039;</div>
+                    <p>Trace the dotted guide line<br>as accurately as possible</p>
+                </div>
+            </div>
+
+            <div class="action-row">
+                <button id="hwAnalyzeBtn" class="btn-analyze" onclick="analyzeHandwriting()">&#128300; Analyze Handwriting</button>
+                <button class="btn-secondary" onclick="downloadCanvas()" title="Save drawing">&#128190; Save</button>
+            </div>
+
+            <div class="upload-area" id="hwUploadArea" onclick="document.getElementById('hwFileInput').click()">
+                &#128228; <strong>Drag &amp; drop</strong> or click to upload a handwriting image
+                <input type="file" id="hwFileInput" accept="image/*" onchange="handleHWUpload(event)">
+            </div>
+        </div>
+
+        <!-- Right: Results -->
+        <div class="panel" id="hwResultsPanel">
+            <div class="panel-header">
+                <div class="panel-icon">&#128202;</div>
+                <h2>Analysis Results</h2>
+            </div>
+            <div id="hwResultsContent">
+                <div class="placeholder">
+                    <div class="ph-icon">&#128300;</div>
+                    <p>Draw a spiral or wave pattern and click <strong>Analyze Handwriting</strong></p>
+                    <p class="ph-sub">The AI ensemble will evaluate tremor, micrographia, and motor control indicators</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- SPEECH MODE                                          -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="mode-content" id="mode-speech">
+    <div class="steps-row">
+        <div class="step-card"><div class="step-num">1</div><div class="step-icon">&#127908;</div><h3>Record / Upload</h3><p>Say &ldquo;Ahhh&rdquo; for 3-5 sec or upload a file</p></div>
+        <div class="step-card"><div class="step-num">2</div><div class="step-icon">&#129504;</div><h3>AI Analysis</h3><p>5 models analyze 960+ vocal features</p></div>
+        <div class="step-card"><div class="step-num">3</div><div class="step-icon">&#128202;</div><h3>Get Results</h3><p>Risk score + vocal biomarker breakdown</p></div>
+    </div>
+
+    <div class="container">
+        <!-- Left: Voice Input -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-icon">&#127908;</div>
+                <h2>Voice Input</h2>
+            </div>
+
+            <div class="upload-zone" id="spUploadZone" onclick="document.getElementById('spFileInput').click()">
+                <div class="uz-icon">&#128193;</div>
+                <h4>Drop audio file here or click to browse</h4>
+                <p>Upload a clear recording &mdash; sustained vowel, reading, or conversation</p>
+                <div class="filetypes">WAV &middot; MP3 &middot; OGG &middot; FLAC &middot; M4A (max 16 MB)</div>
+                <input type="file" id="spFileInput" accept="audio/*" onchange="handleSPFileSelect(event)">
+            </div>
+
+            <div class="or-divider">or record live</div>
+
+            <div class="record-section">
+                <button class="record-btn" id="recordBtn" onclick="toggleRecording()">&#127908;</button>
+                <div class="record-label" id="recordLabel">Tap to start recording</div>
+                <div class="record-timer" id="recordTimer">0:00</div>
+            </div>
+
+            <div class="audio-preview" id="audioPreview">
+                <div class="ap-header">
+                    <span class="ap-name" id="apName">recording.wav</span>
+                    <button class="ap-remove" onclick="removeAudio()">&#10005; Remove</button>
+                </div>
+                <audio id="audioPlayer" controls></audio>
+                <div class="waveform-container"><canvas id="waveformCanvas"></canvas></div>
+            </div>
+
+            <button class="btn-analyze" id="spAnalyzeBtn" onclick="analyzeSpeech()" disabled style="margin-top:16px;width:100%;">&#128300; Analyze Voice</button>
+        </div>
+
+        <!-- Right: Results -->
+        <div class="panel" id="spResultsPanel">
+            <div class="panel-header">
+                <div class="panel-icon">&#128202;</div>
+                <h2>Analysis Results</h2>
+            </div>
+            <div id="spResultsContent">
+                <div class="placeholder">
+                    <div class="ph-icon">&#129658;</div>
+                    <p>Record or upload a voice sample,<br>then tap <strong>Analyze Voice</strong> to see results.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- FUSION MODE (CMAFN)                                   -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="mode-content" id="mode-fusion">
+    <div class="steps-row">
+        <div class="step-card"><div class="step-num">1</div><div class="step-icon">&#9997;&#65039; + &#127908;</div><h3>Provide Both</h3><p>Draw/upload handwriting <strong>and/or</strong> record/upload speech</p></div>
+        <div class="step-card"><div class="step-num">2</div><div class="step-icon">&#129516;</div><h3>Cross-Modal Fusion</h3><p>CMAFN fuses modalities via transformer attention + GMU</p></div>
+        <div class="step-card"><div class="step-num">3</div><div class="step-icon">&#128202;</div><h3>Fused Results</h3><p>Risk score from 5-fold ensemble with per-modality breakdown</p></div>
+    </div>
+
+    <div class="container">
+        <!-- Left: Inputs -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-icon">&#129516;</div>
+                <h2>Multimodal Input</h2>
+            </div>
+
+            <!-- HW sub-section -->
+            <div style="margin-bottom:16px;">
+                <div style="font-size:.82rem;font-weight:600;margin-bottom:8px;color:var(--primary);">&#9997;&#65039; Handwriting (draw or upload)</div>
+                <div class="toolbar">
+                    <div class="tool-group">
+                        <span class="tool-group-label">Template</span>
+                        <button id="fuSpiralBtn" class="active" onclick="fuSetTemplate('spiral')">&#127744; Spiral</button>
+                        <button id="fuWaveBtn" onclick="fuSetTemplate('wave')">&#127754; Wave</button>
+                        <button id="fuNoneBtn" onclick="fuSetTemplate('none')">&#9999;&#65039; Free</button>
+                    </div>
+                    <div class="sep"></div>
+                    <div class="tool-group">
+                        <span class="tool-group-label">Pen</span>
+                        <input type="range" id="fuBrushSize" min="2" max="14" value="4">
+                    </div>
+                    <div class="sep"></div>
+                    <button onclick="fuClearCanvas()">&#128465; Clear</button>
+                </div>
+                <div class="canvas-wrap">
+                    <canvas id="fuDrawCanvas" width="500" height="500"></canvas>
+                    <div class="canvas-hint" id="fuCanvasHint">
+                        <div class="hint-icon">&#9997;&#65039;</div>
+                        <p>Draw a spiral or wave</p>
+                    </div>
+                </div>
+                <div class="upload-area" id="fuHWUploadArea" onclick="document.getElementById('fuHWFileInput').click()">
+                    &#128228; Or upload a handwriting image
+                    <input type="file" id="fuHWFileInput" accept="image/*" onchange="handleFuHWUpload(event)">
+                </div>
+            </div>
+
+            <!-- Audio sub-section -->
+            <div>
+                <div style="font-size:.82rem;font-weight:600;margin-bottom:8px;color:var(--primary);">&#127908; Speech (upload or record)</div>
+                <div class="upload-zone" id="fuSpUploadZone" onclick="document.getElementById('fuSpFileInput').click()" style="padding:18px;">
+                    <div class="uz-icon">&#128193;</div>
+                    <h4>Drop audio file here or click to browse</h4>
+                    <div class="filetypes">WAV &middot; MP3 &middot; OGG &middot; FLAC &middot; M4A (max 16 MB)</div>
+                    <input type="file" id="fuSpFileInput" accept="audio/*" onchange="handleFuSPFileSelect(event)">
+                </div>
+                <div class="or-divider">or record live</div>
+                <div class="record-section">
+                    <button class="record-btn" id="fuRecordBtn" onclick="fuToggleRecording()">&#127908;</button>
+                    <div class="record-label" id="fuRecordLabel">Tap to start recording</div>
+                    <div class="record-timer" id="fuRecordTimer">0:00</div>
+                </div>
+                <div class="audio-preview" id="fuAudioPreview">
+                    <div class="ap-header">
+                        <span class="ap-name" id="fuApName">recording.wav</span>
+                        <button class="ap-remove" onclick="fuRemoveAudio()">&#10005; Remove</button>
+                    </div>
+                    <audio id="fuAudioPlayer" controls></audio>
+                </div>
+            </div>
+
+            <div class="action-row" style="margin-top:16px;">
+                <button id="fuAnalyzeBtn" class="btn-analyze" onclick="analyzeFusion()">&#129516; Analyze with CMAFN Fusion</button>
+            </div>
+        </div>
+
+        <!-- Right: Results -->
+        <div class="panel" id="fuResultsPanel">
+            <div class="panel-header">
+                <div class="panel-icon">&#128202;</div>
+                <h2>Fusion Results</h2>
+            </div>
+            <div id="fuResultsContent">
+                <div class="placeholder">
+                    <div class="ph-icon">&#129516;</div>
+                    <p>Provide handwriting and/or speech input,<br>then tap <strong>Analyze with CMAFN Fusion</strong></p>
+                    <p class="ph-sub">Both modalities recommended for best accuracy</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <strong>&#9888;&#65039; Disclaimer:</strong> This tool is for <em>research purposes only</em>. It is <strong>not</strong> a substitute for professional medical diagnosis. Consult a healthcare provider for clinical evaluation.
+    <br>Handwriting: 5&times;MLP + 5&times;EfficientNet-B0+CBAM &bull; 93.57% Acc &bull; 0.9851 AUC &nbsp;|&nbsp; Speech: XLS-R 300M + Cross-Attention &bull; 91.7% Acc &bull; 0.97 AUC &nbsp;|&nbsp; Fusion: CMAFN &bull; Cross-Modal Attention + GMU
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+// Global
+// ═══════════════════════════════════════════
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── Convert any audio file/blob to WAV before uploading ──
+async function convertToWav(file) {
+    try {
+        const ac = new (window.AudioContext || window.webkitAudioContext)();
+        const arrayBuf = await file.arrayBuffer();
+        const audioBuf = await ac.decodeAudioData(arrayBuf);
+        const numCh = 1;
+        const sampleRate = 16000;
+        const offCtx = new OfflineAudioContext(numCh, audioBuf.duration * sampleRate, sampleRate);
+        const src = offCtx.createBufferSource();
+        src.buffer = audioBuf;
+        src.connect(offCtx.destination);
+        src.start();
+        const rendered = await offCtx.startRendering();
+        const pcm = rendered.getChannelData(0);
+        const wavBuf = new ArrayBuffer(44 + pcm.length * 2);
+        const view = new DataView(wavBuf);
+        function writeStr(off, s) { for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i)); }
+        writeStr(0, 'RIFF');
+        view.setUint32(4, 36 + pcm.length * 2, true);
+        writeStr(8, 'WAVE');
+        writeStr(12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true);
+        view.setUint16(22, numCh, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * numCh * 2, true);
+        view.setUint16(32, numCh * 2, true);
+        view.setUint16(34, 16, true);
+        writeStr(36, 'data');
+        view.setUint32(40, pcm.length * 2, true);
+        for (let i = 0; i < pcm.length; i++) {
+            const s = Math.max(-1, Math.min(1, pcm[i]));
+            view.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+        }
+        ac.close();
+        return new File([wavBuf], 'recording.wav', { type: 'audio/wav' });
+    } catch (e) {
+        console.warn('WAV conversion failed, using original file:', e);
+        return file;
+    }
+}
+
+// ── Mode Switching ──
+function switchMode(mode) {
+    document.querySelectorAll('.mode-content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('mode-' + mode).classList.add('active');
+    const tabMap = { handwriting: 'modeTabHW', speech: 'modeTabSP', fusion: 'modeTabFU' };
+    document.getElementById(tabMap[mode]).classList.add('active');
+    if (mode === 'fusion' && !fuCanvasInit) { fuInitCanvas(); fuCanvasInit = true; }
+}
+
+// ── Health Check ──
+async function checkHealth() {
+    try {
+        const r = await fetch('/health');
+        const d = await r.json();
+        const dot = document.getElementById('statusDot');
+        const txt = document.getElementById('statusText');
+        const hwOk = d.handwriting && d.handwriting.loaded;
+        const spOk = d.speech && d.speech.loaded;
+        const fuOk = d.fusion && d.fusion.loaded;
+        if (hwOk || spOk || fuOk) {
+            dot.className = 'status-dot ok';
+            const parts = [];
+            if (hwOk) parts.push('HW: ' + (d.handwriting.mlp_count + d.handwriting.cnn_count));
+            if (spOk) parts.push('SP: ' + d.speech.model_count);
+            if (fuOk) parts.push('FU: ' + d.fusion.model_count);
+            txt.textContent = parts.join(' | ') + ' models';
+        } else {
+            dot.className = 'status-dot err';
+            txt.textContent = (d.speech && d.speech.error) || (d.fusion && d.fusion.error) || 'Models not loaded';
+        }
+    } catch {
+        document.getElementById('statusDot').className = 'status-dot err';
+        document.getElementById('statusText').textContent = 'Server offline';
+    }
+}
+checkHealth();
+
+// ── Dark Mode ──
+function toggleDarkMode() {
+    document.body.classList.toggle('dark');
+    const isDark = document.body.classList.contains('dark');
+    localStorage.setItem('nsDarkMode', isDark);
+    document.getElementById('darkModeBtn').innerHTML = isDark ? '&#9728;&#65039; Light' : '&#127769; Dark';
+}
+if (localStorage.getItem('nsDarkMode') === 'true') {
+    document.body.classList.add('dark');
+    document.getElementById('darkModeBtn').innerHTML = '&#9728;&#65039; Light';
+}
+
+function scoreColor(v) {
+    if (v < 0.33) return 'var(--success)';
+    if (v < 0.66) return 'var(--warning)';
+    return 'var(--danger)';
+}
+
+// ═══════════════════════════════════════════
+// HANDWRITING — Canvas Drawing
+// ═══════════════════════════════════════════
+const canvas = document.getElementById('drawCanvas');
+const ctx = canvas.getContext('2d');
+let drawing = false, strokes = [], currentStroke = [];
+let template = 'spiral', penColor = '#1a1a2e';
+let hwHistory = JSON.parse(localStorage.getItem('hwHistory') || '[]');
+
+function initCanvas() {
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    drawTemplate();
+    updateHint();
+}
+
+function drawTemplate() {
+    if (template === 'none') return;
+    ctx.save();
+    ctx.strokeStyle = '#ddd';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([6, 4]);
+    if (template === 'spiral') {
+        ctx.beginPath();
+        for (let t = 0; t < 6 * Math.PI; t += 0.05) {
+            const r = 10 + 12 * t;
+            const x = 250 + r * Math.cos(t), y = 250 + r * Math.sin(t);
+            t === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+    } else if (template === 'wave') {
+        ctx.beginPath();
+        for (let x = 40; x < 460; x++) {
+            const y = 250 + 120 * Math.sin((x - 40) / 66 * Math.PI);
+            x === 40 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+    }
+    ctx.restore();
+}
+
+function setTemplate(t) {
+    template = t;
+    ['spiralBtn','waveBtn','noneBtn'].forEach(id => document.getElementById(id).classList.remove('active'));
+    document.getElementById(t === 'spiral' ? 'spiralBtn' : t === 'wave' ? 'waveBtn' : 'noneBtn').classList.add('active');
+    redraw();
+}
+
+function setPenColor(color, el) {
+    penColor = color;
+    document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+    el.classList.add('active');
+}
+
+function redraw() {
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    drawTemplate();
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    for (const s of strokes) {
+        if (s.length < 2) continue;
+        ctx.strokeStyle = s[0].color || '#1a1a2e';
+        ctx.lineWidth = s[0].size || 4;
+        ctx.beginPath();
+        ctx.moveTo(s[0].x, s[0].y);
+        for (let i = 1; i < s.length; i++) ctx.lineTo(s[i].x, s[i].y);
+        ctx.stroke();
+    }
+    updateHint();
+}
+
+function updateHint() {
+    const h = document.getElementById('canvasHint');
+    if (h) h.classList.toggle('hidden', strokes.length > 0);
+}
+
+function clearCanvas() { strokes = []; redraw(); hwResetResults(); }
+function hwResetResults() {
+    document.getElementById('hwResultsContent').innerHTML = '<div class="placeholder"><div class="ph-icon">&#128300;</div><p>Draw a spiral or wave pattern and click <strong>Analyze Handwriting</strong></p><p class="ph-sub">The AI ensemble will evaluate tremor, micrographia, and motor control indicators</p></div>';
+}
+
+function undoStroke() { if (strokes.length > 0) { strokes.pop(); redraw(); showToast('Stroke undone'); } }
+
+function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const sx = canvas.width / rect.width, sy = canvas.height / rect.height;
+    if (e.touches) return { x: (e.touches[0].clientX - rect.left) * sx, y: (e.touches[0].clientY - rect.top) * sy };
+    return { x: (e.clientX - rect.left) * sx, y: (e.clientY - rect.top) * sy };
+}
+
+canvas.addEventListener('mousedown', e => startDraw(e));
+canvas.addEventListener('mousemove', e => draw(e));
+canvas.addEventListener('mouseup', () => endDraw());
+canvas.addEventListener('mouseleave', () => endDraw());
+canvas.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e); }, {passive:false});
+canvas.addEventListener('touchmove', e => { e.preventDefault(); draw(e); }, {passive:false});
+canvas.addEventListener('touchend', e => { e.preventDefault(); endDraw(); }, {passive:false});
+
+function startDraw(e) {
+    drawing = true;
+    const pos = getPos(e);
+    const bs = parseInt(document.getElementById('brushSize').value);
+    currentStroke = [{ x: pos.x, y: pos.y, size: bs, color: penColor }];
+    updateHint();
+}
+function draw(e) {
+    if (!drawing) return;
+    const pos = getPos(e);
+    const bs = parseInt(document.getElementById('brushSize').value);
+    currentStroke.push({ x: pos.x, y: pos.y, size: bs, color: penColor });
+    if (currentStroke.length >= 2) {
+        const prev = currentStroke[currentStroke.length - 2];
+        ctx.strokeStyle = penColor; ctx.lineWidth = bs; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.beginPath(); ctx.moveTo(prev.x, prev.y); ctx.lineTo(pos.x, pos.y); ctx.stroke();
+    }
+}
+function endDraw() {
+    if (drawing && currentStroke.length > 1) strokes.push(currentStroke);
+    drawing = false; currentStroke = []; updateHint();
+}
+document.getElementById('brushSize').addEventListener('input', function() { document.getElementById('brushSizeLabel').textContent = this.value; });
+
+// ── Drag & Drop (HW) ──
+const hwUpload = document.getElementById('hwUploadArea');
+hwUpload.addEventListener('dragover', e => { e.preventDefault(); hwUpload.classList.add('drag-over'); });
+hwUpload.addEventListener('dragleave', () => hwUpload.classList.remove('drag-over'));
+hwUpload.addEventListener('drop', e => { e.preventDefault(); hwUpload.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f && f.type.startsWith('image/')) loadImageFile(f); });
+
+function handleHWUpload(e) { const f = e.target.files[0]; if (f) loadImageFile(f); e.target.value = ''; }
+function loadImageFile(file) {
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        const img = new Image();
+        img.onload = function() {
+            strokes = []; template = 'none'; setTemplate('none');
+            ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+            const w = img.width * scale, h = img.height * scale;
+            ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+            strokes.push([{x:0,y:0,size:1,color:'#000'},{x:1,y:1,size:1,color:'#000'}]);
+            updateHint(); showToast('Image loaded — click Analyze');
+        };
+        img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+function downloadCanvas() {
+    if (strokes.length === 0) { showToast('Nothing to save'); return; }
+    const link = document.createElement('a');
+    link.download = 'pd-drawing-' + Date.now() + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click(); showToast('Drawing saved');
+}
+
+// ── Handwriting Analysis ──
+async function analyzeHandwriting() {
+    if (strokes.length === 0) { showToast('Please draw a pattern or upload an image first'); return; }
+    const btn = document.getElementById('hwAnalyzeBtn');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Analyzing...';
+    document.getElementById('hwResultsContent').innerHTML = '<div style="padding:30px 20px;text-align:center;"><div class="spinner spinner-dark" style="width:36px;height:36px;margin:0 auto 16px;"></div><div class="analysis-progress"><div class="progress-step active" id="hwps1"><span class="p-icon">&#9203;</span> Extracting 16 biomarker features...</div><div class="progress-step" id="hwps2"><span class="p-icon">&#9711;</span> Running MLP ensemble (5 folds)...</div><div class="progress-step" id="hwps3"><span class="p-icon">&#9711;</span> Running CNN ensemble + TTA (35 views)...</div><div class="progress-step" id="hwps4"><span class="p-icon">&#9711;</span> Meta-learner stacking prediction...</div></div></div>';
+    const steps = ['hwps1','hwps2','hwps3','hwps4'];
+    let si = 0;
+    const st = setInterval(() => { if (si < steps.length) { document.getElementById(steps[si]).classList.remove('active'); document.getElementById(steps[si]).classList.add('done'); document.getElementById(steps[si]).querySelector('.p-icon').innerHTML = '&#10003;'; si++; if (si < steps.length) { document.getElementById(steps[si]).classList.add('active'); document.getElementById(steps[si]).querySelector('.p-icon').innerHTML = '&#9203;'; } } }, 800);
+    try {
+        const dataURL = canvas.toDataURL('image/png');
+        const resp = await fetch('/predict/handwriting', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image: dataURL }) });
+        const result = await resp.json();
+        clearInterval(st);
+        if (result.error) throw new Error(result.error);
+        renderHWResults(result);
+        hwHistory.unshift({ time: new Date().toLocaleString(), risk: result.combined_risk, status: result.status, mlp: result.mlp_risk, cnn: result.cnn_risk, tta: result.cnn_tta_risk });
+        if (hwHistory.length > 20) hwHistory.pop();
+        localStorage.setItem('hwHistory', JSON.stringify(hwHistory));
+    } catch (err) {
+        clearInterval(st);
+        document.getElementById('hwResultsContent').innerHTML = '<div class="placeholder" style="color:var(--danger);"><div class="ph-icon">&#9888;&#65039;</div><p><strong>Analysis Failed:</strong> ' + err.message + '</p></div>';
+    } finally { btn.disabled = false; btn.innerHTML = '&#128300; Analyze Handwriting'; }
+}
+
+function renderHWResults(r) {
+    const risk = r.combined_risk, pct = (risk * 100).toFixed(1);
+    const angle = Math.PI * (1 - risk);
+    let color = 'var(--success)', statusClass = 'LOW', interpClass = 'interp-low';
+    if (risk >= 0.66) { color = 'var(--danger)'; statusClass = 'HIGH'; interpClass = 'interp-high'; }
+    else if (risk >= 0.33) { color = 'var(--warning)'; statusClass = 'MODERATE'; interpClass = 'interp-moderate'; }
+    const nx = (130 + 110 * Math.cos(angle)).toFixed(1), ny = (140 - 110 * Math.sin(angle)).toFixed(1);
+    const interpTexts = { LOW: 'Your handwriting shows <strong>no significant indicators</strong> of Parkinson\'s Disease. The drawing appears steady with consistent stroke control.', MODERATE: 'Your analysis shows <strong>some potential indicators</strong>. Consider consulting a healthcare professional for further assessment.', HIGH: 'Your analysis shows <strong>significant indicators</strong> consistent with Parkinson\'s Disease. We recommend consulting a neurologist.' };
+    const ms = [r.mlp_risk, r.cnn_risk, r.cnn_tta_risk];
+    const avgDev = ms.reduce((s, v) => s + Math.abs(v - risk), 0) / ms.length;
+    const agreement = Math.max(0, 100 - avgDev * 200).toFixed(0);
+
+    let html = '<div class="gauge-box"><svg viewBox="0 0 260 160" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#4caf50"/><stop offset="50%" stop-color="#ff9800"/><stop offset="100%" stop-color="#f44336"/></linearGradient></defs><path d="M 20 140 A 110 110 0 0 1 240 140" fill="none" stroke="#e8f5e9" stroke-width="20" stroke-linecap="round"/><path d="M 20 140 A 110 110 0 0 1 130 30" fill="none" stroke="#fff3e0" stroke-width="20" stroke-linecap="round"/><path d="M 20 140 A 110 110 0 0 0 56 52" fill="none" stroke="#ffebee" stroke-width="20" stroke-linecap="round"/><text x="240" y="158" text-anchor="middle" font-size="9" fill="#2e7d32" font-weight="600">LOW</text><text x="130" y="22" text-anchor="middle" font-size="9" fill="#e65100" font-weight="600">MOD</text><text x="20" y="158" text-anchor="middle" font-size="9" fill="#c62828" font-weight="600">HIGH</text><line x1="130" y1="140" x2="' + nx + '" y2="' + ny + '" stroke="' + color + '" stroke-width="3" stroke-linecap="round"/><circle cx="130" cy="140" r="7" fill="' + color + '"/><circle cx="130" cy="140" r="3" fill="#fff"/></svg><div class="risk-pct" style="color:' + color + '">' + pct + '%</div><div class="risk-label">Parkinson\'s Disease Risk Score</div><span class="status-badge status-' + statusClass + '">' + r.status + '</span></div>';
+    html += '<div class="interpretation ' + interpClass + '">' + interpTexts[statusClass] + '</div>';
+    html += '<div class="confidence-section"><div class="confidence-label"><span>Model Confidence</span><span>' + agreement + '% agreement</span></div><div class="confidence-bar-bg"><div class="confidence-bar" style="width:' + agreement + '%;background:' + color + ';"></div></div><div class="model-agreement">All models ' + (parseInt(agreement) > 70 ? 'strongly agree' : 'show some variance') + ' on this prediction</div></div>';
+    html += '<div class="scores"><div class="score-card"><div class="label">MLP Ensemble</div><div class="val" style="color:' + scoreColor(r.mlp_risk) + '">' + (r.mlp_risk*100).toFixed(1) + '%</div><div class="model-info">5-fold &times; 16 biomarkers</div></div><div class="score-card"><div class="label">CNN Ensemble</div><div class="val" style="color:' + scoreColor(r.cnn_risk) + '">' + (r.cnn_risk*100).toFixed(1) + '%</div><div class="model-info">5-fold EfficientNet+CBAM</div></div><div class="score-card"><div class="label">CNN + TTA</div><div class="val" style="color:' + scoreColor(r.cnn_tta_risk) + '">' + (r.cnn_tta_risk*100).toFixed(1) + '%</div><div class="model-info">7 views &times; 5 folds</div></div><div class="score-card"><div class="label">&#11088; Final Ensemble</div><div class="val" style="color:' + color + ';font-size:1.5rem">' + pct + '%</div><div class="model-info">Meta-learner stacking</div></div></div>';
+
+    // Biomarkers tab
+    html += '<div class="tab-row"><button class="tab-btn active" onclick="hwSwitchTab(\'features\',this)">&#128201; Biomarkers (16)</button><button class="tab-btn" onclick="hwSwitchTab(\'history\',this)">&#128337; History (' + hwHistory.length + ')</button></div>';
+    html += '<div class="tab-content active" id="hw-tab-features"><table class="features-table"><tr><th>Feature</th><th>Value</th><th class="bar-cell">Relative</th></tr>';
+    const feats = Object.entries(r.features);
+    const maxVal = Math.max(...feats.map(f => Math.abs(f[1])), 0.001);
+    feats.sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
+    const fc = { stroke_width_mean:'#42a5f5', stroke_width_std:'#42a5f5', contour_roughness:'#ef5350', direction_changes:'#ef5350', n_components:'#ab47bc', ink_density:'#66bb6a', solidity:'#66bb6a', intensity_variance:'#ffa726', fractal_dimension:'#ab47bc', entropy:'#ffa726', hu_moment_1:'#78909c', hu_moment_2:'#78909c', curvature_mean:'#ec407a', curvature_std:'#ec407a', aspect_ratio:'#26a69a', stroke_regularity:'#26a69a' };
+    for (const [name, val] of feats) {
+        const bw = Math.min((Math.abs(val) / maxVal) * 100, 100).toFixed(0);
+        const dn = name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        const dc = fc[name] || '#c5cae9';
+        html += '<tr><td><div class="feat-name"><span class="feat-dot" style="background:' + dc + '"></span>' + dn + '</div></td><td style="font-family:monospace;font-size:.76rem;">' + val.toFixed(4) + '</td><td class="bar-cell"><div class="feat-bar" style="width:' + bw + '%;background:' + dc + '40;border-left:3px solid ' + dc + ';"></div></td></tr>';
+    }
+    html += '</table></div>';
+    html += '<div class="tab-content" id="hw-tab-history">' + renderHWHistory() + '</div>';
+    html += '<div class="export-row"><button class="btn-export" onclick="downloadHWReport()">&#128229; Download Report</button><button class="btn-export" onclick="clearHWHistory()">&#128465; Clear History</button></div>';
+    document.getElementById('hwResultsContent').innerHTML = html;
+}
+
+function hwSwitchTab(tab, btn) {
+    document.querySelectorAll('#hwResultsPanel .tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('#hwResultsPanel .tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('hw-tab-' + tab).classList.add('active');
+}
+
+function renderHWHistory() {
+    if (hwHistory.length === 0) return '<div class="history-empty">No analysis history yet.</div>';
+    let h = '';
+    for (const e of hwHistory) {
+        const c = e.risk < 0.33 ? 'var(--success)' : e.risk < 0.66 ? 'var(--warning)' : 'var(--danger)';
+        h += '<div class="history-item"><div style="width:40px;height:40px;border-radius:8px;background:' + c + '15;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">' + (e.risk < 0.33 ? '&#9989;' : e.risk < 0.66 ? '&#9888;&#65039;' : '&#10060;') + '</div><div style="flex:1;"><div style="font-weight:700;font-size:.88rem;color:' + c + ';">' + (e.risk*100).toFixed(1) + '% &mdash; ' + e.status + '</div><div style="font-size:.7rem;color:#bbb;">' + e.time + '</div></div></div>';
+    }
+    return h;
+}
+function clearHWHistory() { if (!confirm('Clear handwriting history?')) return; hwHistory = []; localStorage.removeItem('hwHistory'); const t = document.getElementById('hw-tab-history'); if (t) t.innerHTML = renderHWHistory(); showToast('History cleared'); }
+function downloadHWReport() {
+    const d = hwHistory[0]; if (!d) { showToast('No results'); return; }
+    const lines = ['=== NEUROSCREEN — HANDWRITING REPORT ===','','Date: ' + d.time,'','Risk: ' + (d.risk*100).toFixed(1) + '% (' + d.status + ')','MLP: ' + (d.mlp*100).toFixed(1) + '%','CNN: ' + (d.cnn*100).toFixed(1) + '%','CNN+TTA: ' + (d.tta*100).toFixed(1) + '%','','Disclaimer: Research tool only. Not a medical diagnosis.'];
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+    const link = document.createElement('a'); link.download = 'hw-report-' + Date.now() + '.txt'; link.href = URL.createObjectURL(blob); link.click(); showToast('Report downloaded');
+}
+
+// ═══════════════════════════════════════════
+// SPEECH — Recording & Upload
+// ═══════════════════════════════════════════
+let spCurrentFile = null, mediaRecorder = null, audioChunks = [], recordingStartTime = null, timerInterval = null, audioContext = null;
+
+// Drag & Drop (Speech)
+const spZone = document.getElementById('spUploadZone');
+spZone.addEventListener('dragover', e => { e.preventDefault(); spZone.classList.add('drag-over'); });
+spZone.addEventListener('dragleave', () => spZone.classList.remove('drag-over'));
+spZone.addEventListener('drop', e => { e.preventDefault(); spZone.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f && f.type.startsWith('audio/')) loadAudioFile(f); else showToast('Please drop an audio file'); });
+function handleSPFileSelect(e) { if (e.target.files[0]) loadAudioFile(e.target.files[0]); }
+
+function loadAudioFile(file) {
+    spCurrentFile = file;
+    document.getElementById('apName').textContent = file.name;
+    document.getElementById('audioPlayer').src = URL.createObjectURL(file);
+    document.getElementById('audioPreview').style.display = 'block';
+    document.getElementById('spAnalyzeBtn').disabled = false;
+    document.getElementById('spUploadZone').style.display = 'none';
+    drawWaveform(file);
+    showToast('Audio loaded');
+}
+
+function removeAudio() {
+    spCurrentFile = null;
+    document.getElementById('audioPreview').style.display = 'none';
+    document.getElementById('spUploadZone').style.display = '';
+    document.getElementById('spAnalyzeBtn').disabled = true;
+    document.getElementById('spFileInput').value = '';
+    spResetResults();
+}
+
+function spResetResults() {
+    document.getElementById('spResultsContent').innerHTML = '<div class="placeholder"><div class="ph-icon">&#129658;</div><p>Record or upload a voice sample,<br>then tap <strong>Analyze Voice</strong> to see results.</p></div>';
+}
+
+// ── Live Recording ──
+async function toggleRecording() {
+    const btn = document.getElementById('recordBtn'), label = document.getElementById('recordLabel'), timer = document.getElementById('recordTimer');
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop(); btn.classList.remove('recording'); btn.textContent = '🎙️'; label.textContent = 'Tap to start recording'; timer.style.display = 'none'; clearInterval(timerInterval);
+        return;
+    }
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 16000, channelCount: 1, echoCancellation: true, noiseSuppression: true } });
+        audioChunks = [];
+        mediaRecorder = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm' });
+        mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+        mediaRecorder.onstop = () => { stream.getTracks().forEach(t => t.stop()); const blob = new Blob(audioChunks, { type: 'audio/webm' }); loadAudioFile(new File([blob], 'recording.webm', { type: 'audio/webm' })); showToast('Recording saved'); };
+        mediaRecorder.start(100);
+        btn.classList.add('recording'); btn.textContent = '⏹️'; label.textContent = 'Recording… tap to stop';
+        recordingStartTime = Date.now(); timer.style.display = 'block';
+        timerInterval = setInterval(() => { const sec = Math.floor((Date.now() - recordingStartTime) / 1000); timer.textContent = Math.floor(sec/60) + ':' + String(sec%60).padStart(2,'0'); if (sec >= 30) { mediaRecorder.stop(); showToast('Max 30s reached'); } }, 200);
+    } catch { showToast('Microphone access denied'); }
+}
+
+// ── Waveform ──
+function drawWaveform(file) {
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const buffer = await audioContext.decodeAudioData(e.target.result);
+            const data = buffer.getChannelData(0);
+            const cv = document.getElementById('waveformCanvas'), cx = cv.getContext('2d');
+            cv.width = cv.offsetWidth * 2; cv.height = cv.offsetHeight * 2;
+            cx.clearRect(0, 0, cv.width, cv.height);
+            const step = Math.ceil(data.length / cv.width), mid = cv.height / 2;
+            const grad = cx.createLinearGradient(0, 0, cv.width, 0);
+            grad.addColorStop(0, '#7986cb'); grad.addColorStop(0.5, '#3949ab'); grad.addColorStop(1, '#7986cb');
+            cx.fillStyle = grad;
+            for (let i = 0; i < cv.width; i++) {
+                let mn = 1, mx = -1;
+                for (let j = 0; j < step; j++) { const v = data[i*step+j] || 0; if (v < mn) mn = v; if (v > mx) mx = v; }
+                cx.fillRect(i, (1+mn)*mid, 1, Math.max(1, (mx-mn)*mid));
+            }
+        } catch {}
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+// ── Speech Analysis ──
+async function analyzeSpeech() {
+    if (!spCurrentFile) { showToast('Upload or record audio first'); return; }
+    const btn = document.getElementById('spAnalyzeBtn');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Analyzing&hellip;';
+    document.getElementById('spResultsContent').innerHTML = '<div style="text-align:center;padding:60px 20px;"><div class="spinner spinner-dark" style="width:32px;height:32px;margin:0 auto;"></div><p style="margin-top:14px;font-size:.85rem;color:var(--text-secondary);">Analyzing voice features&hellip;</p><p style="font-size:.72rem;color:#bbb;margin-top:4px;">This may take 15-30 seconds on first run</p></div>';
+    try {
+        // Convert to WAV so server can always decode it (webm needs ffmpeg)
+        let fileToSend = spCurrentFile;
+        const ext = spCurrentFile.name.split('.').pop().toLowerCase();
+        if (ext === 'webm' || ext === 'ogg' || spCurrentFile.type.includes('webm') || spCurrentFile.type.includes('ogg')) {
+            fileToSend = await convertToWav(spCurrentFile);
+        }
+        const form = new FormData(); form.append('file', fileToSend);
+        const res = await fetch('/predict/speech', { method: 'POST', body: form });
+        const data = await res.json();
+        if (data.error) { showToast('Error: ' + data.error); spResetResults(); }
+        else { renderSPResults(data); showToast('Analysis complete'); }
+    } catch (err) { showToast('Error: ' + err.message); spResetResults(); }
+    finally { btn.disabled = false; btn.innerHTML = '&#128300; Analyze Voice'; }
+}
+
+function renderSPResults(data) {
+    const risk = data.combined_risk, conf = data.confidence || 0.9;
+    const preds = data.individual_predictions || [], vf = data.voice_features || {};
+    let color, pillClass, ibClass, statusText, interpText;
+    if (risk >= 0.66) { color = 'var(--danger)'; pillClass = 'status-HIGH'; ibClass = 'interp-high'; statusText = 'HIGH RISK'; interpText = 'Significant Parkinson\'s-related vocal patterns detected — sustained vocal tremor, pitch instability, reduced HNR. <strong>Please consult a neurologist.</strong>'; }
+    else if (risk >= 0.33) { color = 'var(--warning)'; pillClass = 'status-MODERATE'; ibClass = 'interp-moderate'; statusText = 'MODERATE RISK'; interpText = 'Some indicators present — mild pitch variation and possible tremor. Consider follow-up testing with a specialist.'; }
+    else { color = 'var(--success)'; pillClass = 'status-LOW'; ibClass = 'interp-low'; statusText = 'LOW RISK'; interpText = 'Vocal patterns appear within normal ranges. No significant Parkinson\'s indicators detected.'; }
+
+    const pct = (risk * 100).toFixed(1);
+    const circ = 2 * Math.PI * 75, doff = circ * (1 - risk);
+    let foldsHTML = '';
+    preds.forEach((p, i) => { const c = p >= 0.66 ? 'var(--danger)' : p >= 0.33 ? 'var(--warning)' : 'var(--success)'; foldsHTML += '<div class="fold-bar-row"><span class="fb-label">Fold ' + (i+1) + '</span><div class="fb-track"><div class="fb-fill" style="width:' + (p*100) + '%;background:' + c + ';"></div></div><span class="fb-val" style="color:' + c + ';">' + (p*100).toFixed(1) + '%</span></div>'; });
+
+    let vfHTML = '';
+    if (vf.mean_pitch) {
+        vfHTML = '<div class="vf-title">&#128300; Vocal Biomarkers</div><div class="vf-grid">'
+            + '<div class="vf-item"><div class="vf-label">Pitch</div><div class="vf-val">' + vf.mean_pitch + '</div><div class="vf-unit">Hz</div></div>'
+            + '<div class="vf-item"><div class="vf-label">Pitch StdDev</div><div class="vf-val">' + vf.std_pitch + '</div><div class="vf-unit">Hz</div></div>'
+            + '<div class="vf-item"><div class="vf-label">Jitter</div><div class="vf-val">' + vf.jitter + '%</div><div class="vf-unit">local</div></div>'
+            + '<div class="vf-item"><div class="vf-label">Shimmer</div><div class="vf-val">' + vf.shimmer + '%</div><div class="vf-unit">local</div></div>'
+            + '<div class="vf-item"><div class="vf-label">HNR</div><div class="vf-val">' + vf.hnr + '</div><div class="vf-unit">dB</div></div>'
+            + '<div class="vf-item"><div class="vf-label">Spec. Center</div><div class="vf-val">' + vf.spectral_centroid + '</div><div class="vf-unit">Hz</div></div>'
+            + '<div class="vf-item"><div class="vf-label">Formant F1</div><div class="vf-val">' + vf.f1_mean + '</div><div class="vf-unit">Hz</div></div>'
+            + '<div class="vf-item"><div class="vf-label">Formant F2</div><div class="vf-val">' + vf.f2_mean + '</div><div class="vf-unit">Hz</div></div>'
+            + '<div class="vf-item"><div class="vf-label">Duration</div><div class="vf-val">' + vf.duration + '</div><div class="vf-unit">sec</div></div>'
+            + '</div>';
+    }
+
+    document.getElementById('spResultsContent').innerHTML = ''
+        + '<div class="gauge-box"><div style="display:inline-block;position:relative;width:180px;height:180px;"><svg width="180" height="180" viewBox="0 0 180 180" style="position:absolute;top:0;left:0;transform:rotate(-90deg);"><circle cx="90" cy="90" r="75" fill="none" stroke="#e2e8f0" stroke-width="12"/><circle cx="90" cy="90" r="75" fill="none" stroke="' + color + '" stroke-width="12" stroke-linecap="round" stroke-dasharray="' + circ + '" stroke-dashoffset="' + doff + '" style="transition:stroke-dashoffset 1s ease;"/></svg><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;"><div class="risk-pct" style="color:' + color + ';font-size:2.2rem;">' + pct + '%</div><div style="font-size:.72rem;color:var(--text-secondary);">PD Risk</div></div></div><div style="margin-top:8px;"><span class="status-badge ' + pillClass + '">' + statusText + '</span></div></div>'
+        + '<div class="interpretation ' + ibClass + '"><strong>Interpretation:</strong> ' + interpText + '</div>'
+        + '<div class="scores"><div class="score-card"><div class="label">Ensemble Risk</div><div class="val" style="color:' + color + ';">' + pct + '%</div></div><div class="score-card"><div class="label">Confidence</div><div class="val">' + (conf*100).toFixed(1) + '%</div></div></div>'
+        + vfHTML
+        + '<div class="fold-section"><div class="fold-title">&#128200; Per-Model Breakdown (5-Fold Ensemble)</div>' + foldsHTML + '</div>';
+}
+
+// ═══════════════════════════════════════════
+// FUSION — Canvas + Recording + Analysis
+// ═══════════════════════════════════════════
+let fuCanvasInit = false;
+const fuCanvas = document.getElementById('fuDrawCanvas');
+const fuCtx = fuCanvas.getContext('2d');
+let fuDrawing = false, fuStrokes = [], fuCurrentStroke = [];
+let fuTemplate = 'spiral', fuPenColor = '#1a1a2e';
+let fuCurrentFile = null, fuMediaRecorder = null, fuAudioChunks = [], fuTimerInterval = null, fuRecStartTime = null;
+
+function fuInitCanvas() {
+    fuCtx.fillStyle = '#fff';
+    fuCtx.fillRect(0, 0, fuCanvas.width, fuCanvas.height);
+    fuDrawTemplate();
+    fuUpdateHint();
+}
+
+function fuDrawTemplate() {
+    if (fuTemplate === 'none') return;
+    fuCtx.save();
+    fuCtx.strokeStyle = '#ddd'; fuCtx.lineWidth = 1.5; fuCtx.setLineDash([6, 4]);
+    if (fuTemplate === 'spiral') {
+        fuCtx.beginPath();
+        for (let t = 0; t < 6 * Math.PI; t += 0.05) {
+            const r = 10 + 12 * t;
+            const x = 250 + r * Math.cos(t), y = 250 + r * Math.sin(t);
+            t === 0 ? fuCtx.moveTo(x, y) : fuCtx.lineTo(x, y);
+        }
+        fuCtx.stroke();
+    } else if (fuTemplate === 'wave') {
+        fuCtx.beginPath();
+        for (let x = 40; x < 460; x++) {
+            const y = 250 + 120 * Math.sin((x - 40) / 66 * Math.PI);
+            x === 40 ? fuCtx.moveTo(x, y) : fuCtx.lineTo(x, y);
+        }
+        fuCtx.stroke();
+    }
+    fuCtx.restore();
+}
+
+function fuSetTemplate(t) {
+    fuTemplate = t;
+    ['fuSpiralBtn','fuWaveBtn','fuNoneBtn'].forEach(id => document.getElementById(id).classList.remove('active'));
+    document.getElementById(t === 'spiral' ? 'fuSpiralBtn' : t === 'wave' ? 'fuWaveBtn' : 'fuNoneBtn').classList.add('active');
+    fuRedraw();
+}
+
+function fuRedraw() {
+    fuCtx.fillStyle = '#fff'; fuCtx.fillRect(0, 0, fuCanvas.width, fuCanvas.height);
+    fuDrawTemplate();
+    fuCtx.lineCap = 'round'; fuCtx.lineJoin = 'round';
+    for (const s of fuStrokes) {
+        if (s.length < 2) continue;
+        fuCtx.strokeStyle = s[0].color || '#1a1a2e'; fuCtx.lineWidth = s[0].size || 4;
+        fuCtx.beginPath(); fuCtx.moveTo(s[0].x, s[0].y);
+        for (let i = 1; i < s.length; i++) fuCtx.lineTo(s[i].x, s[i].y);
+        fuCtx.stroke();
+    }
+    fuUpdateHint();
+}
+
+function fuUpdateHint() { const h = document.getElementById('fuCanvasHint'); if (h) h.classList.toggle('hidden', fuStrokes.length > 0); }
+function fuClearCanvas() { fuStrokes = []; fuRedraw(); }
+
+function fuGetPos(e) {
+    const rect = fuCanvas.getBoundingClientRect();
+    const sx = fuCanvas.width / rect.width, sy = fuCanvas.height / rect.height;
+    if (e.touches) return { x: (e.touches[0].clientX - rect.left) * sx, y: (e.touches[0].clientY - rect.top) * sy };
+    return { x: (e.clientX - rect.left) * sx, y: (e.clientY - rect.top) * sy };
+}
+
+fuCanvas.addEventListener('mousedown', e => { fuDrawing = true; const pos = fuGetPos(e); const bs = parseInt(document.getElementById('fuBrushSize').value); fuCurrentStroke = [{x:pos.x,y:pos.y,size:bs,color:fuPenColor}]; fuUpdateHint(); });
+fuCanvas.addEventListener('mousemove', e => {
+    if (!fuDrawing) return; const pos = fuGetPos(e); const bs = parseInt(document.getElementById('fuBrushSize').value);
+    fuCurrentStroke.push({x:pos.x,y:pos.y,size:bs,color:fuPenColor});
+    if (fuCurrentStroke.length >= 2) { const prev = fuCurrentStroke[fuCurrentStroke.length-2]; fuCtx.strokeStyle = fuPenColor; fuCtx.lineWidth = bs; fuCtx.lineCap = 'round'; fuCtx.lineJoin = 'round'; fuCtx.beginPath(); fuCtx.moveTo(prev.x,prev.y); fuCtx.lineTo(pos.x,pos.y); fuCtx.stroke(); }
+});
+fuCanvas.addEventListener('mouseup', () => { if (fuDrawing && fuCurrentStroke.length > 1) fuStrokes.push(fuCurrentStroke); fuDrawing = false; fuCurrentStroke = []; fuUpdateHint(); });
+fuCanvas.addEventListener('mouseleave', () => { if (fuDrawing && fuCurrentStroke.length > 1) fuStrokes.push(fuCurrentStroke); fuDrawing = false; fuCurrentStroke = []; });
+fuCanvas.addEventListener('touchstart', e => { e.preventDefault(); const pos = fuGetPos(e); const bs = parseInt(document.getElementById('fuBrushSize').value); fuDrawing = true; fuCurrentStroke = [{x:pos.x,y:pos.y,size:bs,color:fuPenColor}]; fuUpdateHint(); }, {passive:false});
+fuCanvas.addEventListener('touchmove', e => { e.preventDefault(); if (!fuDrawing) return; const pos = fuGetPos(e); const bs = parseInt(document.getElementById('fuBrushSize').value); fuCurrentStroke.push({x:pos.x,y:pos.y,size:bs,color:fuPenColor}); if (fuCurrentStroke.length >= 2) { const prev = fuCurrentStroke[fuCurrentStroke.length-2]; fuCtx.strokeStyle = fuPenColor; fuCtx.lineWidth = bs; fuCtx.lineCap = 'round'; fuCtx.lineJoin = 'round'; fuCtx.beginPath(); fuCtx.moveTo(prev.x,prev.y); fuCtx.lineTo(pos.x,pos.y); fuCtx.stroke(); } }, {passive:false});
+fuCanvas.addEventListener('touchend', e => { e.preventDefault(); if (fuDrawing && fuCurrentStroke.length > 1) fuStrokes.push(fuCurrentStroke); fuDrawing = false; fuCurrentStroke = []; fuUpdateHint(); }, {passive:false});
+
+function handleFuHWUpload(e) {
+    const f = e.target.files[0]; if (!f) return; e.target.value = '';
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        const img = new Image();
+        img.onload = function() {
+            fuStrokes = []; fuTemplate = 'none'; fuSetTemplate('none');
+            fuCtx.fillStyle = '#fff'; fuCtx.fillRect(0, 0, fuCanvas.width, fuCanvas.height);
+            const scale = Math.min(fuCanvas.width / img.width, fuCanvas.height / img.height);
+            const w = img.width * scale, h = img.height * scale;
+            fuCtx.drawImage(img, (fuCanvas.width-w)/2, (fuCanvas.height-h)/2, w, h);
+            fuStrokes.push([{x:0,y:0,size:1,color:'#000'},{x:1,y:1,size:1,color:'#000'}]);
+            fuUpdateHint(); showToast('Image loaded');
+        };
+        img.src = ev.target.result;
+    };
+    reader.readAsDataURL(f);
+}
+
+// Fusion audio drag/drop
+const fuSpZone = document.getElementById('fuSpUploadZone');
+fuSpZone.addEventListener('dragover', e => { e.preventDefault(); fuSpZone.classList.add('drag-over'); });
+fuSpZone.addEventListener('dragleave', () => fuSpZone.classList.remove('drag-over'));
+fuSpZone.addEventListener('drop', e => { e.preventDefault(); fuSpZone.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f && f.type.startsWith('audio/')) fuLoadAudioFile(f); else showToast('Please drop an audio file'); });
+function handleFuSPFileSelect(e) { if (e.target.files[0]) fuLoadAudioFile(e.target.files[0]); }
+
+function fuLoadAudioFile(file) {
+    fuCurrentFile = file;
+    document.getElementById('fuApName').textContent = file.name;
+    document.getElementById('fuAudioPlayer').src = URL.createObjectURL(file);
+    document.getElementById('fuAudioPreview').style.display = 'block';
+    document.getElementById('fuSpUploadZone').style.display = 'none';
+    showToast('Audio loaded');
+}
+
+function fuRemoveAudio() {
+    fuCurrentFile = null;
+    document.getElementById('fuAudioPreview').style.display = 'none';
+    document.getElementById('fuSpUploadZone').style.display = '';
+    document.getElementById('fuSpFileInput').value = '';
+}
+
+async function fuToggleRecording() {
+    const btn = document.getElementById('fuRecordBtn'), label = document.getElementById('fuRecordLabel'), timer = document.getElementById('fuRecordTimer');
+    if (fuMediaRecorder && fuMediaRecorder.state === 'recording') {
+        fuMediaRecorder.stop(); btn.classList.remove('recording'); btn.textContent = '🎙️'; label.textContent = 'Tap to start recording'; timer.style.display = 'none'; clearInterval(fuTimerInterval);
+        return;
+    }
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 16000, channelCount: 1, echoCancellation: true, noiseSuppression: true } });
+        fuAudioChunks = [];
+        fuMediaRecorder = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm' });
+        fuMediaRecorder.ondataavailable = e => { if (e.data.size > 0) fuAudioChunks.push(e.data); };
+        fuMediaRecorder.onstop = () => { stream.getTracks().forEach(t => t.stop()); const blob = new Blob(fuAudioChunks, { type: 'audio/webm' }); fuLoadAudioFile(new File([blob], 'recording.webm', { type: 'audio/webm' })); showToast('Recording saved'); };
+        fuMediaRecorder.start(100);
+        btn.classList.add('recording'); btn.textContent = '⏹️'; label.textContent = 'Recording… tap to stop';
+        fuRecStartTime = Date.now(); timer.style.display = 'block';
+        fuTimerInterval = setInterval(() => { const s = Math.floor((Date.now() - fuRecStartTime) / 1000); timer.textContent = Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }, 500);
+    } catch { showToast('Microphone access denied'); }
+}
+
+// Fusion HW upload drag/drop
+const fuHwUp = document.getElementById('fuHWUploadArea');
+fuHwUp.addEventListener('dragover', e => { e.preventDefault(); fuHwUp.classList.add('drag-over'); });
+fuHwUp.addEventListener('dragleave', () => fuHwUp.classList.remove('drag-over'));
+fuHwUp.addEventListener('drop', e => { e.preventDefault(); fuHwUp.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f && f.type.startsWith('image/')) { const dt = new DataTransfer(); dt.items.add(f); document.getElementById('fuHWFileInput').files = dt.files; handleFuHWUpload({target:{files:[f],value:'x'}}); } });
+
+// Analyze Fusion
+async function analyzeFusion() {
+    const hasHW = fuStrokes.length > 0;
+    const hasAudio = !!fuCurrentFile;
+    if (!hasHW && !hasAudio) { showToast('Provide at least a drawing or audio'); return; }
+
+    const btn = document.getElementById('fuAnalyzeBtn');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Analyzing with CMAFN&hellip;';
+    document.getElementById('fuResultsContent').innerHTML = '<div style="text-align:center;padding:50px 20px;"><div class="spinner spinner-dark" style="width:36px;height:36px;margin:0 auto 16px;"></div><div class="analysis-progress"><div class="progress-step active"><span class="p-icon">&#9203;</span> Extracting features from inputs...</div><div class="progress-step"><span class="p-icon">&#9711;</span> Running cross-modal attention fusion...</div><div class="progress-step"><span class="p-icon">&#9711;</span> 5-fold ensemble prediction...</div></div></div>';
+
+    const fd = new FormData();
+    if (hasHW) fd.append('image_data', fuCanvas.toDataURL('image/png'));
+    if (hasAudio) {
+        let audioToSend = fuCurrentFile;
+        const ext = fuCurrentFile.name.split('.').pop().toLowerCase();
+        if (ext === 'webm' || ext === 'ogg' || fuCurrentFile.type.includes('webm') || fuCurrentFile.type.includes('ogg')) {
+            audioToSend = await convertToWav(fuCurrentFile);
+        }
+        fd.append('audio_file', audioToSend);
+    }
+
+    try {
+        const res = await fetch('/predict/fusion', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        renderFusionResults(data);
+        showToast('Fusion analysis complete');
+    } catch (err) {
+        document.getElementById('fuResultsContent').innerHTML = '<div class="placeholder" style="color:var(--danger);"><div class="ph-icon">&#9888;&#65039;</div><p><strong>Analysis Failed:</strong> ' + err.message + '</p></div>';
+    } finally { btn.disabled = false; btn.innerHTML = '&#129516; Analyze with CMAFN Fusion'; }
+}
+
+function renderFusionResults(data) {
+    const risk = data.combined_risk, pct = (risk*100).toFixed(1);
+    let color, statusClass, interpClass, interpText;
+    if (risk >= 0.66) { color = 'var(--danger)'; statusClass = 'HIGH'; interpClass = 'interp-high'; interpText = 'The cross-modal fusion model detected <strong>significant Parkinson\'s indicators</strong> across modalities. Consult a neurologist for clinical evaluation.'; }
+    else if (risk >= 0.33) { color = 'var(--warning)'; statusClass = 'MODERATE'; interpClass = 'interp-moderate'; interpText = 'The fusion model found <strong>some potential indicators</strong>. Consider consulting a healthcare professional.'; }
+    else { color = 'var(--success)'; statusClass = 'LOW'; interpClass = 'interp-low'; interpText = 'The cross-modal analysis shows <strong>no significant Parkinson\'s indicators</strong>. Results appear within normal ranges.'; }
+
+    const angle = Math.PI * (1 - risk);
+    const nx = (130 + 110 * Math.cos(angle)).toFixed(1), ny = (140 - 110 * Math.sin(angle)).toFixed(1);
+
+    let html = '<div class="gauge-box"><svg viewBox="0 0 260 160" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gG2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#4caf50"/><stop offset="50%" stop-color="#ff9800"/><stop offset="100%" stop-color="#f44336"/></linearGradient></defs><path d="M 20 140 A 110 110 0 0 1 240 140" fill="none" stroke="#e8f5e9" stroke-width="20" stroke-linecap="round"/><path d="M 20 140 A 110 110 0 0 1 130 30" fill="none" stroke="#fff3e0" stroke-width="20" stroke-linecap="round"/><path d="M 20 140 A 110 110 0 0 0 56 52" fill="none" stroke="#ffebee" stroke-width="20" stroke-linecap="round"/><text x="240" y="158" text-anchor="middle" font-size="9" fill="#2e7d32" font-weight="600">LOW</text><text x="130" y="22" text-anchor="middle" font-size="9" fill="#e65100" font-weight="600">MOD</text><text x="20" y="158" text-anchor="middle" font-size="9" fill="#c62828" font-weight="600">HIGH</text><line x1="130" y1="140" x2="' + nx + '" y2="' + ny + '" stroke="' + color + '" stroke-width="3" stroke-linecap="round"/><circle cx="130" cy="140" r="7" fill="' + color + '"/><circle cx="130" cy="140" r="3" fill="#fff"/></svg><div class="risk-pct" style="color:' + color + '">' + pct + '%</div><div class="risk-label">Fused PD Risk Score (CMAFN)</div><span class="status-badge status-' + statusClass + '">' + data.status + '</span></div>';
+
+    html += '<div class="interpretation ' + interpClass + '">' + interpText + '</div>';
+
+    // Modalities used
+    let modChips = '';
+    if (data.modalities_used) data.modalities_used.forEach(m => { modChips += '<span style="display:inline-block;padding:3px 12px;border-radius:14px;font-size:.7rem;font-weight:600;margin:2px 4px;' + (m === 'handwriting' ? 'background:#eef2ff;color:#4338ca;' : 'background:#ecfdf5;color:#047857;') + '">' + (m === 'handwriting' ? '✏️ Handwriting' : '🎤 Speech') + '</span>'; });
+    html += '<div style="text-align:center;margin:8px 0;">' + modChips + '</div>';
+
+    // Confidence
+    html += '<div class="confidence-section"><div class="confidence-label"><span>Ensemble Confidence</span><span>' + (data.confidence*100).toFixed(1) + '%</span></div><div class="confidence-bar-bg"><div class="confidence-bar" style="width:' + (data.confidence*100) + '%;background:' + color + ';"></div></div></div>';
+
+    // Modality scores
+    html += '<div class="scores"><div class="score-card"><div class="label">&#9997;&#65039; Handwriting</div><div class="val" style="color:' + scoreColor(data.hw_risk) + '">' + (data.hw_risk*100).toFixed(1) + '%</div><div class="model-info">EfficientNet-B4+CBAM+SPP</div></div><div class="score-card"><div class="label">&#127908; Speech Audio</div><div class="val" style="color:' + scoreColor(data.audio_risk) + '">' + (data.audio_risk*100).toFixed(1) + '%</div><div class="model-info">XLS-R+CNN+MFCC+SE</div></div><div class="score-card"><div class="label">&#129516; Fused (CMAFN)</div><div class="val" style="color:' + color + ';font-size:1.5rem;">' + pct + '%</div><div class="model-info">Cross-Modal Attention + GMU</div></div><div class="score-card"><div class="label">Uncertainty</div><div class="val">&pm;' + (data.uncertainty*100).toFixed(1) + '%</div><div class="model-info">Fold standard deviation</div></div></div>';
+
+    // Fold breakdown
+    if (data.fold_predictions && data.fold_predictions.length > 0) {
+        let foldsHTML = '';
+        data.fold_predictions.forEach((p, i) => { const c = p >= 0.66 ? 'var(--danger)' : p >= 0.33 ? 'var(--warning)' : 'var(--success)'; foldsHTML += '<div class="fold-bar-row"><span class="fb-label">Fold ' + (i+1) + '</span><div class="fb-track"><div class="fb-fill" style="width:' + (p*100) + '%;background:' + c + ';"></div></div><span class="fb-val" style="color:' + c + ';">' + (p*100).toFixed(1) + '%</span></div>'; });
+        html += '<div class="fold-section"><div class="fold-title">&#128200; Per-Fold Breakdown (5-Fold Ensemble)</div>' + foldsHTML + '</div>';
+    }
+
+    // Voice features
+    if (data.voice_features) {
+        const vf = data.voice_features;
+        html += '<div class="vf-title">&#128300; Vocal Biomarkers</div><div class="vf-grid">'
+            + '<div class="vf-item"><div class="vf-label">Pitch</div><div class="vf-val">' + vf.mean_pitch + '</div><div class="vf-unit">Hz</div></div>'
+            + '<div class="vf-item"><div class="vf-label">Pitch Std</div><div class="vf-val">' + vf.std_pitch + '</div><div class="vf-unit">Hz</div></div>'
+            + '<div class="vf-item"><div class="vf-label">Jitter</div><div class="vf-val">' + vf.jitter + '%</div><div class="vf-unit">local</div></div>'
+            + '<div class="vf-item"><div class="vf-label">Shimmer</div><div class="vf-val">' + vf.shimmer + '%</div><div class="vf-unit">local</div></div>'
+            + '<div class="vf-item"><div class="vf-label">HNR</div><div class="vf-val">' + vf.hnr + '</div><div class="vf-unit">dB</div></div>'
+            + '</div>';
+    }
+
+    document.getElementById('fuResultsContent').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════
+// Init
+// ═══════════════════════════════════════════
+initCanvas();
+</script>
+</body>
+</html>

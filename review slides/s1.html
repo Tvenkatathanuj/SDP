@@ -1,164 +1,537 @@
-<!DOCTYPE html>
-
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=1280, height=720" name="viewport"/>
-<title>Cover Slide</title>
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
-<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet"/>
-<style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            overflow: hidden;
-        }
-        .slide-container {
-            width: 1280px;
-            height: 720px;
-            display: flex;
-            flex-direction: column;
-            background: #ffffff;
-            position: relative;
-        }
-        .header-bar {
-            background: #1e3a8a;
-            color: white;
-            padding: 20px 60px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .content-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 60px 80px;
-            background: #f8fafc;
-            overflow-y: auto;
-        }
-        .main-title {
-            font-size: 48px;
-            font-weight: 800;
-            color: #1e3a8a;
-            line-height: 1.3;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .subtitle {
-            font-size: 28px;
-            font-weight: 600;
-            color: #3b82f6;
-            text-align: center;
-            margin-bottom: 50px;
-        }
-        .info-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-top: 40px;
-        }
-        .team-section {
-            flex: 1;
-        }
-        .section-title {
-            font-size: 22px;
-            font-weight: 700;
-            color: #1e40af;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .team-member {
-            font-size: 18px;
-            color: #334155;
-            margin-bottom: 10px;
-            padding-left: 10px;
-        }
-        .guide-section {
-            flex: 1;
-            text-align: right;
-        }
-        .guide-name {
-            font-size: 20px;
-            font-weight: 600;
-            color: #1e40af;
-            margin-bottom: 5px;
-        }
-        .footer-bar {
-            background: #1e3a8a;
-            color: white;
-            padding: 15px 60px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .icon-box {
-            width: 50px;
-            height: 50px;
-            background: #3b82f6;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-        }
-        .decorative-line {
-            width: 100px;
-            height: 4px;
-            background: #3b82f6;
-            margin: 20px auto;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Multimodal Parkinson’s Disease Detection — Title Slide</title>
+  <style>
+    /* ============ PPT/EXPORT SAFETY ============ */
+    @page { size: 13.333in 7.5in; margin: 0; } /* 16:9 */
+    html, body { height: 100%; }
+    body { margin: 0; background: #f3f6fb; }
+
+    /* Center on screen, but keep exact slide size for export */
+    .stage{
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+
+    /* Exact 16:9 canvas */
+    .slide{
+      width: 1280px;
+      height: 720px;
+      background: #ffffff;
+      position: relative;
+      overflow: hidden;
+      border-radius: 18px;
+      box-shadow: 0 22px 60px rgba(16, 24, 40, 0.18);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      color: #0f172a;
+    }
+
+    /* If your screen is smaller, scale visually (export still uses 1280×720) */
+    @media (max-width: 1320px){
+      .slide { transform: scale(0.92); transform-origin: top left; }
+    }
+    @media (max-width: 1220px){
+      .slide { transform: scale(0.84); }
+    }
+    @media (max-width: 1120px){
+      .slide { transform: scale(0.76); }
+    }
+
+    /* ============ THEME ============ */
+    :root{
+      --blue-900:#0b2a6f;
+      --blue-700:#1d4ed8;
+      --teal-600:#0f766e;
+      --teal-500:#14b8a6;
+      --slate-900:#0f172a;
+      --slate-700:#334155;
+      --slate-500:#64748b;
+      --line:#e5e7eb;
+      --card:#ffffff;
+      --muted:#f8fafc;
+    }
+
+    /* Background accents (clean, PPT-friendly) */
+    .accent-top{
+      position:absolute; left:0; top:0; right:0; height:10px;
+      background: var(--blue-900);
+    }
+    .accent-rail{
+      position:absolute; left:0; top:0; bottom:0; width:110px;
+      background: var(--blue-900);
+    }
+    .accent-rail::after{
+      content:"";
+      position:absolute; left:0; bottom:0; width:110px; height:180px;
+      background: #1e40af;
+    }
+    .accent-rail::before{
+      content:"";
+      position:absolute; left:0; bottom:0; width:110px; height:85px;
+      background: var(--teal-500);
+      transform: translateY(180px);
+    }
+    .blob-1{
+      position:absolute; right:-170px; top:-160px; width:520px; height:520px;
+      background:#eef2ff;
+      border-radius: 999px;
+    }
+    .blob-2{
+      position:absolute; right:170px; top:210px; width:360px; height:360px;
+      background:#ecfeff;
+      border-radius: 999px;
+    }
+    .base-band{
+      position:absolute; left:110px; right:0; bottom:0; height:150px;
+      background:#f8fafc;
+      border-top: 1px solid #eef2f7;
+    }
+
+    /* Layout grid */
+    .content{
+      position: relative;
+      height: 100%;
+      padding-left: 110px; /* rail */
+      box-sizing: border-box;
+      display: grid;
+      grid-template-rows: 90px 1fr 70px;
+    }
+    .header{
+      padding: 26px 46px 0 46px;
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .row{
+      padding: 8px 46px 0 46px;
+      display:grid;
+      grid-template-columns: 1.65fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* Pills / badges */
+    .pillbar{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+    .pill{
+      display:flex; align-items:center; gap:10px;
+      padding: 10px 14px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,0.9);
+      border-radius: 999px;
+      font-size: 13px;
+      color: var(--slate-700);
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+      white-space: nowrap;
+    }
+    .pill strong{ color: var(--slate-900); font-weight: 700; }
+
+    .tag{
+      display:flex; align-items:center; gap:10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(229,231,235,0.9);
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+    }
+    .tag .t1{ font-size: 13px; font-weight: 800; letter-spacing: .4px; }
+    .tag .t2{ font-size: 11px; color: var(--slate-500); margin-top: 2px; }
+    .tagcol{ display:flex; flex-direction: column; line-height: 1.15; }
+
+    .iconbox{
+      width: 38px; height: 38px; border-radius: 12px;
+      display:grid; place-items:center;
+      color:#fff;
+      flex: 0 0 auto;
+    }
+
+    /* Title block */
+    .kicker{
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2.2px;
+      color: #1e40af;
+      font-weight: 800;
+    }
+    .title{
+      margin-top: 10px;
+      font-family: ui-serif, Georgia, "Times New Roman", Times, serif; /* PPT-safe */
+      font-weight: 800;
+      font-size: 50px;
+      line-height: 1.05;
+      letter-spacing: -0.6px;
+      color: #0b1220;
+    }
+    .subtitle{
+      margin-top: 12px;
+      font-size: 19px;
+      line-height: 1.5;
+      color: var(--slate-700);
+      max-width: 720px;
+    }
+    .subtitle .em1{ font-weight: 800; color: var(--blue-900); }
+    .subtitle .em2{ font-weight: 800; color: var(--teal-600); }
+
+    /* Metric chips */
+    .chips{
+      margin-top: 18px;
+      display:flex; flex-wrap:wrap; gap:10px;
+    }
+    .chip{
+      display:flex; align-items:center; gap:10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #ffffff;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+      font-size: 13px;
+      color: var(--slate-700);
+    }
+    .dot{ width:10px; height:10px; border-radius:999px; }
+    .dot.blue{ background: var(--blue-700); }
+    .dot.teal{ background: var(--teal-500); }
+    .dot.gray{ background: #94a3b8; }
+
+    /* Cards */
+    .card{
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(229,231,235,0.95);
+      border-radius: 18px;
+      box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+    }
+    .card.pad{ padding: 18px; }
+
+    .section-title{
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.6px;
+      color: var(--slate-500);
+      font-weight: 900;
+    }
+
+    /* Authors / guide grid */
+    .authors{
+      margin-top: 22px;
+      padding: 18px;
+    }
+    .authors-grid{
+      margin-top: 10px;
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+    .mini{
+      border: 1px solid #eef2f7;
+      background: #f8fafc;
+      border-radius: 14px;
+      padding: 12px;
+      min-height: 64px;
+    }
+    .mini .name{ font-weight: 800; font-size: 13px; color: #0b1220; }
+    .mini .id{ font-size: 11px; color: var(--slate-500); margin-top: 6px; }
+
+    .side-stack{ display:flex; flex-direction: column; gap: 14px; }
+
+    /* Core idea stepper */
+    .core-head{
+      display:flex; align-items:center; justify-content: space-between; gap: 10px;
+      padding: 16px 16px 10px 16px;
+    }
+    .core-head .label{ font-weight: 900; font-size: 14px; color: #111827; }
+    .core-steps{ padding: 4px 16px 16px 16px; display:flex; flex-direction: column; gap: 10px; }
+    .step{
+      display:grid;
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+      align-items:start;
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid #eef2f7;
+      background: #ffffff;
+    }
+    .step .b{
+      width: 28px; height: 28px; border-radius: 10px;
+      display:grid; place-items:center;
+      border: 1px solid rgba(229,231,235,0.9);
+      background: #f8fafc;
+    }
+    .step .h{ font-weight: 900; font-size: 13px; color:#0b1220; }
+    .step .p{ font-size: 11px; color: var(--slate-500); margin-top: 2px; line-height: 1.35; }
+
+    /* Subtitle card */
+    .subcard{ padding: 16px; }
+    .subtext{
+      margin-top: 10px;
+      font-size: 18px;
+      line-height: 1.25;
+      font-weight: 900;
+      color: #0b1220;
+    }
+    .bullets{
+      margin-top: 12px;
+      display:flex; flex-direction: column; gap: 8px;
+      font-size: 12px;
+      color: var(--slate-700);
+    }
+    .brow{ display:flex; gap: 10px; align-items:flex-start; }
+    .bcheck{
+      width: 18px; height: 18px; border-radius: 6px;
+      background: #ecfeff;
+      border: 1px solid rgba(20,184,166,0.35);
+      display:grid; place-items:center;
+      flex: 0 0 auto;
+    }
+
+    /* Footer */
+    .footer{
+      padding: 0 46px 18px 46px;
+      display:flex;
+      align-items:flex-end;
+      justify-content: space-between;
+      gap: 18px;
+      color: var(--slate-500);
+      font-size: 11px;
+    }
+    .branddots{ display:flex; align-items:center; gap: 8px; }
+    .branddots span{ width:10px; height:10px; border-radius:999px; display:inline-block; }
+    .branddots .d1{ background: var(--blue-900); }
+    .branddots .d2{ background: #1e40af; }
+    .branddots .d3{ background: var(--teal-500); }
+
+    /* Simple inline SVG icons */
+    .svg { width: 16px; height: 16px; display:block; }
+    .svg-lg { width: 18px; height: 18px; }
+  </style>
 </head>
+
 <body>
-<div class="slide-container">
-<div class="header-bar">
-<div>
-<p style="font-size: 16px; font-weight: 600;"><i class="fas fa-university"></i> Department of Computer Science / Engineering</p>
-</div>
-<div>
-<p style="font-size: 14px;">Senior Design Project</p>
-</div>
-</div>
-<div class="content-wrapper">
-<div class="icon-box" style="margin: 0 auto 30px auto;">
-<i class="fas fa-brain"></i>
-</div>
-<p class="main-title">Parkinson's Detection Using Handwriting and Speech</p>
-<div class="decorative-line"></div>
-<p style="font-size: 32px; font-weight: 600; color: #475569; text-align: center; margin-bottom: 10px;">Using Handwriting and Speech Analysis</p>
-<p class="subtitle">Senior Design Project Review-1</p>
-<div class="info-section">
-<div class="team-section">
-<p class="section-title"><i class="fas fa-users"></i> Presented By</p>
-<p class="team-member"><strong>TANGUTURI VENKATA THANUJ</strong>, Reg No: 22BCE20003</p>
-<p class="team-member"><strong>KATAM KRISHNA CHAITANYA</strong>, Reg No: 22BCE7359</p>
-<p class="team-member"><strong>PATHAKUNTLA NARENDAR REDDY</strong>, Reg No: 22BCE7707</p>
-</div>
-<div class="guide-section">
-<p class="section-title" style="justify-content: flex-end;"><i class="fas fa-chalkboard-teacher"></i> Project Guide</p>
-<p class="guide-name">Dr. Rajasekhar Boddu</p>
-<p style="font-size: 16px; color: #64748b;">Associate Professor</p>
-</div>
-</div>
-</div>
-<div class="footer-bar">
-<div>
-<p style="font-size: 14px;"><i class="far fa-calendar-alt"></i> February 3, 2026</p>
-</div>
-<div>
-<p style="font-size: 14px;"><i class="fas fa-map-marker-alt"></i> [University Name]</p>
-</div>
-</div>
-</div>
+  <div class="stage">
+    <div class="slide">
+      <div class="accent-top"></div>
+      <div class="accent-rail"></div>
+      <div class="blob-1"></div>
+      <div class="blob-2"></div>
+      <div class="base-band"></div>
+
+      <div class="content">
+        <!-- HEADER -->
+        <div class="header">
+          <div class="pillbar">
+            <div class="tag">
+              <div class="iconbox" style="background:var(--blue-900)">
+                <!-- brain-ish icon -->
+                <svg class="svg svg-lg" viewBox="0 0 24 24" fill="none">
+                  <path d="M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0 0 6v3a3 3 0 0 0 3 3"
+                        stroke="white" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 0 6v3a3 3 0 0 1-3 3"
+                        stroke="white" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M12 5v14" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="tagcol">
+                <div class="t1" style="color:var(--blue-900)">Biomedical AI</div>
+                <div class="t2">Non-invasive screening</div>
+              </div>
+            </div>
+
+            <div class="tag">
+              <div class="iconbox" style="background:var(--teal-600)">
+                <svg class="svg svg-lg" viewBox="0 0 24 24" fill="none">
+                  <path d="M7 7h10M7 12h10M7 17h10" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M5 6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6z"
+                        stroke="white" stroke-width="2"/>
+                </svg>
+              </div>
+              <div class="tagcol">
+                <div class="t1" style="color:var(--teal-600)">Multimodal Fusion</div>
+                <div class="t2">Handwriting + Speech</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pill">
+            <strong>Parkinson’s Disease Detection</strong>
+          </div>
+        </div>
+
+        <!-- BODY -->
+        <div class="row">
+          <!-- LEFT: TITLE + AUTHORS -->
+          <div>
+            <div class="kicker">IEEE-Style Research Presentation</div>
+            <div class="title">Multimodal Parkinson’s Disease Detection</div>
+            <div class="subtitle">
+              Using <span class="em1">Cross-Modal Attention Fusion</span> of
+              <span class="em2">Handwriting</span> and <span class="em2">Speech</span> biomarkers
+            </div>
+
+            <div class="chips">
+              <div class="chip"><span class="dot blue"></span><strong>96.94%</strong>&nbsp;Accuracy</div>
+              <div class="chip"><span class="dot teal"></span><strong>0.999</strong>&nbsp;AUC–ROC</div>
+              <div class="chip"><span class="dot gray"></span>Real-time Web Screening</div>
+            </div>
+
+            <div class="card authors">
+              <div style="display:flex; gap:16px; align-items:stretch;">
+                <div style="flex:1;">
+                  <div class="section-title">Authors</div>
+                  <div class="authors-grid">
+                    <div class="mini">
+                      <div class="name">Tanguturi Venkata Thanuj</div>
+                      <div class="id">22BCE20003</div>
+                    </div>
+                    <div class="mini">
+                      <div class="name">Katam Krishna Chaitanya</div>
+                      <div class="id">22BCE7359</div>
+                    </div>
+                    <div class="mini">
+                      <div class="name">Pathakuntla Narendar Reddy</div>
+                      <div class="id">22BCE7707</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="width:1px; background:#e5e7eb; margin: 0 4px;"></div>
+
+                <div style="width: 310px;">
+                  <div class="section-title">Guide</div>
+                  <div class="mini" style="background:#eef2ff; border-color:#dbeafe;">
+                    <div class="name" style="color:var(--blue-900)">Dr. Rajasekhar Boddu</div>
+                    <div class="id" style="color:#1e40af">Assistant Professor, CSE</div>
+                  </div>
+
+                  <div class="section-title" style="margin-top:12px;">Institution</div>
+                  <div class="mini" style="background:#ffffff;">
+                    <div class="name">VIT-AP University</div>
+                    <div class="id">Department of Computer Science and Engineering</div>
+                    <div class="id">Amaravati, Andhra Pradesh</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: CORE IDEA + SUBTITLE -->
+          <div class="side-stack">
+            <div class="card">
+              <div class="core-head">
+                <div class="label">Core Idea</div>
+                <div class="iconbox" style="background:var(--blue-900); width:36px; height:36px; border-radius: 12px;">
+                  <svg class="svg svg-lg" viewBox="0 0 24 24" fill="none">
+                    <path d="M7 7h10v10H7V7z" stroke="white" stroke-width="2"/>
+                    <path d="M7 12h10" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M12 7v10" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </div>
+              </div>
+
+              <div class="core-steps">
+                <div class="step">
+                  <div class="b" style="background:#eef2ff;">
+                    <svg class="svg" viewBox="0 0 24 24" fill="none">
+                      <path d="M4 20h16" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round"/>
+                      <path d="M7 17l10-10" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round"/>
+                      <path d="M8.5 8.5l7 7" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="h">Handwriting Biomarkers</div>
+                    <div class="p">Spiral/Wave drawings + 16 spatial features</div>
+                  </div>
+                </div>
+
+                <div class="step">
+                  <div class="b" style="background:#ecfeff;">
+                    <svg class="svg" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 14a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v4a3 3 0 0 0 3 3z"
+                            stroke="#0f766e" stroke-width="2"/>
+                      <path d="M5 11a7 7 0 0 0 14 0" stroke="#0f766e" stroke-width="2" stroke-linecap="round"/>
+                      <path d="M12 18v3" stroke="#0f766e" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="h">Speech Biomarkers</div>
+                    <div class="p">XLS‑R + MFCC + acoustic voice measures</div>
+                  </div>
+                </div>
+
+                <div class="step">
+                  <div class="b">
+                    <svg class="svg" viewBox="0 0 24 24" fill="none">
+                      <path d="M7 7h4v4H7V7zm6 6h4v4h-4v-4z" stroke="#334155" stroke-width="2"/>
+                      <path d="M11 9h2a4 4 0 0 1 4 4v0" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="h">Cross‑Modal Attention</div>
+                    <div class="p">Transformer-based fusion + GMU gating</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card subcard">
+              <div class="section-title">Subtitle</div>
+              <div class="subtext">Non-invasive, real-time PD screening using consumer hardware</div>
+
+              <div class="bullets">
+                <div class="brow">
+                  <div class="bcheck">
+                    <svg class="svg" viewBox="0 0 24 24" fill="none">
+                      <path d="M6 12l4 4 8-8" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <div>Patient-level stratified 5-fold CV</div>
+                </div>
+                <div class="brow">
+                  <div class="bcheck">
+                    <svg class="svg" viewBox="0 0 24 24" fill="none">
+                      <path d="M6 12l4 4 8-8" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <div>Deployable web application pipeline</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Optional mini “demo” placeholder (looks good in PPT) -->
+            <div class="card pad" style="border-style:dashed; background:#ffffff;">
+              <div class="section-title">Optional Visual</div>
+              <div style="margin-top:10px; display:grid; grid-template-columns: 1fr; gap:10px;">
+                <div style="height:86px; border-radius:14px; border:1px solid #eef2f7; background:#f8fafc; display:flex; align-items:center; justify-content:center; color:#64748b; font-size:12px;">
+                  Add screenshot of your web demo / model diagram here
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+          <div style="display:flex; gap:10px; align-items:center;">
+            <span style="width:10px;height:10px;border-radius:999px;background:#94a3b8;display:inline-block;"></span>
+            <span>Prepared for academic presentation • <strong style="color:#334155;">EDIT: course / conference name</strong></span>
+          </div>
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div class="branddots">
+              <span class="d1"></span><span class="d2"></span><span class="d3"></span>
+            </div>
+            <span>VIT‑AP • CSE</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
 </body>
 </html>

@@ -3,318 +3,381 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=1280, height=720" name="viewport"/>
-<title>Software and Hardware Requirements</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    body {
-        font-family: 'Inter', sans-serif;
-        overflow: hidden;
-    }
-    .slide-container {
-        width: 1280px;
-        height: 720px;
-        display: flex;
-        flex-direction: column;
-        background: #ffffff;
-        position: relative;
-    }
-    .header-section {
-        background: #1e3a8a;
-        color: white;
-        padding: 22px 60px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-    .title-text {
-        font-size: 38px;
-        font-weight: 700;
-        letter-spacing: -0.5px;
-    }
-    .content-area {
-        flex: 1;
-        padding: 25px 50px;
-        background: #f8fafc;
-        display: flex;
-        flex-direction: column;
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
-    .section-title {
-        font-size: 22px;
-        font-weight: 700;
-        color: #1e3a8a;
-        margin-bottom: 12px;
-        display: flex;
-        align-items: center;
-    }
-    .section-icon {
-        width: 32px;
-        height: 32px;
-        background: #3b82f6;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 15px;
-        margin-right: 10px;
-    }
-    .bullet-item {
-        display: flex;
-        align-items: flex-start;
-        margin-bottom: 8px;
-        background: white;
-        padding: 10px 16px;
-        border-radius: 6px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        border-left: 3px solid #3b82f6;
-    }
-    .bullet-icon {
-        width: 26px;
-        height: 26px;
-        background: #3b82f6;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 11px;
-        flex-shrink: 0;
-        margin-right: 10px;
-        margin-top: 2px;
-    }
-    .bullet-text {
-        flex: 1;
-        font-size: 14px;
-        line-height: 1.4;
-        color: #334155;
-    }
-    .hardware-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        margin-top: 12px;
-    }
-    .hardware-card {
-        background: white;
-        border-radius: 8px;
-        padding: 14px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-        border-top: 4px solid #3b82f6;
-    }
-    .hardware-card.recommended {
-        border-top-color: #10b981;
-    }
-    .hardware-card.optimal {
-        border-top-color: #8b5cf6;
-    }
-    .card-title {
-        font-size: 15px;
-        font-weight: 700;
-        color: #1e3a8a;
-        margin-bottom: 8px;
-        display: flex;
-        align-items: center;
-    }
-    .card-badge {
-        font-size: 11px;
-        padding: 3px 8px;
-        border-radius: 12px;
-        margin-left: 8px;
-        font-weight: 600;
-    }
-    .badge-min {
-        background: #dbeafe;
-        color: #1e40af;
-    }
-    .badge-rec {
-        background: #d1fae5;
-        color: #065f46;
-    }
-    .badge-opt {
-        background: #ede9fe;
-        color: #5b21b6;
-    }
-    .spec-item {
-        font-size: 12px;
-        color: #475569;
-        margin-bottom: 5px;
-        display: flex;
-        align-items: flex-start;
-    }
-    .spec-label {
-        font-weight: 600;
-        color: #334155;
-        min-width: 60px;
-    }
-    .footer-bar {
-        background: #1e3a8a;
-        padding: 12px 60px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        color: white;
-        font-size: 14px;
-    }
-</style>
+    body { margin: 0; }
+    .slide { width: 1280px; height: 720px; }
+    .font-inter { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    .font-playfair { font-family: "Playfair Display", Georgia, serif; }
+  </style>
 </head>
 <body>
-<div class="slide-container">
-<div class="header-section">
-<div class="title-text">
-<p><i class="fas fa-cog"></i> Software and Hardware Requirements</p>
+<div class="slide font-inter flex bg-white overflow-hidden">
+<!-- Left accent rail -->
+<div class="h-full w-24 flex flex-col">
+<div class="flex-1 bg-blue-900"></div>
+<div class="h-40 bg-blue-700"></div>
+<div class="h-28 bg-teal-500"></div>
 </div>
-<div style="text-align: right;">
-<p style="font-size: 18px; font-weight: 600;">System Specifications</p>
-<p style="font-size: 14px; opacity: 0.9;">Development &amp; Deployment</p>
+<!-- Main -->
+<div class="flex-1 h-full flex flex-col relative">
+<!-- Subtle background shapes -->
+<div class="absolute inset-0 pointer-events-none">
+<div class="absolute -top-28 -right-24 w-96 h-96 rounded-full bg-blue-50"></div>
+<div class="absolute top-44 right-40 w-64 h-64 rounded-full bg-teal-50"></div>
+<div class="absolute bottom-0 right-0 w-full h-36 bg-gray-50"></div>
+<div class="absolute top-0 left-0 w-full h-2 bg-blue-900"></div>
 </div>
+<!-- Header -->
+<div class="relative px-12 pt-10 flex items-start justify-between">
+<div>
+<div class="flex items-center space-x-3">
+<div class="w-11 h-11 rounded-xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-database text-white text-lg"></i>
 </div>
-<div class="content-area">
-<div style="margin-bottom: 18px;">
-<div class="section-title">
-<div class="section-icon">
-<i class="fas fa-code"></i>
-</div>
-<p>Software Requirements</p>
-</div>
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fab fa-python"></i>
-</div>
-<div class="bullet-text">
-<p><strong>Core Frameworks:</strong> Python 3.8+, PyTorch 2.0+, TorchVision/Audio 0.15+</p>
-</div>
-</div>
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fas fa-waveform"></i>
-</div>
-<div class="bullet-text">
-<p><strong>Audio Processing:</strong> Librosa 0.10+, Praat-Parselmouth 0.4+, SoundFile 0.12+</p>
+<div class="flex flex-col">
+<p class="text-xs uppercase tracking-widest text-blue-800 font-semibold">Experimental Setup</p>
+<p class="font-playfair text-4xl text-gray-900 font-bold leading-tight">Datasets</p>
 </div>
 </div>
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fas fa-image"></i>
+<div class="mt-3 flex items-center space-x-2">
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm flex items-center space-x-2">
+<i class="fa-solid fa-user-shield text-blue-800 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Patient-level stratified group 5-fold CV</p>
 </div>
-<div class="bullet-text">
-<p><strong>Image Processing:</strong> OpenCV 4.8+, Pillow 10.0+, Albumentations 1.3+</p>
-</div>
-</div>
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fas fa-chart-line"></i>
-</div>
-<div class="bullet-text">
-<p><strong>ML &amp; Data Science:</strong> Scikit-learn 1.3+, Imbalanced-learn 0.11+ (SMOTE), NumPy, Pandas, SciPy</p>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm flex items-center space-x-2">
+<i class="fa-solid fa-ban text-teal-700 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">No leakage across splits</p>
 </div>
 </div>
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fas fa-tools"></i>
 </div>
-<div class="bullet-text">
-<p><strong>Development Tools:</strong> Jupyter/VS Code, Git, TensorBoard 2.13+, Matplotlib, Seaborn</p>
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm px-5 py-4 w-96">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">At a glance</p>
+<div class="mt-3 grid grid-cols-3 gap-3">
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-3">
+<p class="text-xs text-blue-900 font-semibold">Handwriting</p>
+<p class="text-2xl text-blue-900 font-extrabold mt-1">3,264</p>
+<p class="text-xs text-gray-700 mt-1">images</p>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-3">
+<p class="text-xs text-teal-800 font-semibold">Speech</p>
+<p class="text-2xl text-teal-800 font-extrabold mt-1">831</p>
+<p class="text-xs text-gray-700 mt-1">recordings</p>
+</div>
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-3">
+<p class="text-xs text-gray-900 font-semibold">Participants</p>
+<p class="text-2xl text-gray-900 font-extrabold mt-1">61</p>
+<p class="text-xs text-gray-700 mt-1">patients</p>
 </div>
 </div>
+<div class="mt-3 flex items-center space-x-2 text-xs text-gray-600">
+<i class="fa-solid fa-laptop-medical text-teal-700"></i>
+<p class="text-xs text-gray-600">Designed for scalable screening &amp; repeatable capture</p>
+</div>
+</div>
+</div>
+<!-- Content -->
+<div class="relative flex-1 px-12 pt-8 pb-10 flex">
+<!-- Left: Dataset cards -->
+<div class="flex-1 pr-8 flex flex-col">
+<!-- Handwriting card -->
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-7">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-4">
+<div class="w-12 h-12 rounded-2xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-pen-nib text-white text-xl"></i>
 </div>
 <div>
-<div class="section-title">
-<div class="section-icon">
-<i class="fas fa-server"></i>
-</div>
-<p>Hardware Configurations</p>
-</div>
-<div class="hardware-grid">
-<div class="hardware-card">
-<div class="card-title">
-<p>Minimum</p>
-<span class="card-badge badge-min">Testing</span>
-</div>
-<div class="spec-item">
-<span class="spec-label">CPU:</span>
-<p>i5 8th gen / Ryzen 5</p>
-</div>
-<div class="spec-item">
-<span class="spec-label">RAM:</span>
-<p>16 GB DDR4</p>
-</div>
-<div class="spec-item">
-<span class="spec-label">GPU:</span>
-<p>GTX 1650 (4 GB)</p>
-</div>
-<div class="spec-item">
-<span class="spec-label">Storage:</span>
-<p>256 GB SSD</p>
+<p class="text-sm font-semibold text-gray-800">Handwriting Dataset</p>
+<p class="text-2xl font-extrabold text-gray-900 mt-1">Spiral &amp; Wave Drawings</p>
+<p class="text-sm text-gray-600 mt-2">Balanced classes to support robust evaluation.</p>
 </div>
 </div>
-<div class="hardware-card recommended">
-<div class="card-title">
-<p>Recommended</p>
-<span class="card-badge badge-rec">Training</span>
-</div>
-<div class="spec-item">
-<span class="spec-label">CPU:</span>
-<p>i7/i9 10th+ / Ryzen 7/9</p>
-</div>
-<div class="spec-item">
-<span class="spec-label">RAM:</span>
-<p>32 GB DDR4/DDR5</p>
-</div>
-<div class="spec-item">
-<span class="spec-label">GPU:</span>
-<p>RTX 3060/3070 (12+ GB)</p>
-</div>
-<div class="spec-item">
-<span class="spec-label">Storage:</span>
-<p>512 GB NVMe SSD</p>
+<div class="px-3 py-1 rounded-full bg-blue-50 border border-blue-100">
+<p class="text-xs font-semibold text-blue-900">Computer Vision</p>
 </div>
 </div>
-<div class="hardware-card optimal">
-<div class="card-title">
-<p>Optimal</p>
-<span class="card-badge badge-opt">Large-Scale</span>
+<div class="mt-5 grid grid-cols-4 gap-3">
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Total</p>
+<p class="mt-2 text-2xl font-extrabold text-gray-900">3,264</p>
+<p class="text-xs text-gray-600 mt-1">images</p>
 </div>
-<div class="spec-item">
-<span class="spec-label">CPU:</span>
-<p>Threadripper / Xeon 16+</p>
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
+<p class="text-xs uppercase tracking-widest text-blue-900 font-semibold">HC</p>
+<p class="mt-2 text-2xl font-extrabold text-blue-900">1,632</p>
+<p class="text-xs text-gray-700 mt-1">healthy controls</p>
 </div>
-<div class="spec-item">
-<span class="spec-label">RAM:</span>
-<p>64 GB DDR4/DDR5</p>
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
+<p class="text-xs uppercase tracking-widest text-blue-900 font-semibold">PD</p>
+<p class="mt-2 text-2xl font-extrabold text-blue-900">1,632</p>
+<p class="text-xs text-gray-700 mt-1">Parkinson’s</p>
 </div>
-<div class="spec-item">
-<span class="spec-label">GPU:</span>
-<p>RTX 4090 / A100 (24+ GB)</p>
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Input size</p>
+<p class="mt-2 text-lg font-extrabold text-gray-900">224×224</p>
+<p class="text-xs text-gray-600 mt-1">HW module</p>
+<p class="mt-1 text-lg font-extrabold text-gray-900">336×336</p>
+<p class="text-xs text-gray-600 mt-1">fusion</p>
 </div>
-<div class="spec-item">
-<span class="spec-label">Storage:</span>
-<p>1 TB NVMe SSD</p>
+</div>
+<div class="mt-5 grid grid-cols-3 gap-3">
+<div class="rounded-xl bg-white border border-gray-200 p-4">
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-image text-blue-900"></i>
+<p class="text-xs font-semibold text-gray-900">Inputs</p>
+</div>
+<p class="text-xs text-gray-600 mt-2">Spiral/Wave drawings captured using simple digital/scan inputs.</p>
+</div>
+<div class="rounded-xl bg-white border border-gray-200 p-4">
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-ruler-combined text-gray-700"></i>
+<p class="text-xs font-semibold text-gray-900">Feature engineering</p>
+</div>
+<p class="text-xs text-gray-600 mt-2">16 spatial biomarkers extracted via image processing.</p>
+</div>
+<div class="rounded-xl bg-white border border-gray-200 p-4">
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-check-double text-teal-700"></i>
+<p class="text-xs font-semibold text-gray-900">Use</p>
+</div>
+<p class="text-xs text-gray-600 mt-2">Supports both feature-based MLP and CNN encoder training.</p>
 </div>
 </div>
 </div>
-<div style="margin-top: 15px; background: white; padding: 12px 18px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
-<p style="font-size: 14px; color: #475569;"><i class="fas fa-cloud" style="color: #3b82f6; margin-right: 8px;"></i><strong>Cloud Alternatives:</strong> Google Colab Pro/Pro+ (T4, V100, A100), AWS EC2 (p3.2xlarge, g4dn.xlarge), Azure ML NC-series, Kaggle Notebooks (Free 16 GB GPU)</p>
-</div>
-</div>
-</div>
-<div class="footer-bar">
-<div>
-<p><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>Slide 12</p>
+<!-- Speech card -->
+<div class="mt-5 bg-white border border-gray-200 rounded-2xl shadow-sm p-7">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-4">
+<div class="w-12 h-12 rounded-2xl bg-teal-600 flex items-center justify-center">
+<i class="fa-solid fa-microphone-lines text-white text-xl"></i>
 </div>
 <div>
-<p>Multi-Modal Parkinson's Disease Detection System</p>
+<p class="text-sm font-semibold text-gray-800">Speech Dataset</p>
+<p class="text-2xl font-extrabold text-gray-900 mt-1">Italian Parkinson’s Voice &amp; Speech (IEEE DataPort)</p>
+<p class="text-sm text-gray-600 mt-2">Patient-level grouping is essential to avoid speaker leakage.</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-teal-50 border border-teal-100">
+<p class="text-xs font-semibold text-teal-800">Audio ML</p>
+</div>
+</div>
+<div class="mt-5 grid grid-cols-4 gap-3">
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Total</p>
+<p class="mt-2 text-2xl font-extrabold text-gray-900">831</p>
+<p class="text-xs text-gray-600 mt-1">recordings</p>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-4">
+<p class="text-xs uppercase tracking-widest text-teal-800 font-semibold">Patients</p>
+<p class="mt-2 text-2xl font-extrabold text-teal-800">61</p>
+<p class="text-xs text-gray-700 mt-1">unique speakers</p>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-4">
+<p class="text-xs uppercase tracking-widest text-teal-800 font-semibold">PD vs HC</p>
+<p class="mt-2 text-sm font-bold text-gray-900">24 PD / 37 HC</p>
+<p class="text-xs text-gray-700 mt-1">patients</p>
+</div>
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Audio</p>
+<p class="mt-2 text-sm font-bold text-gray-900">16 kHz</p>
+<p class="text-xs text-gray-600 mt-1">sample rate</p>
+<p class="mt-1 text-sm font-bold text-gray-900">&lt; 8 s</p>
+<p class="text-xs text-gray-600 mt-1">padded/truncated</p>
+</div>
+</div>
+<div class="mt-5 grid grid-cols-3 gap-3">
+<div class="rounded-xl bg-white border border-gray-200 p-4">
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-list-ul text-teal-700"></i>
+<p class="text-xs font-semibold text-gray-900">Tasks included</p>
+</div>
+<p class="text-xs text-gray-600 mt-2">Vowels, diadochokinesis, sentences, prose reading, free speech.</p>
+</div>
+<div class="rounded-xl bg-white border border-gray-200 p-4">
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-layer-group text-gray-700"></i>
+<p class="text-xs font-semibold text-gray-900">Multi-path features</p>
+</div>
+<p class="text-xs text-gray-600 mt-2">XLS-R embeddings + Mel-spectrogram CNN + MFCC + Praat acoustics.</p>
+</div>
+<div class="rounded-xl bg-white border border-gray-200 p-4">
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-shield-heart text-blue-800"></i>
+<p class="text-xs font-semibold text-gray-900">Evaluation integrity</p>
+</div>
+<p class="text-xs text-gray-600 mt-2">Group-stratified 5-fold CV prevents samples from the same speaker appearing in different splits.</p>
 </div>
 </div>
 </div>
+</div>
+<!-- Right: Visual + validation -->
+<div class="w-96 flex flex-col">
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-gray-800">Class balance snapshot</p>
+<div class="w-9 h-9 rounded-xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-chart-pie text-white text-sm"></i>
+</div>
+</div>
+<div class="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-4">
+<div class="h-48">
+<canvas id="datasetChart"></canvas>
+</div>
+<div class="mt-3 grid grid-cols-2 gap-3">
+<div class="rounded-xl bg-white border border-gray-200 p-3">
+<p class="text-xs text-gray-500 font-semibold">Handwriting</p>
+<p class="text-sm text-gray-900 mt-1"><span class="font-extrabold">Balanced</span> (1,632 / 1,632)</p>
+</div>
+<div class="rounded-xl bg-white border border-gray-200 p-3">
+<p class="text-xs text-gray-500 font-semibold">Speech (patients)</p>
+<p class="text-sm text-gray-900 mt-1"><span class="font-extrabold">24 PD</span> / 37 HC</p>
+</div>
+</div>
+</div>
+<div class="mt-4 flex items-center space-x-2 text-xs text-gray-600">
+<i class="fa-solid fa-circle-info text-gray-600"></i>
+<p class="text-xs text-gray-600">Speech recordings are many-to-one per patient; evaluation is grouped by patient.</p>
+</div>
+</div>
+<div class="mt-5 bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-gray-800">Validation protocol</p>
+<div class="w-9 h-9 rounded-xl bg-teal-600 flex items-center justify-center">
+<i class="fa-solid fa-shield text-white text-sm"></i>
+</div>
+</div>
+<div class="mt-4 space-y-3">
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-9 h-9 rounded-xl bg-white border border-blue-100 flex items-center justify-center">
+<i class="fa-solid fa-user-shield text-blue-900"></i>
+</div>
+<div>
+<p class="text-sm font-semibold text-blue-900">Group 5-fold cross-validation</p>
+<p class="text-xs text-blue-900 mt-1">Speaker-level splits prevent identity leakage for speech.</p>
+</div>
+</div>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-9 h-9 rounded-xl bg-white border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-scale-balanced text-teal-700"></i>
+</div>
+<div>
+<p class="text-sm font-semibold text-teal-800">Stratified by class</p>
+<p class="text-xs text-teal-900 mt-1">Maintains PD/HC distribution across folds.</p>
+</div>
+</div>
+</div>
+<div class="rounded-xl bg-gray-900 border border-gray-900 p-4">
+<div class="flex items-start justify-between">
+<div class="pr-3">
+<p class="text-xs uppercase tracking-widest text-gray-300 font-semibold">Why it matters</p>
+<p class="mt-2 text-sm text-gray-100 leading-relaxed">
+                      Patient-level validation improves clinical credibility by ensuring the model generalizes to <span class="font-semibold">unseen patients</span>, not repeated samples.
+                    </p>
+</div>
+<div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center">
+<i class="fa-solid fa-check text-gray-900"></i>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-4 flex items-center space-x-2 text-xs text-gray-500">
+<i class="fa-solid fa-file-lines"></i>
+<p class="text-xs">Next: Training Strategy</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<div class="relative px-12 pb-8 flex items-center justify-between">
+<div class="flex items-center space-x-3 text-gray-500">
+<i class="fa-solid fa-file-lines"></i>
+<p class="text-xs">Multimodal Parkinson’s Disease Detection using Cross-Modal Attention Fusion</p>
+</div>
+<div class="flex items-center space-x-2 bg-white border border-gray-200 rounded-full px-4 py-2 shadow-sm">
+<i class="fa-solid fa-arrow-right text-blue-900 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Next: Training Strategy</p>
+</div>
+</div>
+</div>
+</div>
+<script>
+    const ctx = document.getElementById('datasetChart');
+    const datasetChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Handwriting Images', 'Speech Patients'],
+        datasets: [
+          {
+            label: 'PD',
+            data: [1632, 24],
+            backgroundColor: '#1E3A8A',
+            borderColor: '#1E3A8A',
+            borderWidth: 1,
+            borderRadius: 10,
+            barThickness: 34
+          },
+          {
+            label: 'Healthy Control',
+            data: [1632, 37],
+            backgroundColor: '#14B8A6',
+            borderColor: '#14B8A6',
+            borderWidth: 1,
+            borderRadius: 10,
+            barThickness: 34
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              boxWidth: 14,
+              boxHeight: 14,
+              usePointStyle: true,
+              pointStyle: 'rectRounded',
+              color: '#374151',
+              font: { family: 'Inter', size: 11, weight: '600' }
+            }
+          },
+          tooltip: {
+            backgroundColor: '#111827',
+            titleFont: { family: 'Inter', size: 12, weight: '700' },
+            bodyFont: { family: 'Inter', size: 12, weight: '600' }
+          }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: '#374151', font: { family: 'Inter', size: 11, weight: '600' } }
+          },
+          y: {
+            beginAtZero: true,
+            grid: { color: '#E5E7EB' },
+            ticks: {
+              color: '#6B7280',
+              font: { family: 'Inter', size: 10, weight: '600' },
+              callback: function(value) {
+                if (value >= 1000) return (value/1000) + 'k';
+                return value;
+              }
+            }
+          }
+        }
+      }
+    });
+  </script>
 </body>
 </html>

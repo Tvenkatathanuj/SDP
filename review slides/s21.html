@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<style>
+    body { margin: 0; }
+    .slide { width: 1280px; height: 720px; }
+    .font-inter { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    .font-playfair { font-family: "Playfair Display", Georgia, serif; }
+  </style>
+</head>
+<body>
+<div class="slide font-inter flex bg-white overflow-hidden">
+<!-- Left accent rail -->
+<div class="h-full w-24 flex flex-col">
+<div class="flex-1 bg-blue-900"></div>
+<div class="h-40 bg-blue-700"></div>
+<div class="h-28 bg-teal-500"></div>
+</div>
+<!-- Main -->
+<div class="flex-1 h-full flex flex-col relative">
+<!-- Subtle background shapes (no gradients) -->
+<div class="absolute inset-0 pointer-events-none">
+<div class="absolute -top-28 -right-24 w-96 h-96 rounded-full bg-blue-50"></div>
+<div class="absolute top-44 right-40 w-64 h-64 rounded-full bg-teal-50"></div>
+<div class="absolute bottom-0 right-0 w-full h-36 bg-gray-50"></div>
+<div class="absolute top-0 left-0 w-full h-2 bg-blue-900"></div>
+</div>
+<!-- Header -->
+<div class="relative px-12 pt-10 flex items-start justify-between">
+<div>
+<div class="flex items-center space-x-3">
+<div class="w-11 h-11 rounded-xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-book-open-reader text-white text-lg"></i>
+</div>
+<div class="flex flex-col">
+<p class="text-xs uppercase tracking-widest text-blue-800 font-semibold">References</p>
+<p class="font-playfair text-4xl text-gray-900 font-bold leading-tight">Selected References</p>
+</div>
+</div>
+<div class="mt-3 flex items-center space-x-2">
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm flex items-center space-x-2">
+<i class="fa-solid fa-quote-left text-blue-800 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Key sources used in the methodology</p>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm flex items-center space-x-2">
+<i class="fa-solid fa-shield-check text-teal-700 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">IEEE-style shortlist</p>
+</div>
+</div>
+</div>
+<!-- Quick card -->
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm px-5 py-4 w-96">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Coverage</p>
+<div class="mt-3 grid grid-cols-3 gap-2">
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-3">
+<p class="text-xs text-blue-900 font-semibold">Handwriting</p>
+<p class="text-xs text-gray-700 mt-1">Transfer learning</p>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-3">
+<p class="text-xs text-teal-800 font-semibold">Speech</p>
+<p class="text-xs text-gray-700 mt-1">SSL + XLS-R</p>
+</div>
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-3">
+<p class="text-xs text-gray-900 font-semibold">Training</p>
+<p class="text-xs text-gray-700 mt-1">Augmentation</p>
+</div>
+</div>
+<div class="mt-3 flex items-center space-x-2 text-xs text-gray-600">
+<i class="fa-solid fa-circle-info text-gray-500"></i>
+<p class="text-xs text-gray-600">Full bibliography appears in the paper; this slide highlights foundational works.</p>
+</div>
+</div>
+</div>
+<!-- Content -->
+<div class="relative flex-1 px-12 pt-8 pb-10 flex">
+<!-- Left column: Reference list -->
+<div class="flex-1 pr-8 flex flex-col">
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-7">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-9 h-9 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-list-ol text-gray-700 text-sm"></i>
+</div>
+<div>
+<p class="text-sm font-semibold text-gray-900">Core citations</p>
+<p class="text-xs text-gray-500 mt-0.5">Five references highlighted as requested</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-gray-50 border border-gray-200">
+<p class="text-xs font-semibold text-gray-800">IEEE</p>
+</div>
+</div>
+<div class="mt-6 space-y-4">
+<!-- Ref 1 -->
+<div class="rounded-2xl bg-blue-50 border border-blue-100 p-5">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-4">
+<div class="w-10 h-10 rounded-2xl bg-white border border-blue-100 flex items-center justify-center">
+<i class="fa-solid fa-pen-nib text-blue-900"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-extrabold text-blue-900">Pereira et al., 2018</p>
+<p class="text-sm text-gray-800 mt-1">“Handwriting dynamics assessment for early identification of Parkinson’s disease.”</p>
+<p class="text-xs text-gray-600 mt-1">Artificial Intelligence in Medicine (AIM), 2018</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-blue-100">
+<p class="text-xs font-semibold text-blue-900">Handwriting</p>
+</div>
+</div>
+</div>
+<!-- Ref 2 -->
+<div class="rounded-2xl bg-blue-50 border border-blue-100 p-5">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-4">
+<div class="w-10 h-10 rounded-2xl bg-white border border-blue-100 flex items-center justify-center">
+<i class="fa-solid fa-image text-blue-900"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-extrabold text-blue-900">Diaz et al., 2021</p>
+<p class="text-sm text-gray-800 mt-1">“A transfer learning approach with MobileNetV2 for Parkinson’s disease detection using hand drawings.”</p>
+<p class="text-xs text-gray-600 mt-1">Expert Systems with Applications (ESWA), 2021</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-blue-100">
+<p class="text-xs font-semibold text-blue-900">Transfer learning</p>
+</div>
+</div>
+</div>
+<!-- Ref 3 -->
+<div class="rounded-2xl bg-teal-50 border border-teal-100 p-5">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-4">
+<div class="w-10 h-10 rounded-2xl bg-white border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-wave-square text-teal-700"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-extrabold text-teal-900">Baevski et al., 2020</p>
+<p class="text-sm text-gray-800 mt-1">“wav2vec 2.0: A framework for self-supervised learning of speech representations.”</p>
+<p class="text-xs text-gray-600 mt-1">NeurIPS, 2020</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-teal-100">
+<p class="text-xs font-semibold text-teal-900">Self-supervised</p>
+</div>
+</div>
+</div>
+<!-- Ref 4 -->
+<div class="rounded-2xl bg-teal-50 border border-teal-100 p-5">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-4">
+<div class="w-10 h-10 rounded-2xl bg-white border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-language text-teal-700"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-extrabold text-teal-900">Conneau et al., 2021</p>
+<p class="text-sm text-gray-800 mt-1">“Unsupervised cross-lingual representation learning for speech recognition.”</p>
+<p class="text-xs text-gray-600 mt-1">INTERSPEECH, 2021 (XLS-R)</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-teal-100">
+<p class="text-xs font-semibold text-teal-900">XLS-R</p>
+</div>
+</div>
+</div>
+<!-- Ref 5 -->
+<div class="rounded-2xl bg-gray-50 border border-gray-200 p-5">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-4">
+<div class="w-10 h-10 rounded-2xl bg-white border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-sliders text-gray-800"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-extrabold text-gray-900">Park et al., 2019</p>
+<p class="text-sm text-gray-800 mt-1">“SpecAugment: A simple data augmentation method for automatic speech recognition.”</p>
+<p class="text-xs text-gray-600 mt-1">INTERSPEECH, 2019</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200">
+<p class="text-xs font-semibold text-gray-900">Augmentation</p>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-5 flex items-center justify-between">
+<div class="flex items-center space-x-2 text-xs text-gray-500">
+<i class="fa-solid fa-circle-info"></i>
+<p class="text-xs">Titles and venues are shown to aid quick attribution during presentation.</p>
+</div>
+<div class="flex items-center space-x-2">
+<div class="w-2.5 h-2.5 rounded-full bg-blue-900"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-blue-700"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-teal-500"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right column: Thematic grouping + cue card -->
+<div class="w-96 flex flex-col">
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-gray-900">How these map to our system</p>
+<div class="w-9 h-9 rounded-xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-sitemap text-white text-sm"></i>
+</div>
+</div>
+<div class="mt-5 space-y-3">
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-9 h-9 rounded-xl bg-white border border-blue-100 flex items-center justify-center">
+<i class="fa-solid fa-pen-ruler text-blue-900"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold text-blue-900">Handwriting foundations</p>
+<p class="text-xs text-blue-900 mt-1">Supports spatial biomarkers and transfer learning baselines.</p>
+</div>
+</div>
+<div class="mt-3 flex flex-wrap gap-2">
+<div class="px-3 py-1 rounded-full bg-white border border-blue-100">
+<p class="text-xs font-semibold text-blue-900">Pereira 2018</p>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-blue-100">
+<p class="text-xs font-semibold text-blue-900">Diaz 2021</p>
+</div>
+</div>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-9 h-9 rounded-xl bg-white border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-microphone-lines text-teal-700"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold text-teal-900">Self-supervised speech</p>
+<p class="text-xs text-teal-900 mt-1">Motivates SSL embeddings and multilingual encoders.</p>
+</div>
+</div>
+<div class="mt-3 flex flex-wrap gap-2">
+<div class="px-3 py-1 rounded-full bg-white border border-teal-100">
+<p class="text-xs font-semibold text-teal-900">Baevski 2020</p>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-teal-100">
+<p class="text-xs font-semibold text-teal-900">Conneau 2021</p>
+</div>
+</div>
+</div>
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-9 h-9 rounded-xl bg-white border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-wand-magic-sparkles text-gray-800"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold text-gray-900">Training robustness</p>
+<p class="text-xs text-gray-700 mt-1">Augmentation improves generalization under variability.</p>
+</div>
+</div>
+<div class="mt-3 flex flex-wrap gap-2">
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200">
+<p class="text-xs font-semibold text-gray-900">Park 2019</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-5 bg-white border border-gray-200 rounded-2xl shadow-sm p-6 flex-1">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-gray-900">Presenter cue</p>
+<div class="w-9 h-9 rounded-xl bg-teal-600 flex items-center justify-center">
+<i class="fa-solid fa-note-sticky text-white text-sm"></i>
+</div>
+</div>
+<div class="mt-5 space-y-4">
+<div class="rounded-2xl bg-gray-900 border border-gray-900 p-5">
+<p class="text-xs uppercase tracking-widest text-gray-300 font-semibold">One-line script</p>
+<p class="mt-2 text-sm text-gray-100 leading-relaxed">
+                  These works motivate our choices for <span class="font-semibold">handwriting biomarkers</span>, <span class="font-semibold">self-supervised speech encoders</span> (XLS-R / wav2vec),
+                  and <span class="font-semibold">augmentation</span> (SpecAugment) used in training.
+                </p>
+</div>
+<div class="rounded-2xl bg-white border border-gray-200 p-5">
+<div class="flex items-center justify-between">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Tip</p>
+<div class="px-3 py-1 rounded-full bg-gray-50 border border-gray-200">
+<p class="text-xs font-semibold text-gray-700">Keep it short</p>
+</div>
+</div>
+<p class="mt-2 text-sm text-gray-700 leading-relaxed">
+                  If asked for more details, refer to the paper’s full reference list and dataset citations.
+                </p>
+<div class="mt-3 flex items-center space-x-2 text-xs text-gray-600">
+<i class="fa-solid fa-circle-info text-gray-500"></i>
+<p class="text-xs">This slide is a shortlist, not an exhaustive bibliography.</p>
+</div>
+</div>
+</div>
+<div class="mt-5 flex items-center justify-end">
+<div class="flex items-center space-x-2 bg-white border border-gray-200 rounded-full px-4 py-2 shadow-sm">
+<i class="fa-solid fa-arrow-right text-blue-900 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Next: Thank You</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<div class="relative px-12 pb-8 flex items-center justify-between">
+<div class="flex items-center space-x-3 text-gray-500">
+<i class="fa-solid fa-file-lines"></i>
+<p class="text-xs">Multimodal Parkinson’s Disease Detection using Cross-Modal Attention Fusion</p>
+</div>
+<div class="flex items-center space-x-2">
+<div class="w-2.5 h-2.5 rounded-full bg-blue-900"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-blue-700"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-teal-500"></div>
+<p class="text-xs text-gray-500 ml-2">VIT-AP • CSE</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

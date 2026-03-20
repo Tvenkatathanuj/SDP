@@ -3,158 +3,369 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=1280, height=720" name="viewport"/>
-<title>Conclusion</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    body {
-        font-family: 'Inter', sans-serif;
-        overflow: hidden;
-    }
-    .slide-container {
-        width: 1280px;
-        height: 720px;
-        display: flex;
-        flex-direction: column;
-        background: #ffffff;
-        position: relative;
-    }
-    .header-section {
-        background: #1e3a8a;
-        color: white;
-        padding: 30px 60px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-    .title-text {
-        font-size: 42px;
-        font-weight: 700;
-        letter-spacing: -0.5px;
-    }
-    .content-area {
-        flex: 1;
-        padding: 22px 60px;
-        background: #f8fafc;
-        display: flex;
-        flex-direction: column;
-    }
-    .bullet-item {
-        display: flex;
-        align-items: flex-start;
-        margin-bottom: 11px;
-        background: white;
-        padding: 12px 18px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        border-left: 4px solid #10b981;
-    }
-    .bullet-icon {
-        width: 34px;
-        height: 34px;
-        background: #10b981;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 15px;
-        flex-shrink: 0;
-        margin-right: 16px;
-    }
-    .bullet-text {
-        flex: 1;
-        font-size: 16px;
-        line-height: 1.5;
-        color: #334155;
-    }
-    .footer-bar {
-        background: #1e3a8a;
-        padding: 12px 60px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        color: white;
-        font-size: 14px;
-    }
-</style>
+    body { margin: 0; }
+    .slide { width: 1280px; height: 720px; }
+    .font-inter { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    .font-playfair { font-family: "Playfair Display", Georgia, serif; }
+  </style>
 </head>
 <body>
-<div class="slide-container">
-<div class="header-section">
-<div class="title-text">
-<p><i class="fas fa-flag-checkered"></i> Conclusion</p>
+<div class="slide font-inter flex bg-white overflow-hidden">
+<!-- Left accent rail -->
+<div class="h-full w-24 flex flex-col">
+<div class="flex-1 bg-blue-900"></div>
+<div class="h-40 bg-blue-700"></div>
+<div class="h-28 bg-teal-500"></div>
 </div>
-<div style="text-align: right;">
-<p style="font-size: 18px; font-weight: 600;">Key Achievements &amp; Future Work</p>
-<p style="font-size: 14px; opacity: 0.9;">Senior Design Project</p>
+<!-- Main -->
+<div class="flex-1 h-full flex flex-col relative">
+<!-- Subtle background shapes (no gradients) -->
+<div class="absolute inset-0 pointer-events-none">
+<div class="absolute -top-28 -right-24 w-96 h-96 rounded-full bg-blue-50"></div>
+<div class="absolute top-44 right-40 w-64 h-64 rounded-full bg-teal-50"></div>
+<div class="absolute bottom-0 right-0 w-full h-36 bg-gray-50"></div>
+<div class="absolute top-0 left-0 w-full h-2 bg-blue-900"></div>
 </div>
-</div>
-<div class="content-area">
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fas fa-network-wired"></i>
-</div>
-<div class="bullet-text">
-<p><strong>Multi-modal approach</strong> addresses critical limitations in existing PD detection systems by synergistically combining handwriting (EfficientNet-B4 + SPP + CBAM) and speech (tri-path architecture) analysis for comprehensive symptom coverage</p>
-</div>
-</div>
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fas fa-sitemap"></i>
-</div>
-<div class="bullet-text">
-<p><strong>Attention-based late fusion</strong> adaptively weights modalities per patient, ensuring robustness across diverse symptom presentations and providing superior accuracy compared to single-modality approaches</p>
-</div>
-</div>
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fas fa-chart-line"></i>
-</div>
-<div class="bullet-text">
-<p><strong>SMOTE effectively addresses</strong> severe class imbalance (5.7:1 ratio), generating 332 synthetic Parkinson's samples to prevent majority-class bias while maintaining high PD detection sensitivity</p>
-</div>
-</div>
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fas fa-user-check"></i>
-</div>
-<div class="bullet-text">
-<p><strong>LOPO cross-validation</strong> ensures genuine patient-independent generalization with robust performance on unseen patients, simulating real-world clinical deployment scenarios</p>
-</div>
-</div>
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fas fa-mobile-alt"></i>
-</div>
-<div class="bullet-text">
-<p><strong>Accessible, non-invasive pipeline</strong> using smartphone camera and microphone enables clinical screening, home monitoring, and deployment in resource-limited settings without specialized equipment</p>
-</div>
-</div>
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fas fa-arrow-right"></i>
-</div>
-<div class="bullet-text">
-<p><strong>Next steps:</strong> Extended datasets, prospective clinical trials, explainability enhancements (attention visualization), mobile app development, and integration with clinical decision support systems</p>
-</div>
-</div>
-</div>
-<div class="footer-bar">
+<!-- Header -->
+<div class="relative px-12 pt-10 flex items-start justify-between">
 <div>
-<p><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>Slide 15</p>
+<div class="flex items-center space-x-3">
+<div class="w-11 h-11 rounded-xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-scale-balanced text-white text-lg"></i>
+</div>
+<div class="flex flex-col">
+<p class="text-xs uppercase tracking-widest text-blue-800 font-semibold">Results</p>
+<p class="font-playfair text-4xl text-gray-900 font-bold leading-tight">Performance Comparison</p>
+</div>
+</div>
+<div class="mt-3 flex items-center space-x-2">
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm flex items-center space-x-2">
+<i class="fa-solid fa-link text-blue-800 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Cross-attention learns complementary signals</p>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm flex items-center space-x-2">
+<i class="fa-solid fa-shield-check text-teal-700 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Patient-level 5-fold CV</p>
+</div>
+</div>
+</div>
+<!-- Key takeaway card -->
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm px-5 py-4 w-96">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Key takeaway</p>
+<p class="mt-2 text-sm text-gray-700 leading-relaxed">
+            Multimodal fusion (CMAFN) improves performance by
+            <span class="font-semibold text-gray-900">combining motor biomarkers</span> (handwriting) with
+            <span class="font-semibold text-gray-900">voice biomarkers</span> (speech) through
+            <span class="font-semibold text-gray-900">Transformer-based cross-attention</span>.
+          </p>
+<div class="mt-3 grid grid-cols-3 gap-3">
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-3">
+<p class="text-xs text-blue-900 font-semibold">Best</p>
+<p class="text-xs text-gray-700 mt-1">CMAFN</p>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-3">
+<p class="text-xs text-teal-800 font-semibold">AUC</p>
+<p class="text-xs text-gray-700 mt-1">0.9995</p>
+</div>
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-3">
+<p class="text-xs text-gray-900 font-semibold">Gain</p>
+<p class="text-xs text-gray-700 mt-1">+3.37%*</p>
+</div>
+</div>
+<p class="mt-2 text-xs text-gray-500">
+            *Gain computed vs best unimodal accuracy (93.57% handwriting) from the paper’s reported module results.
+          </p>
+</div>
+</div>
+<!-- Content -->
+<div class="relative flex-1 px-12 pt-6 pb-10 flex">
+<!-- Left column: Charts + stability -->
+<div class="flex-1 pr-8 flex flex-col">
+<!-- Bar chart -->
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-9 h-9 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-chart-column text-gray-700 text-sm"></i>
 </div>
 <div>
-<p>Multi-Modal Parkinson's Disease Detection System</p>
+<p class="text-sm font-semibold text-gray-900">Accuracy by approach</p>
+<p class="text-xs text-gray-500 mt-0.5">Module-level results reported in the paper</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-gray-50 border border-gray-200">
+<p class="text-xs font-semibold text-gray-800">Acc (%)</p>
+</div>
+</div>
+<div class="mt-4" style="height: 210px;">
+<canvas id="accChart"></canvas>
+</div>
+<div class="mt-4 grid grid-cols-3 gap-3">
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
+<p class="text-xs uppercase tracking-widest text-blue-900 font-semibold">Handwriting</p>
+<p class="mt-2 text-2xl font-extrabold text-blue-900">93.57%</p>
+<p class="text-xs text-gray-700 mt-1">AUC 0.985</p>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-4">
+<p class="text-xs uppercase tracking-widest text-teal-800 font-semibold">Speech</p>
+<p class="mt-2 text-2xl font-extrabold text-teal-800">91.70%</p>
+<p class="text-xs text-gray-700 mt-1">AUC 0.971</p>
+</div>
+<div class="rounded-xl bg-gray-900 border border-gray-900 p-4">
+<p class="text-xs uppercase tracking-widest text-gray-300 font-semibold">CMAFN</p>
+<p class="mt-2 text-2xl font-extrabold text-white">96.94%</p>
+<p class="text-xs text-gray-200 mt-1">AUC 0.9995</p>
 </div>
 </div>
 </div>
+<!-- Stability card -->
+<div class="mt-5 bg-white border border-gray-200 rounded-2xl shadow-sm p-6 flex-1">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-9 h-9 rounded-xl bg-teal-600 flex items-center justify-center">
+<i class="fa-solid fa-layer-group text-white text-sm"></i>
+</div>
+<div>
+<p class="text-sm font-semibold text-gray-900">Cross-validation stability (fusion)</p>
+<p class="text-xs text-gray-500 mt-0.5">Balanced Accuracy across 5 folds (paper)</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-teal-50 border border-teal-100">
+<p class="text-xs font-semibold text-teal-800">Mean ± Std</p>
+</div>
+</div>
+<div class="mt-4 grid grid-cols-5 gap-2">
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-3 text-center">
+<p class="text-xs text-gray-500 font-semibold">Fold 1</p>
+<p class="text-base font-extrabold text-gray-900 mt-1">99.10%</p>
+</div>
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-3 text-center">
+<p class="text-xs text-gray-500 font-semibold">Fold 2</p>
+<p class="text-base font-extrabold text-gray-900 mt-1">96.40%</p>
+</div>
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-3 text-center">
+<p class="text-xs text-gray-500 font-semibold">Fold 3</p>
+<p class="text-base font-extrabold text-gray-900 mt-1">99.46%</p>
+</div>
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-3 text-center">
+<p class="text-xs text-gray-500 font-semibold">Fold 4</p>
+<p class="text-base font-extrabold text-gray-900 mt-1">99.82%</p>
+</div>
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-3 text-center">
+<p class="text-xs text-gray-500 font-semibold">Fold 5</p>
+<p class="text-base font-extrabold text-gray-900 mt-1">99.82%</p>
+</div>
+</div>
+<div class="mt-4 rounded-2xl bg-teal-50 border border-teal-100 p-5 flex items-center justify-between">
+<div>
+<p class="text-xs uppercase tracking-widest text-teal-900 font-semibold">Stability summary</p>
+<p class="mt-1 text-2xl font-extrabold text-teal-900">98.92% ± 1.29%</p>
+<p class="text-xs text-teal-900 mt-1">Balanced Accuracy (mean ± std) across folds</p>
+</div>
+<div class="w-12 h-12 rounded-2xl bg-white border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-chart-line text-teal-700 text-xl"></i>
+</div>
+</div>
+<div class="mt-4 flex items-center space-x-2 text-xs text-gray-600">
+<i class="fa-solid fa-circle-info text-gray-500"></i>
+<p class="text-xs text-gray-600">High and consistent fold performance supports generalization under patient-level grouping.</p>
+</div>
+</div>
+</div>
+<!-- Right column: Gains + Sens/Spec + Why cross-attn -->
+<div class="w-96 flex flex-col">
+<!-- Gains -->
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-gray-900">Multimodal gain</p>
+<div class="w-9 h-9 rounded-xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-arrow-trend-up text-white text-sm"></i>
+</div>
+</div>
+<div class="mt-4 rounded-2xl bg-gray-900 border border-gray-900 p-5">
+<p class="text-xs uppercase tracking-widest text-gray-300 font-semibold">Improvement vs best unimodal</p>
+<p class="mt-2 text-4xl font-extrabold text-white">+3.37%</p>
+<p class="mt-1 text-sm text-gray-200">96.94% (CMAFN) vs 93.57% (handwriting)</p>
+</div>
+<div class="mt-4 grid grid-cols-2 gap-3">
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
+<p class="text-xs text-blue-900 font-semibold">vs Handwriting-only</p>
+<p class="mt-2 text-lg font-extrabold text-blue-900">+3.37%</p>
+<p class="text-xs text-gray-700 mt-1">93.57% → 96.94%</p>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-4">
+<p class="text-xs text-teal-800 font-semibold">vs Speech-only</p>
+<p class="mt-2 text-lg font-extrabold text-teal-800">+5.24%</p>
+<p class="text-xs text-gray-700 mt-1">91.70% → 96.94%</p>
+</div>
+</div>
+<div class="mt-4 flex items-center space-x-2 text-xs text-gray-600">
+<i class="fa-solid fa-link text-blue-800"></i>
+<p class="text-xs text-gray-600">Fusion helps when modalities carry orthogonal impairment cues.</p>
+</div>
+</div>
+<!-- Sensitivity / Specificity -->
+<div class="mt-5 bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-gray-900">Clinical-style metrics (fusion)</p>
+<div class="w-9 h-9 rounded-xl bg-teal-600 flex items-center justify-center">
+<i class="fa-solid fa-heart-pulse text-white text-sm"></i>
+</div>
+</div>
+<div class="mt-4 grid grid-cols-2 gap-3">
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
+<p class="text-xs uppercase tracking-widest text-blue-900 font-semibold">PD Recall</p>
+<p class="mt-2 text-2xl font-extrabold text-blue-900">93.88%</p>
+<p class="text-xs text-gray-700 mt-1">Sensitivity</p>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-4">
+<p class="text-xs uppercase tracking-widest text-teal-800 font-semibold">HC Recall</p>
+<p class="mt-2 text-2xl font-extrabold text-teal-800">100.0%</p>
+<p class="text-xs text-gray-700 mt-1">Specificity</p>
+</div>
+</div>
+<div class="mt-3 rounded-2xl bg-gray-50 border border-gray-200 p-4">
+<div class="flex items-center justify-between">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Precision (PD)</p>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200">
+<p class="text-xs font-semibold text-gray-800">Fusion</p>
+</div>
+</div>
+<p class="mt-2 text-2xl font-extrabold text-gray-900">100.0%</p>
+<p class="text-xs text-gray-600 mt-1">Reported overall metrics for CMAFN in the paper</p>
+</div>
+</div>
+<!-- Why cross-attention -->
+<div class="mt-5 bg-white border border-gray-200 rounded-2xl shadow-sm p-6 flex-1">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-gray-900">Why cross-attention helps</p>
+<div class="w-9 h-9 rounded-xl bg-gray-900 flex items-center justify-center">
+<i class="fa-solid fa-diagram-project text-white text-sm"></i>
+</div>
+</div>
+<div class="mt-4 space-y-3">
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-9 h-9 rounded-xl bg-white border border-blue-100 flex items-center justify-center">
+<i class="fa-solid fa-pen-nib text-blue-900"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold text-blue-900">Handwriting captures</p>
+<p class="text-xs text-blue-900 mt-1">Fine motor control degradation (micrographia, tremor cues).</p>
+</div>
+</div>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-9 h-9 rounded-xl bg-white border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-microphone-lines text-teal-700"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold text-teal-800">Speech captures</p>
+<p class="text-xs text-teal-900 mt-1">Voice quality degradation (dysarthria, hypophonia-related cues).</p>
+</div>
+</div>
+</div>
+<div class="rounded-xl bg-gray-900 border border-gray-900 p-4">
+<div class="flex items-start justify-between">
+<div class="pr-3">
+<p class="text-xs uppercase tracking-widest text-gray-300 font-semibold">Cross-modal interaction</p>
+<p class="mt-2 text-sm text-gray-100 leading-relaxed">
+                      Bidirectional attention allows each modality to <span class="font-semibold">query</span> the other,
+                      learning which handwriting patterns correlate with specific speech characteristics.
+                    </p>
+</div>
+<div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center">
+<i class="fa-solid fa-arrows-left-right text-gray-900"></i>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-4 flex items-center space-x-2 text-xs text-gray-500">
+<i class="fa-solid fa-circle-info"></i>
+<p class="text-xs">This design supports robust multimodal screening beyond what each modality achieves alone.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<div class="relative px-12 pb-8 flex items-center justify-between">
+<div class="flex items-center space-x-3 text-gray-500">
+<i class="fa-solid fa-file-lines"></i>
+<p class="text-xs">Multimodal Parkinson’s Disease Detection using Cross-Modal Attention Fusion</p>
+</div>
+<div class="flex items-center space-x-2 bg-white border border-gray-200 rounded-full px-4 py-2 shadow-sm">
+<i class="fa-solid fa-arrow-right text-blue-900 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Next: Key Contributions</p>
+</div>
+</div>
+</div>
+</div>
+<script>
+    const accCtx = document.getElementById('accChart').getContext('2d');
+
+    const labels = ['Handwriting', 'Speech', 'CMAFN (Fusion)'];
+    const acc = [93.57, 91.70, 96.94];
+
+    new Chart(accCtx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Accuracy (%)',
+          data: acc,
+          backgroundColor: [
+            'rgba(30, 58, 138, 0.20)',
+            'rgba(20, 184, 166, 0.20)',
+            'rgba(17, 24, 39, 0.18)'
+          ],
+          borderColor: ['#1E3A8A', '#14B8A6', '#111827'],
+          borderWidth: 1.4,
+          borderRadius: 12,
+          barThickness: 46
+        }]
+      },
+      options: {
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#111827',
+            titleFont: { family: 'Inter', size: 12, weight: '700' },
+            bodyFont: { family: 'Inter', size: 12, weight: '600' },
+            callbacks: {
+              label: function(context) {
+                return ' ' + context.raw.toFixed(2) + '%';
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: '#374151', font: { family: 'Inter', size: 12, weight: '700' } }
+          },
+          y: {
+            min: 88,
+            max: 98,
+            grid: { color: '#E5E7EB' },
+            ticks: {
+              color: '#6B7280',
+              font: { family: 'Inter', size: 11, weight: '600' },
+              callback: function(value) { return value + '%'; }
+            }
+          }
+        }
+      }
+    });
+  </script>
 </body>
 </html>

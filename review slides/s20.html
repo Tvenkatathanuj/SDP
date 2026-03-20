@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<style>
+    body { margin: 0; }
+    .slide { width: 1280px; height: 720px; }
+    .font-inter { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    .font-playfair { font-family: "Playfair Display", Georgia, serif; }
+  </style>
+</head>
+<body>
+<div class="slide font-inter flex bg-white overflow-hidden">
+<!-- Left accent rail -->
+<div class="h-full w-24 flex flex-col">
+<div class="flex-1 bg-blue-900"></div>
+<div class="h-40 bg-blue-700"></div>
+<div class="h-28 bg-teal-500"></div>
+</div>
+<!-- Main -->
+<div class="flex-1 h-full flex flex-col relative">
+<!-- Subtle background shapes (no gradients) -->
+<div class="absolute inset-0 pointer-events-none">
+<div class="absolute -top-28 -right-24 w-96 h-96 rounded-full bg-blue-50"></div>
+<div class="absolute top-44 right-40 w-64 h-64 rounded-full bg-teal-50"></div>
+<div class="absolute bottom-0 right-0 w-full h-36 bg-gray-50"></div>
+<div class="absolute top-0 left-0 w-full h-2 bg-blue-900"></div>
+</div>
+<!-- Header -->
+<div class="relative px-12 pt-10 flex items-start justify-between">
+<div>
+<div class="flex items-center space-x-3">
+<div class="w-11 h-11 rounded-xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-handshake text-white text-lg"></i>
+</div>
+<div class="flex flex-col">
+<p class="text-xs uppercase tracking-widest text-blue-800 font-semibold">Closing</p>
+<p class="font-playfair text-4xl text-gray-900 font-bold leading-tight">Acknowledgments</p>
+</div>
+</div>
+<div class="mt-3 flex items-center space-x-2">
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm flex items-center space-x-2">
+<i class="fa-solid fa-user-tie text-blue-800 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Guide &amp; mentorship</p>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm flex items-center space-x-2">
+<i class="fa-solid fa-building-columns text-teal-700 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Institutional support</p>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm flex items-center space-x-2">
+<i class="fa-solid fa-database text-gray-700 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Datasets &amp; open source</p>
+</div>
+</div>
+</div>
+<!-- Summary card -->
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm px-5 py-4 w-96">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Support pillars</p>
+<div class="mt-3 grid grid-cols-3 gap-2">
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-3">
+<p class="text-xs text-blue-900 font-semibold">Guidance</p>
+<p class="text-xs text-gray-700 mt-1">Research mentoring</p>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-3">
+<p class="text-xs text-teal-800 font-semibold">Resources</p>
+<p class="text-xs text-gray-700 mt-1">Lab &amp; infra</p>
+</div>
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-3">
+<p class="text-xs text-gray-900 font-semibold">Community</p>
+<p class="text-xs text-gray-700 mt-1">Data &amp; tools</p>
+</div>
+</div>
+<div class="mt-3 flex items-center space-x-2 text-xs text-gray-600">
+<i class="fa-solid fa-circle-info text-blue-800"></i>
+<p class="text-xs">Acknowledgments reflect the paper’s stated guide and institution, plus dataset/tool contributors.</p>
+</div>
+</div>
+</div>
+<!-- Body -->
+<div class="relative flex-1 px-12 pt-7 pb-10 flex">
+<!-- Left: Guide + Institution -->
+<div class="flex-1 pr-8 flex flex-col">
+<!-- Guide card -->
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-7">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-2xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-chalkboard-user text-white"></i>
+</div>
+<div>
+<p class="text-sm font-semibold text-gray-900">Guide</p>
+<p class="text-xs text-gray-500 mt-0.5">Academic supervision and feedback</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-blue-50 border border-blue-100">
+<p class="text-xs font-semibold text-blue-900">Mentorship</p>
+</div>
+</div>
+<div class="mt-5 flex items-start space-x-4">
+<div class="w-14 h-14 rounded-2xl bg-gray-50 border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-user-graduate text-gray-700 text-xl"></i>
+</div>
+<div class="flex-1">
+<p class="text-lg font-extrabold text-gray-900">Dr. Rajasekhar Boddu</p>
+<p class="text-sm text-gray-700 mt-1">Assistant Professor, Department of Computer Science and Engineering</p>
+<div class="mt-3 grid grid-cols-3 gap-3">
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-3">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Role</p>
+<p class="text-xs text-gray-800 mt-1 font-semibold">Project Guide</p>
+</div>
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-3">
+<p class="text-xs uppercase tracking-widest text-blue-900 font-semibold">Support</p>
+<p class="text-xs text-gray-800 mt-1 font-semibold">Direction &amp; review</p>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-3">
+<p class="text-xs uppercase tracking-widest text-teal-800 font-semibold">Outcome</p>
+<p class="text-xs text-gray-800 mt-1 font-semibold">Quality &amp; rigor</p>
+</div>
+</div>
+<div class="mt-4 flex items-center space-x-2 text-xs text-gray-600">
+<i class="fa-solid fa-star text-yellow-500"></i>
+<p class="text-xs">Thanks for guidance across model design, validation protocol, and deployment framing.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Institution card -->
+<div class="mt-5 bg-white border border-gray-200 rounded-2xl shadow-sm p-7 flex-1">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-2xl bg-teal-600 flex items-center justify-center">
+<i class="fa-solid fa-building-columns text-white"></i>
+</div>
+<div>
+<p class="text-sm font-semibold text-gray-900">Institutional Support</p>
+<p class="text-xs text-gray-500 mt-0.5">Academic environment and infrastructure</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-teal-50 border border-teal-100">
+<p class="text-xs font-semibold text-teal-800">VIT-AP</p>
+</div>
+</div>
+<div class="mt-5 grid grid-cols-2 gap-4">
+<div class="rounded-2xl bg-gray-50 border border-gray-200 p-5">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-3">
+<div class="w-10 h-10 rounded-2xl bg-white border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-school text-gray-800"></i>
+</div>
+<div>
+<p class="text-sm font-extrabold text-gray-900">VIT-AP University</p>
+<p class="text-xs text-gray-600 mt-1">Academic and research support</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-gray-200">
+<p class="text-xs font-semibold text-gray-700">Campus</p>
+</div>
+</div>
+<div class="mt-4 flex items-center space-x-2 text-xs text-gray-600">
+<i class="fa-solid fa-network-wired text-blue-800"></i>
+<p class="text-xs">Facilities supporting multimodal ML experimentation.</p>
+</div>
+</div>
+<div class="rounded-2xl bg-blue-50 border border-blue-100 p-5">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-3">
+<div class="w-10 h-10 rounded-2xl bg-white border border-blue-100 flex items-center justify-center">
+<i class="fa-solid fa-code text-blue-900"></i>
+</div>
+<div>
+<p class="text-sm font-extrabold text-blue-900">Dept. of CSE</p>
+<p class="text-xs text-blue-900 mt-1">Guidance and technical ecosystem</p>
+</div>
+</div>
+<div class="px-3 py-1 rounded-full bg-white border border-blue-100">
+<p class="text-xs font-semibold text-blue-900">CSE</p>
+</div>
+</div>
+<div class="mt-4 flex items-center space-x-2 text-xs text-blue-900">
+<i class="fa-solid fa-terminal"></i>
+<p class="text-xs">Support for implementation, evaluation, and presentation.</p>
+</div>
+</div>
+</div>
+<div class="mt-5 rounded-2xl bg-white border border-gray-200 p-5">
+<div class="flex items-center justify-between">
+<p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Also appreciated</p>
+<div class="w-9 h-9 rounded-xl bg-gray-900 flex items-center justify-center">
+<i class="fa-solid fa-heart text-white text-sm"></i>
+</div>
+</div>
+<div class="mt-4 grid grid-cols-3 gap-3">
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-4">
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-database text-teal-700 text-sm"></i>
+<p class="text-xs font-semibold text-teal-900">Dataset contributors</p>
+</div>
+<p class="text-xs text-gray-700 mt-2">Thanks to teams providing handwriting and speech datasets used for evaluation.</p>
+</div>
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-cubes text-gray-800 text-sm"></i>
+<p class="text-xs font-semibold text-gray-900">Open-source tools</p>
+</div>
+<p class="text-xs text-gray-700 mt-2">Libraries supporting training, preprocessing, and visualization workflows.</p>
+</div>
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-people-group text-blue-900 text-sm"></i>
+<p class="text-xs font-semibold text-blue-900">Research community</p>
+</div>
+<p class="text-xs text-gray-700 mt-2">Prior work and shared baselines that helped position this study.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: Thank-you panel -->
+<div class="w-96 flex flex-col">
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-gray-900">Thank you</p>
+<div class="w-9 h-9 rounded-xl bg-blue-900 flex items-center justify-center">
+<i class="fa-solid fa-hands-clapping text-white text-sm"></i>
+</div>
+</div>
+<div class="mt-5 rounded-2xl bg-gray-900 border border-gray-900 p-5">
+<p class="text-xs uppercase tracking-widest text-gray-300 font-semibold">With gratitude to</p>
+<p class="mt-2 text-lg font-extrabold text-white leading-snug">Mentors, institution, and the open research ecosystem</p>
+<div class="mt-3 flex items-center space-x-2 text-xs text-gray-200">
+<i class="fa-solid fa-shield-heart"></i>
+<p class="text-xs">Enabling accessible, non-invasive PD screening research</p>
+</div>
+</div>
+<div class="mt-5 space-y-3">
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-10 h-10 rounded-xl bg-white border border-blue-100 flex items-center justify-center">
+<i class="fa-solid fa-user-tie text-blue-900"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold text-blue-900">Dr. Rajasekhar Boddu</p>
+<p class="text-xs text-blue-900 mt-1">Guidance and feedback throughout the project</p>
+</div>
+</div>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-10 h-10 rounded-xl bg-white border border-teal-100 flex items-center justify-center">
+<i class="fa-solid fa-building-columns text-teal-700"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold text-teal-900">VIT-AP University • CSE</p>
+<p class="text-xs text-teal-900 mt-1">Supportive research and learning environment</p>
+</div>
+</div>
+</div>
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+<div class="flex items-start space-x-3">
+<div class="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center">
+<i class="fa-solid fa-database text-gray-800"></i>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold text-gray-900">Dataset &amp; tool contributors</p>
+<p class="text-xs text-gray-700 mt-1">Data availability and open-source libraries made experiments possible</p>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-5 flex items-center space-x-2 text-xs text-gray-600">
+<i class="fa-solid fa-circle-info text-gray-500"></i>
+<p class="text-xs">Next: Selected References</p>
+</div>
+</div>
+<div class="mt-5 bg-white border border-gray-200 rounded-2xl shadow-sm p-6 flex-1">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-gray-900">Project context</p>
+<div class="w-9 h-9 rounded-xl bg-teal-600 flex items-center justify-center">
+<i class="fa-solid fa-file-lines text-white text-sm"></i>
+</div>
+</div>
+<div class="mt-5 space-y-3">
+<div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-stethoscope text-blue-800 text-xs"></i>
+<p class="text-xs font-semibold text-gray-900">Goal</p>
+</div>
+<div class="px-2.5 py-1 rounded-full bg-white border border-gray-200">
+<p class="text-xs font-semibold text-gray-700">Screening</p>
+</div>
+</div>
+<p class="text-xs text-gray-700 mt-2">Non-invasive PD detection using handwriting + speech biomarkers.</p>
+</div>
+<div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-diagram-project text-blue-900 text-xs"></i>
+<p class="text-xs font-semibold text-blue-900">Method</p>
+</div>
+<div class="px-2.5 py-1 rounded-full bg-white border border-blue-100">
+<p class="text-xs font-semibold text-blue-900">CMAFN</p>
+</div>
+</div>
+<p class="text-xs text-gray-700 mt-2">Cross-modal attention learns interactions between modalities.</p>
+</div>
+<div class="rounded-xl bg-teal-50 border border-teal-100 p-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-shield-check text-teal-700 text-xs"></i>
+<p class="text-xs font-semibold text-teal-900">Validation</p>
+</div>
+<div class="px-2.5 py-1 rounded-full bg-white border border-teal-100">
+<p class="text-xs font-semibold text-teal-900">Patient-level CV</p>
+</div>
+</div>
+<p class="text-xs text-gray-700 mt-2">Patient-level stratified 5-fold protocol to prevent data leakage.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<div class="relative px-12 pb-8 flex items-center justify-between">
+<div class="flex items-center space-x-3 text-gray-500">
+<i class="fa-solid fa-file-lines"></i>
+<p class="text-xs">Multimodal Parkinson’s Disease Detection using Cross-Modal Attention Fusion</p>
+</div>
+<div class="flex items-center space-x-2 bg-white border border-gray-200 rounded-full px-4 py-2 shadow-sm">
+<i class="fa-solid fa-arrow-right text-blue-900 text-xs"></i>
+<p class="text-xs text-gray-700 font-semibold">Next: Selected References</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

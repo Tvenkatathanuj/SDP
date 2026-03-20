@@ -1,161 +1,507 @@
-<!DOCTYPE html>
-
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=1280, height=720" name="viewport"/>
-<title>Introduction and Motivation</title>
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
-<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet"/>
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Problem Statement — Slide</title>
+
+  <style>
+    /* ===== PPT/EXPORT SAFE CANVAS ===== */
+    @page { size: 13.333in 7.5in; margin: 0; } /* 16:9 */
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
     body {
-        font-family: 'Inter', sans-serif;
-        overflow: hidden;
+      margin: 0;
+      background: #eef2ff;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      color: #0f172a;
     }
-    .slide-container {
-        width: 1280px;
-        height: 720px;
-        display: flex;
-        flex-direction: column;
-        background: #ffffff;
-        position: relative;
+
+    .stage{
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
     }
-    .header-section {
-        background: #1e3a8a;
-        color: white;
-        padding: 30px 60px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+
+    .slide{
+      width: 1280px;
+      height: 720px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 22px 60px rgba(15, 23, 42, 0.18);
     }
-    .title-text {
-        font-size: 42px;
-        font-weight: 700;
-        letter-spacing: -0.5px;
+
+    /* Optional visual scaling (export remains 1280×720) */
+    @media (max-width: 1320px){ .slide{ transform: scale(.92); transform-origin: top left; } }
+    @media (max-width: 1220px){ .slide{ transform: scale(.84); } }
+
+    :root{
+      --blue-900:#0b2a6f;
+      --blue-700:#1d4ed8;
+      --teal-600:#0f766e;
+      --teal-500:#14b8a6;
+
+      --slate-900:#0f172a;
+      --slate-700:#334155;
+      --slate-500:#64748b;
+
+      --line:#e5e7eb;
+      --muted:#f8fafc;
     }
-    .content-area {
-        flex: 1;
-        padding: 28px 65px;
-        background: #f8fafc;
-        display: flex;
-        flex-direction: column;
-        overflow-y: auto;
+
+    /* ===== BACKGROUND ===== */
+    .topline{ position:absolute; left:0; top:0; right:0; height:10px; background:var(--blue-900); }
+    .rail{ position:absolute; left:0; top:0; bottom:0; width:108px; background:var(--blue-900); }
+    .rail .b1{ position:absolute; left:0; bottom:145px; width:108px; height:165px; background:#1e40af; }
+    .rail .b2{ position:absolute; left:0; bottom:0; width:108px; height:145px; background:var(--teal-500); }
+
+    .blob1{ position:absolute; right:-190px; top:-170px; width:560px; height:560px; background:#eef2ff; border-radius:999px; }
+    .blob2{ position:absolute; right:140px; top:210px; width:360px; height:360px; background:#ecfeff; border-radius:999px; }
+    .baseband{ position:absolute; left:108px; right:0; bottom:0; height:140px; background:#f8fafc; border-top:1px solid #eef2f7; }
+
+    /* ===== LAYOUT GRID (prevents overflow) ===== */
+    .content{
+      position: relative;
+      height: 100%;
+      padding-left: 108px;
+      display: grid;
+      grid-template-rows: 104px 1fr 70px; /* header/body/footer */
     }
-    .bullet-item {
-        display: flex;
-        align-items: flex-start;
-        margin-bottom: 12px;
-        background: white;
-        padding: 13px 18px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        border-left: 4px solid #3b82f6;
+
+    .header{
+      padding: 26px 44px 0 44px;
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 18px;
     }
-    .bullet-icon {
-        width: 38px;
-        height: 38px;
-        background: #3b82f6;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 17px;
-        flex-shrink: 0;
-        margin-right: 18px;
+
+    .body{
+      padding: 10px 44px 0 44px;
+      display: grid;
+      grid-template-columns: 1.7fr 1fr;
+      gap: 18px;
+      align-items: start;
+      min-height: 0;
     }
-    .bullet-text {
-        flex: 1;
-        font-size: 16.5px;
-        line-height: 1.5;
-        color: #334155;
+
+    .footer{
+      padding: 0 44px 18px 44px;
+      display:flex;
+      align-items:flex-end;
+      justify-content: space-between;
+      gap: 14px;
+      color: var(--slate-500);
+      font-size: 11px;
     }
-    .footer-bar {
-        background: #1e3a8a;
-        padding: 12px 60px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        color: white;
-        font-size: 14px;
+
+    /* ===== TYPO / ATOMS ===== */
+    .kicker{
+      font-size: 11px;
+      letter-spacing: 2.4px;
+      text-transform: uppercase;
+      font-weight: 900;
+      color: #1e40af;
     }
-</style>
+    .h1{
+      margin-top: 2px;
+      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+      font-size: 42px;
+      line-height: 1.05;
+      font-weight: 850;
+      letter-spacing: -0.6px;
+      color: #0b1220;
+    }
+
+    .pillrow{ margin-top: 8px; display:flex; gap:10px; flex-wrap:wrap; }
+    .pill{
+      display:flex; align-items:center; gap:8px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 8px 22px rgba(15,23,42,.06);
+      font-size: 12px;
+      font-weight: 750;
+      color: var(--slate-700);
+      white-space: nowrap;
+    }
+    .dot{ width:10px; height:10px; border-radius:999px; display:inline-block; }
+    .dot.blue{ background: var(--blue-700); }
+    .dot.teal{ background: var(--teal-500); }
+    .dot.gray{ background: #94a3b8; }
+
+    .card{
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(229,231,235,.95);
+      border-radius: 16px;
+      box-shadow: 0 14px 40px rgba(15,23,42,.08);
+      overflow: hidden;
+    }
+    .pad{ padding: 14px; }
+
+    .label{
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 900;
+      color: var(--slate-500);
+    }
+    .sectionTitle{
+      font-size: 14px;
+      font-weight: 900;
+      color: #111827;
+    }
+
+    .row2{ display:flex; align-items:center; justify-content: space-between; gap: 10px; }
+    .miniIcon{
+      width: 36px; height: 36px;
+      border-radius: 12px;
+      display:grid; place-items:center;
+      color:#fff;
+      background: var(--blue-900);
+      flex: 0 0 auto;
+    }
+    .svg{ width: 18px; height: 18px; display:block; }
+
+    /* ===== LEFT: CHALLENGES LIST ===== */
+    .list{ margin-top: 10px; display:flex; flex-direction: column; gap: 10px; }
+    .item{
+      display:grid;
+      grid-template-columns: 30px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 10px;
+      border: 1px solid #eef2f7;
+      border-radius: 14px;
+      background: #fff;
+    }
+    .ibox{
+      width: 30px; height: 30px;
+      border-radius: 10px;
+      display:grid; place-items:center;
+      border: 1px solid rgba(229,231,235,.9);
+      background: #f8fafc;
+    }
+    .itH{ font-size: 13px; font-weight: 900; color:#0b1220; }
+    .itP{ margin-top: 2px; font-size: 12px; line-height: 1.35; color: var(--slate-700); }
+
+    /* optional clamp to guarantee no overflow (safe for PPT converters) */
+    .clamp2{
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ===== RIGHT: TWO COMPACT CARDS (no tall stacking) ===== */
+    .right{
+      display:flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .highlightBox{
+      border-radius: 14px;
+      border: 1px solid #dbeafe;
+      background: #eef2ff;
+      padding: 10px;
+    }
+    .hTop{ display:flex; align-items:center; justify-content: space-between; gap: 10px; }
+    .bigNum{ margin-top: 6px; font-size: 22px; font-weight: 1000; letter-spacing: -0.4px; color: var(--blue-900); }
+    .small{ margin-top: 4px; font-size: 11px; line-height: 1.25; color: var(--slate-700); }
+
+    .mustList{ margin-top: 10px; display:flex; flex-direction: column; gap: 8px; }
+    .must{
+      display:grid;
+      grid-template-columns: 26px 1fr;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid #eef2f7;
+      background: #fff;
+    }
+    .mH{ font-size: 12px; font-weight: 900; color:#0b1220; }
+    .mP{ margin-top: 2px; font-size: 11px; line-height: 1.25; color: var(--slate-700); }
+
+    /* ===== “PATH” AS HORIZONTAL STEPPER (fits) ===== */
+    .stepper{
+      margin-top: 10px;
+      display:grid;
+      grid-template-columns: 1fr 44px 1fr 44px 1fr;
+      gap: 10px;
+      align-items:center;
+    }
+    .step{
+      border: 1px solid #eef2f7;
+      background: #fff;
+      border-radius: 14px;
+      padding: 10px;
+      min-height: 62px;
+    }
+    .sH{ font-size: 12px; font-weight: 950; color:#0b1220; }
+    .sP{ margin-top: 2px; font-size: 11px; color: var(--slate-500); }
+    .arrow{
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      background: #f8fafc;
+      display:grid;
+      place-items:center;
+      color: var(--slate-700);
+      font-weight: 1000;
+    }
+
+    /* footer next pill */
+    .next{
+      display:flex; align-items:center; gap:10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 10px 25px rgba(15,23,42,.06);
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--slate-700);
+      white-space: nowrap;
+    }
+  </style>
 </head>
+
 <body>
-<div class="slide-container">
-<div class="header-section">
-<div class="title-text">
-<p><i class="fas fa-lightbulb"></i> INTRODUCTION</p>
-</div>
-<div style="text-align: right;">
-<p style="font-size: 18px; font-weight: 600;">Background & Significance</p>
-<p style="font-size: 14px; opacity: 0.9;">Parkinson's Disease Challenges</p>
-</div>
-</div>
-<div class="content-area">
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fas fa-globe"></i>
-</div>
-<div class="bullet-text">
-<p><strong>Global Impact:</strong> Parkinson's Disease is the second most common neurodegenerative disorder globally, affecting over 10 million people with increasing prevalence due to aging populations.</p>
-</div>
-</div>
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fas fa-user-md"></i>
-</div>
-<div class="bullet-text">
-<p><strong>Diagnostic Challenge:</strong> Early and accurate diagnosis remains challenging as symptoms often manifest subtly in initial stages, and clinical assessment relies heavily on subjective neurological examinations.</p>
-</div>
-</div>
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fas fa-hand-paper"></i>
-</div>
-<div class="bullet-text">
-<p><strong>Motor Symptoms:</strong> Tremor, rigidity, and bradykinesia significantly impact handwriting, causing micrographia (small, cramped writing) and irregular spiral/wave drawings.</p>
-</div>
-</div>
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fas fa-volume-up"></i>
-</div>
-<div class="bullet-text">
-<p><strong>Speech Impairments:</strong> Reduced loudness, monotone voice, and imprecise articulation affect 70-90% of PD patients, providing valuable diagnostic biomarkers.</p>
-</div>
-</div>
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fas fa-robot"></i>
-</div>
-<div class="bullet-text">
-<p><strong>Deep Learning Opportunity:</strong> Recent advances in deep learning and computer vision enable automated analysis of these motor and vocal biomarkers, offering objective, quantitative assessment tools that outperform traditional single-modality methods.</p>
-</div>
-</div>
-<div class="bullet-item">
-<div class="bullet-icon">
-<i class="fas fa-bullseye"></i>
-</div>
-<div class="bullet-text">
-<p><strong>Project Goal:</strong> Develop a state-of-the-art, accessible screening tool to assist clinicians in early PD detection and monitor disease progression over time using complementary handwriting and speech analysis.</p>
-</div>
-</div>
-</div>
-<div class="footer-bar">
-<div>
-<p><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>Slide 3</p>
-</div>
-<div>
-<p>Multi-Modal Parkinson's Disease Detection System</p>
-</div>
-</div>
-</div>
+  <div class="stage">
+    <div class="slide">
+      <div class="topline"></div>
+      <div class="rail"><div class="b1"></div><div class="b2"></div></div>
+      <div class="blob1"></div>
+      <div class="blob2"></div>
+      <div class="baseband"></div>
+
+      <div class="content">
+        <!-- ===== HEADER ===== -->
+        <div class="header">
+          <div>
+            <div class="kicker">Context</div>
+            <div class="h1">Problem Statement</div>
+
+            <div class="pillrow">
+              <div class="pill"><span class="dot blue"></span>Clinical diagnosis is challenging</div>
+              <div class="pill"><span class="dot teal"></span>Need scalable screening</div>
+            </div>
+          </div>
+
+          <div class="card" style="width: 350px;">
+            <div class="pad">
+              <div class="row2">
+                <div class="label">Why early detection matters</div>
+                <div class="miniIcon" style="background:var(--blue-900)">
+                  <svg class="svg" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0 0 6v3a3 3 0 0 0 3 3" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 0 6v3a3 3 0 0 1-3 3" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M12 5v14" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </div>
+              </div>
+
+              <div class="highlightBox" style="margin-top:10px;">
+                <div class="hTop">
+                  <div style="font-size:12px;font-weight:950;color:var(--blue-900);">Neuron loss before symptoms</div>
+                  <div class="ibox" style="width:28px;height:28px;border-radius:10px;background:#fff;border-color:#dbeafe;">
+                    <span class="dot blue" style="width:10px;height:10px;"></span>
+                  </div>
+                </div>
+                <div class="bigNum">~60–80%</div>
+                <div class="small clamp2">Dopaminergic neurons may be lost before motor symptoms are clinically observable.</div>
+              </div>
+
+              <div style="margin-top:10px; display:flex; gap:10px; align-items:flex-start; font-size:12px; color:var(--slate-700);">
+                <div class="ibox" style="width:18px;height:18px;border-radius:6px;background:#ecfeff;border-color:#ccfbf1;"></div>
+                <div class="clamp2"><strong>Current practice:</strong> clinical scales + costly neuroimaging.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== BODY ===== -->
+        <div class="body">
+          <!-- LEFT: CHALLENGES -->
+          <div class="card">
+            <div class="pad">
+              <div class="row2">
+                <div class="sectionTitle">Core challenges in PD screening</div>
+                <div class="ibox" title="info">
+                  <svg class="svg" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 8h.01" stroke="#334155" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M11 12h1v6h-1" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" stroke="#334155" stroke-width="2"/>
+                  </svg>
+                </div>
+              </div>
+
+              <div class="list">
+                <div class="item">
+                  <div class="ibox" style="background:#eef2ff;border-color:#dbeafe;">
+                    <svg class="svg" viewBox="0 0 24 24" fill="none">
+                      <path d="M4 12s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z" stroke="#1d4ed8" stroke-width="2"/>
+                      <path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" stroke="#1d4ed8" stroke-width="2"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="itH">Subjective clinical assessment</div>
+                    <div class="itP clamp2">Clinician observation and rating scales can vary across settings and experts.</div>
+                  </div>
+                </div>
+
+                <div class="item">
+                  <div class="ibox" style="background:#ecfeff;border-color:#ccfbf1;">
+                    <svg class="svg" viewBox="0 0 24 24" fill="none">
+                      <path d="M9 3h6v4H9V3z" stroke="#0f766e" stroke-width="2"/>
+                      <path d="M8 7h8l-1 14H9L8 7z" stroke="#0f766e" stroke-width="2" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="itH">High-cost confirmatory tests</div>
+                    <div class="itP clamp2">Neuroimaging and specialized assessments are expensive and not widely accessible.</div>
+                  </div>
+                </div>
+
+                <div class="item">
+                  <div class="ibox">
+                    <svg class="svg" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 7v5l3 2" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
+                      <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" stroke="#334155" stroke-width="2"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="itH">Late clinical onset</div>
+                    <div class="itP clamp2">Motor symptoms appear after substantial neuron loss, shrinking early intervention time.</div>
+                  </div>
+                </div>
+
+                <div class="item">
+                  <div class="ibox" style="background:#ecfdf5;border-color:#bbf7d0;">
+                    <svg class="svg" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 2l3 7h7l-5.5 4 2 7-6.5-4.3L5.5 20l2-7L2 9h7l3-7z"
+                            stroke="#166534" stroke-width="2" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="itH">Need scalable, low-cost screening</div>
+                    <div class="itP clamp2">Non-invasive, easy capture on consumer hardware, suitable for mass and remote screening.</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center; gap:12px; color:var(--slate-500); font-size:11px;">
+                <div class="clamp2">Motivation: use handwriting (motor) + speech (voice) as accessible biomarkers.</div>
+                <div style="display:flex; gap:8px;">
+                  <span class="dot" style="background:var(--blue-900); width:10px; height:10px;"></span>
+                  <span class="dot" style="background:#1e40af; width:10px; height:10px;"></span>
+                  <span class="dot" style="background:var(--teal-500); width:10px; height:10px;"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: REQUIREMENTS + PATH (compact, fits) -->
+          <div class="right">
+            <div class="card">
+              <div class="pad">
+                <div class="row2">
+                  <div class="sectionTitle">What the solution must achieve</div>
+                  <div class="miniIcon" style="background:var(--blue-900)">
+                    <svg class="svg" viewBox="0 0 24 24" fill="none">
+                      <path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M7 4h10a2 2 0 0 1 2 2v14H5V6a2 2 0 0 1 2-2z" stroke="white" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+
+                <div class="mustList">
+                  <div class="must">
+                    <div class="ibox" style="width:26px;height:26px;border-radius:9px;background:#eef2ff;border-color:#dbeafe;">
+                      <span class="dot blue" style="width:10px;height:10px;"></span>
+                    </div>
+                    <div>
+                      <div class="mH">Non-invasive inputs</div>
+                      <div class="mP clamp2">Handwriting drawings + short speech samples.</div>
+                    </div>
+                  </div>
+
+                  <div class="must">
+                    <div class="ibox" style="width:26px;height:26px;border-radius:9px;background:#ecfeff;border-color:#ccfbf1;">
+                      <span class="dot teal" style="width:10px;height:10px;"></span>
+                    </div>
+                    <div>
+                      <div class="mH">Low cost & accessible</div>
+                      <div class="mP clamp2">Works on consumer devices and supports remote workflows.</div>
+                    </div>
+                  </div>
+
+                  <div class="must" style="background:#eef2ff;border-color:#dbeafe;">
+                    <div class="ibox" style="width:26px;height:26px;border-radius:9px;background:var(--blue-900);border-color:var(--blue-900);">
+                      <span class="dot" style="background:#fff;width:10px;height:10px;"></span>
+                    </div>
+                    <div>
+                      <div class="mH" style="color:var(--blue-900)">Fast & scalable inference</div>
+                      <div class="mP clamp2" style="color:var(--blue-900)">Real-time screening; deployable as a web application.</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="margin-top:12px;">
+                  <div class="label">Path from problem to approach</div>
+                  <div class="stepper">
+                    <div class="step">
+                      <div class="sH">Motor signals</div>
+                      <div class="sP">Handwriting (micrographia)</div>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="step">
+                      <div class="sH">Voice signals</div>
+                      <div class="sP">Speech (dysarthria)</div>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="step" style="background:#0f172a;color:#fff;border-color:#0f172a;">
+                      <div class="sH" style="color:#fff;">Fusion</div>
+                      <div class="sP" style="color:#e2e8f0;">Learn complementary patterns</div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="card" style="border-style:dashed; background:#fff;">
+              <div class="pad">
+                <div class="label">Optional (for PPT)</div>
+                <div style="margin-top:6px; font-size:12px; color:var(--slate-700);">
+                  Add 1-line citation or “dataset summary” here if needed (kept short to avoid overflow).
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <div class="footer">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="dot gray"></span>
+            <span>Multimodal Parkinson’s Disease Detection using Cross-Modal Attention Fusion</span>
+          </div>
+
+          <div class="next">
+            <span class="dot blue"></span>
+            Next: Motivation
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

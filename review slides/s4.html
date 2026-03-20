@@ -1,239 +1,669 @@
-<!DOCTYPE html>
-
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=1280, height=720" name="viewport"/>
-<title>Literature Review: Handwriting-Based PD Detection</title>
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
-<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet"/>
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Motivation — Slide</title>
+
+  <style>
+    /* ===== PPT/EXPORT SAFE ===== */
+    @page { size: 13.333in 7.5in; margin: 0; } /* 16:9 */
+    html, body { height: 100%; }
+    body { margin: 0; background: #eef2ff; }
+
+    /* ===== SCOPE EVERYTHING to avoid merging conflicts ===== */
+    .motivation-slide, .motivation-slide * { box-sizing: border-box; }
+
+    .motivation-slide{
+      width: 1280px;
+      height: 720px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 18px;
+      background: #ffffff;
+      box-shadow: 0 22px 60px rgba(15, 23, 42, 0.18);
+      color: #0f172a;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
     }
-    body {
-        font-family: 'Inter', sans-serif;
-        overflow: hidden;
+
+    :root{
+      --blue-900:#0b2a6f;
+      --blue-700:#1d4ed8;
+      --teal-600:#0f766e;
+      --teal-500:#14b8a6;
+
+      --slate-900:#0f172a;
+      --slate-700:#334155;
+      --slate-500:#64748b;
+
+      --line:#e5e7eb;
+      --muted:#f8fafc;
     }
-    .slide-container {
-        width: 1280px;
-        height: 720px;
-        display: flex;
-        flex-direction: column;
-        background: #ffffff;
-        position: relative;
+
+    /* ===== BACKGROUND ACCENTS ===== */
+    .motivation-slide__topline{
+      position:absolute; left:0; top:0; right:0; height:10px; background:var(--blue-900);
     }
-    .header-section {
-        background: #1e3a8a;
-        color: white;
-        padding: 18px 60px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+    .motivation-slide__rail{
+      position:absolute; left:0; top:0; bottom:0; width:108px; background:var(--blue-900);
     }
-    .title-text {
-        font-size: 38px;
-        font-weight: 700;
-        letter-spacing: -0.5px;
+    .motivation-slide__railB1{ position:absolute; left:0; bottom:145px; width:108px; height:165px; background:#1e40af; }
+    .motivation-slide__railB2{ position:absolute; left:0; bottom:0; width:108px; height:145px; background:var(--teal-500); }
+
+    .motivation-slide__blob1{
+      position:absolute; right:-190px; top:-170px; width:560px; height:560px;
+      background:#eef2ff; border-radius:999px;
     }
-    .content-area {
-        flex: 1;
-        padding: 20px 45px;
-        background: #f8fafc;
-        display: flex;
-        flex-direction: column;
-        overflow: auto;
+    .motivation-slide__blob2{
+      position:absolute; right:140px; top:210px; width:360px; height:360px;
+      background:#ecfeff; border-radius:999px;
     }
-    .table-container {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-        overflow: hidden;
+    .motivation-slide__baseband{
+      position:absolute; left:108px; right:0; bottom:0; height:140px;
+      background:#f8fafc; border-top:1px solid #eef2f7;
     }
-    table {
-        width: 100%;
-        border-collapse: collapse;
+
+    /* ===== MAIN GRID (prevents overflow) ===== */
+    .motivation-slide__content{
+      position: relative;
+      height: 100%;
+      padding-left: 108px;
+      display: grid;
+      grid-template-rows: 104px 1fr 70px; /* header/body/footer */
     }
-    thead {
-        background: #1e3a8a;
-        color: white;
+
+    .motivation-slide__header{
+      padding: 26px 44px 0 44px;
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 16px;
     }
-    th {
-        padding: 10px 14px;
-        text-align: left;
-        font-size: 15px;
-        font-weight: 700;
-        border-bottom: 3px solid #3b82f6;
+    .motivation-slide__body{
+      padding: 10px 44px 0 44px;
+      display:grid;
+      grid-template-columns: 0.95fr 1.35fr;
+      gap: 16px;
+      align-items: start;
+      min-height: 0;
     }
-    th:first-child {
-        width: 50px;
-        text-align: center;
+    .motivation-slide__footer{
+      padding: 0 44px 18px 44px;
+      display:flex;
+      align-items:flex-end;
+      justify-content: space-between;
+      gap: 14px;
+      color: var(--slate-500);
+      font-size: 11px;
     }
-    th:nth-child(2) {
-        width: 40%;
+
+    /* ===== TYPO / ATOMS ===== */
+    .motivation-slide__kicker{
+      font-size: 11px;
+      letter-spacing: 2.4px;
+      text-transform: uppercase;
+      font-weight: 900;
+      color: #1e40af;
     }
-    th:nth-child(3) {
-        width: 25%;
+    .motivation-slide__h1{
+      margin-top: 2px;
+      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+      font-size: 42px;
+      line-height: 1.05;
+      font-weight: 850;
+      letter-spacing: -0.6px;
+      color: #0b1220;
     }
-    th:nth-child(4) {
-        width: 25%;
+
+    .motivation-slide__pillrow{ margin-top: 8px; display:flex; gap:10px; flex-wrap:wrap; }
+    .motivation-slide__pill{
+      display:flex; align-items:center; gap:8px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 8px 22px rgba(15,23,42,.06);
+      font-size: 12px;
+      font-weight: 750;
+      color: var(--slate-700);
+      white-space: nowrap;
     }
-    th:last-child {
-        width: 10%;
-        text-align: center;
+    .motivation-slide__dot{ width:10px; height:10px; border-radius:999px; display:inline-block; }
+    .motivation-slide__dot--blue{ background: var(--blue-700); }
+    .motivation-slide__dot--teal{ background: var(--teal-500); }
+    .motivation-slide__dot--gray{ background:#94a3b8; }
+
+    .motivation-slide__card{
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(229,231,235,.95);
+      border-radius: 16px;
+      box-shadow: 0 14px 40px rgba(15,23,42,.08);
+      overflow: hidden;
     }
-    tbody tr {
-        border-bottom: 1px solid #e2e8f0;
+    .motivation-slide__pad{ padding: 14px; }
+
+    .motivation-slide__label{
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 900;
+      color: var(--slate-500);
     }
-    tbody tr:nth-child(even) {
-        background: #f8fafc;
+    .motivation-slide__sectionTitle{
+      font-size: 14px;
+      font-weight: 900;
+      color: #111827;
     }
-    tbody tr:nth-child(odd) {
-        background: white;
+    .motivation-slide__row2{
+      display:flex; align-items:center; justify-content: space-between; gap: 10px;
     }
-    tbody tr:hover {
-        background: #e0f2fe;
+
+    .motivation-slide__iconBox{
+      width: 36px; height: 36px;
+      border-radius: 12px;
+      display:grid; place-items:center;
+      color:#fff;
+      background: var(--blue-900);
+      flex: 0 0 auto;
     }
-    td {
-        padding: 9px 14px;
-        font-size: 14px;
-        color: #334155;
-        line-height: 1.35;
+    .motivation-slide__svg{ width: 18px; height: 18px; display:block; }
+
+    /* ===== CLAMPS to guarantee no overflow ===== */
+    .motivation-slide__clamp2{
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
-    td:first-child {
-        text-align: center;
-        font-weight: 700;
-        color: #1e40af;
-        font-size: 16px;
+    .motivation-slide__clamp3{
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
-    td:last-child {
-        text-align: center;
-        font-weight: 700;
-        color: #059669;
-        font-size: 17px;
+
+    /* ===== HEADER RIGHT: HYPOTHESIS ===== */
+    .motivation-slide__hypoText{
+      margin-top: 8px;
+      font-size: 12px;
+      line-height: 1.4;
+      color: var(--slate-700);
     }
-    .method-text {
-        font-weight: 600;
-        color: #1e40af;
+    .motivation-slide__mini3{
+      margin-top: 10px;
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
     }
-    .dataset-text {
-        color: #475569;
+    .motivation-slide__mini{
+      border-radius: 14px;
+      border: 1px solid #eef2f7;
+      background: #ffffff;
+      padding: 10px;
+      min-height: 64px;
     }
-    .footer-bar {
-        background: #1e3a8a;
-        padding: 12px 60px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        color: white;
-        font-size: 14px;
+    .motivation-slide__mini strong{
+      display:block;
+      font-size: 11px;
+      color: #0b1220;
+      font-weight: 1000;
     }
-    .subtitle-badge {
-        background: #3b82f6;
-        color: white;
-        padding: 6px 16px;
-        border-radius: 20px;
-        font-size: 14px;
-        font-weight: 600;
+    .motivation-slide__mini span{
+      display:block;
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--slate-500);
+      line-height: 1.2;
     }
-</style>
+    .motivation-slide__mini--blue{ background:#eef2ff; border-color:#dbeafe; }
+    .motivation-slide__mini--teal{ background:#ecfeff; border-color:#ccfbf1; }
+    .motivation-slide__mini--gray{ background:#f8fafc; border-color:#e5e7eb; }
+
+    /* ===== LEFT BODY: TWO MODALITY CARDS ===== */
+    .motivation-slide__stack{ display:flex; flex-direction: column; gap: 12px; min-height:0; }
+    .motivation-slide__bigChip{
+      border-radius: 14px;
+      border: 1px solid #eef2f7;
+      background: #f8fafc;
+      padding: 12px;
+    }
+    .motivation-slide__bigHead{
+      display:flex; align-items:center; justify-content: space-between; gap: 10px;
+    }
+    .motivation-slide__bigLeft{
+      display:flex; align-items:center; gap: 10px;
+    }
+    .motivation-slide__badge{
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      background:#fff;
+      font-size: 11px;
+      font-weight: 1000;
+      white-space: nowrap;
+      color: var(--slate-700);
+    }
+    .motivation-slide__badge--blue{ background:#eef2ff; border-color:#dbeafe; color:var(--blue-900); }
+    .motivation-slide__badge--teal{ background:#ecfeff; border-color:#ccfbf1; color:var(--teal-600); }
+
+    .motivation-slide__bigTitle{
+      font-size: 15px;
+      font-weight: 1000;
+      color: #0b1220;
+      line-height: 1.1;
+    }
+    .motivation-slide__bigSub{
+      margin-top: 2px;
+      font-size: 11px;
+      color: var(--slate-500);
+    }
+    .motivation-slide__grid2{
+      margin-top: 10px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .motivation-slide__tile{
+      border-radius: 14px;
+      border: 1px solid #eef2f7;
+      background:#fff;
+      padding: 10px;
+      min-height: 84px;
+    }
+    .motivation-slide__tileH{
+      font-size: 12px;
+      font-weight: 1000;
+      color: #0b1220;
+    }
+    .motivation-slide__tileP{
+      margin-top: 4px;
+      font-size: 11px;
+      line-height: 1.25;
+      color: var(--slate-700);
+    }
+
+    /* ===== RIGHT BODY: EXPLANATION + TAKEAWAY (height-safe) ===== */
+    .motivation-slide__rightGrid{
+      display:grid;
+      grid-template-rows: auto auto 1fr; /* handwriting, speech, takeaway (fills but stays inside card) */
+      gap: 10px;
+    }
+    .motivation-slide__block{
+      display:grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      align-items:start;
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid #eef2f7;
+      background: #fff;
+    }
+    .motivation-slide__bI{
+      width: 34px; height: 34px;
+      border-radius: 12px;
+      display:grid; place-items:center;
+      border: 1px solid rgba(229,231,235,.9);
+      background: #f8fafc;
+    }
+    .motivation-slide__bH{
+      font-size: 13px;
+      font-weight: 1000;
+      color:#0b1220;
+    }
+    .motivation-slide__bP{
+      margin-top: 2px;
+      font-size: 11px;
+      line-height: 1.25;
+      color: var(--slate-700);
+    }
+    .motivation-slide__chips3{
+      margin-top: 8px;
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+    .motivation-slide__chip{
+      border-radius: 14px;
+      border: 1px solid #eef2f7;
+      background:#f8fafc;
+      padding: 9px 10px;
+      min-height: 56px;
+    }
+    .motivation-slide__chip strong{
+      display:block;
+      font-size: 11px;
+      font-weight: 1000;
+      color:#0b1220;
+    }
+    .motivation-slide__chip span{
+      display:block;
+      margin-top: 3px;
+      font-size: 11px;
+      color: var(--slate-500);
+      line-height: 1.15;
+    }
+    .motivation-slide__chip--blue{ background:#eef2ff; border-color:#dbeafe; }
+    .motivation-slide__chip--teal{ background:#ecfeff; border-color:#ccfbf1; }
+
+    .motivation-slide__takeaway{
+      border-radius: 14px;
+      border: 1px solid #0f172a;
+      background:#0f172a;
+      padding: 12px;
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 110px;
+    }
+    .motivation-slide__takeaway .t1{
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 900;
+      color: #cbd5e1;
+    }
+    .motivation-slide__takeaway .t2{
+      margin-top: 6px;
+      font-size: 16px;
+      font-weight: 1000;
+      color: #ffffff;
+      line-height: 1.15;
+    }
+    .motivation-slide__takeaway .t3{
+      margin-top: 6px;
+      font-size: 11px;
+      line-height: 1.25;
+      color:#e2e8f0;
+    }
+    .motivation-slide__takeIcon{
+      width: 42px; height: 42px;
+      border-radius: 14px;
+      background:#ffffff;
+      display:grid;
+      place-items:center;
+      flex: 0 0 auto;
+    }
+
+    /* ===== FOOTER NAV ===== */
+    .motivation-slide__next{
+      display:flex; align-items:center; gap:10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 10px 25px rgba(15,23,42,.06);
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--slate-700);
+      white-space: nowrap;
+    }
+  </style>
 </head>
+
 <body>
-<div class="slide-container">
-<div class="header-section">
-<div class="title-text">
-<p><i class="fas fa-book-open"></i> Existing Systems: Handwriting-Based PD Detection</p>
-</div>
-<div style="text-align: right;">
-<div class="subtitle-badge">
-<p>Table 1: Literature Survey</p>
-</div>
-</div>
-</div>
-<div class="content-area">
-<div class="table-container">
-<table>
-<thead>
-<tr>
-<th><p>Sl No.</p></th>
-<th><p>Title and Year</p></th>
-<th><p>Methodology</p></th>
-<th><p>Dataset</p></th>
-<th><p>Acc</p></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><p>1</p></td>
-<td><p>Base Paper: "Automated PD Detection using DL on Spiral Drawings" (2023)</p></td>
-<td><p><span class="method-text">ResNet50 + Transfer Learning</span></p></td>
-<td><p><span class="dataset-text">NewHandPD (204 samples)</span></p></td>
-<td><p>87.2%</p></td>
-</tr>
-<tr>
-<td><p>2</p></td>
-<td><p>"CNN-Based Handwriting Analysis for PD Diagnosis" (2024)</p></td>
-<td><p><span class="method-text">EfficientNet-B3 with Data Augmentation</span></p></td>
-<td><p><span class="dataset-text">Custom Dataset (450 images)</span></p></td>
-<td><p>89.5%</p></td>
-</tr>
-<tr>
-<td><p>3</p></td>
-<td><p>"Vision Transformer for Parkinson's Detection from Drawings" (2023)</p></td>
-<td><p><span class="method-text">ViT-Base with Fine-tuning</span></p></td>
-<td><p><span class="dataset-text">PaHaW Dataset</span></p></td>
-<td><p>85.7%</p></td>
-</tr>
-<tr>
-<td><p>4</p></td>
-<td><p>"Ensemble Deep Learning for PD Screening via Handwriting" (2022)</p></td>
-<td><p><span class="method-text">ResNet + VGG + Inception Ensemble</span></p></td>
-<td><p><span class="dataset-text">Combined datasets (600 samples)</span></p></td>
-<td><p>88.8%</p></td>
-</tr>
-<tr>
-<td><p>5</p></td>
-<td><p>"GAN-Augmented Deep Learning for Micrographia Detection" (2023)</p></td>
-<td><p><span class="method-text">StyleGAN2 + DenseNet121</span></p></td>
-<td><p><span class="dataset-text">Synthetic + Real (800 images)</span></p></td>
-<td><p>86.4%</p></td>
-</tr>
-<tr>
-<td><p>6</p></td>
-<td><p>"Attention-Based CNN for Spiral Drawing Analysis" (2024)</p></td>
-<td><p><span class="method-text">Custom CNN with Spatial Attention</span></p></td>
-<td><p><span class="dataset-text">NewHandPD + PaHaW</span></p></td>
-<td><p>90.1%</p></td>
-</tr>
-<tr>
-<td><p>7</p></td>
-<td><p>"Multi-Task Learning for PD Severity Assessment" (2022)</p></td>
-<td><p><span class="method-text">MTL-CNN (Classification + Regression)</span></p></td>
-<td><p><span class="dataset-text">Clinical Dataset (380 samples)</span></p></td>
-<td><p>84.6%</p></td>
-</tr>
-<tr>
-<td><p>8</p></td>
-<td><p>"Explainable AI for Handwriting-Based PD Detection" (2023)</p></td>
-<td><p><span class="method-text">ResNet34 + GradCAM Visualization</span></p></td>
-<td><p><span class="dataset-text">NewHandPD</span></p></td>
-<td><p>87.8%</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="footer-bar">
-<div>
-<p><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>Slide 4</p>
-</div>
-<div>
-<p>Multi-Modal Parkinson's Disease Detection System</p>
-</div>
-</div>
-</div>
+  <div class="motivation-slide">
+    <div class="motivation-slide__topline"></div>
+    <div class="motivation-slide__rail">
+      <div class="motivation-slide__railB1"></div>
+      <div class="motivation-slide__railB2"></div>
+    </div>
+    <div class="motivation-slide__blob1"></div>
+    <div class="motivation-slide__blob2"></div>
+    <div class="motivation-slide__baseband"></div>
+
+    <div class="motivation-slide__content">
+
+      <!-- ===== HEADER ===== -->
+      <div class="motivation-slide__header">
+        <div>
+          <div class="motivation-slide__kicker">Rationale</div>
+          <div class="motivation-slide__h1">Motivation</div>
+
+          <div class="motivation-slide__pillrow">
+            <div class="motivation-slide__pill">
+              <span class="motivation-slide__dot motivation-slide__dot--blue"></span>
+              Motor impairment → handwriting
+            </div>
+            <div class="motivation-slide__pill">
+              <span class="motivation-slide__dot motivation-slide__dot--teal"></span>
+              Voice impairment → speech
+            </div>
+          </div>
+        </div>
+
+        <div class="motivation-slide__card" style="width: 410px;">
+          <div class="motivation-slide__pad">
+            <div class="motivation-slide__row2">
+              <div class="motivation-slide__label">Hypothesis</div>
+              <div class="motivation-slide__iconBox">
+                <svg class="motivation-slide__svg" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 3a7 7 0 0 0-4 12v3h8v-3a7 7 0 0 0-4-12z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                  <path d="M9 21h6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="motivation-slide__hypoText motivation-slide__clamp3">
+              <strong style="color:#0b1220;">Fusing handwriting + speech</strong> learns complementary biomarkers and improves
+              screening accuracy versus unimodal models.
+            </div>
+
+            <div class="motivation-slide__mini3">
+              <div class="motivation-slide__mini motivation-slide__mini--blue">
+                <strong>Accessible</strong><span>Consumer hardware</span>
+              </div>
+              <div class="motivation-slide__mini motivation-slide__mini--teal">
+                <strong>Non-invasive</strong><span>Low friction tests</span>
+              </div>
+              <div class="motivation-slide__mini motivation-slide__mini--gray">
+                <strong>Scalable</strong><span>Web deployment</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== BODY ===== -->
+      <div class="motivation-slide__body">
+        <!-- LEFT: modalities -->
+        <div class="motivation-slide__card">
+          <div class="motivation-slide__pad">
+            <div class="motivation-slide__row2">
+              <div class="motivation-slide__sectionTitle">Two modalities capture different symptoms</div>
+              <div class="motivation-slide__iconBox">
+                <svg class="motivation-slide__svg" viewBox="0 0 24 24" fill="none">
+                  <path d="M10 14a3 3 0 0 1 0-4l1-1a3 3 0 0 1 4 0" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M14 10a3 3 0 0 1 0 4l-1 1a3 3 0 0 1-4 0" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="motivation-slide__stack" style="margin-top:10px;">
+
+              <!-- Handwriting -->
+              <div class="motivation-slide__bigChip">
+                <div class="motivation-slide__bigHead">
+                  <div class="motivation-slide__bigLeft">
+                    <div class="motivation-slide__iconBox" style="background:#1e40af;">
+                      <svg class="motivation-slide__svg" viewBox="0 0 24 24" fill="none">
+                        <path d="M4 20h16" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M7 16l10-10" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M8.5 8.5l7 7" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <div class="motivation-slide__bigTitle">Handwriting</div>
+                      <div class="motivation-slide__bigSub">Spiral / wave drawings</div>
+                    </div>
+                  </div>
+                  <div class="motivation-slide__badge motivation-slide__badge--blue">Motor</div>
+                </div>
+
+                <div class="motivation-slide__grid2">
+                  <div class="motivation-slide__tile">
+                    <div class="motivation-slide__tileH">Micrographia cues</div>
+                    <div class="motivation-slide__tileP motivation-slide__clamp2">
+                      Smaller strokes and reduced consistency can indicate fine motor degradation.
+                    </div>
+                  </div>
+                  <div class="motivation-slide__tile">
+                    <div class="motivation-slide__tileH">Tremor / irregularity</div>
+                    <div class="motivation-slide__tileP motivation-slide__clamp2">
+                      Jaggedness and variability appear in contours and curvature stability.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Speech -->
+              <div class="motivation-slide__bigChip">
+                <div class="motivation-slide__bigHead">
+                  <div class="motivation-slide__bigLeft">
+                    <div class="motivation-slide__iconBox" style="background:var(--teal-600);">
+                      <svg class="motivation-slide__svg" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 14a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v4a3 3 0 0 0 3 3z" stroke="white" stroke-width="2"/>
+                        <path d="M5 11a7 7 0 0 0 14 0" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M12 18v3" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <div class="motivation-slide__bigTitle">Speech</div>
+                      <div class="motivation-slide__bigSub">16 kHz, &lt; 8 seconds</div>
+                    </div>
+                  </div>
+                  <div class="motivation-slide__badge motivation-slide__badge--teal">Voice</div>
+                </div>
+
+                <div class="motivation-slide__grid2">
+                  <div class="motivation-slide__tile">
+                    <div class="motivation-slide__tileH">Voice quality</div>
+                    <div class="motivation-slide__tileP motivation-slide__clamp2">
+                      Jitter, shimmer, and HNR reflect dysarthria / hypophonia patterns.
+                    </div>
+                  </div>
+                  <div class="motivation-slide__tile">
+                    <div class="motivation-slide__tileH">Spectral dynamics</div>
+                    <div class="motivation-slide__tileP motivation-slide__clamp2">
+                      MFCC and embeddings capture articulation, prosody, and pitch dynamics.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; color:var(--slate-500); font-size:11px;">
+                <div class="motivation-slide__clamp2">Easy to capture repeatedly for remote screening.</div>
+                <div style="display:flex; gap:8px;">
+                  <span class="motivation-slide__dot" style="background:var(--blue-900)"></span>
+                  <span class="motivation-slide__dot" style="background:#1e40af"></span>
+                  <span class="motivation-slide__dot" style="background:var(--teal-500)"></span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: why it works + takeaway -->
+        <div class="motivation-slide__card">
+          <div class="motivation-slide__pad">
+            <div class="motivation-slide__row2">
+              <div class="motivation-slide__sectionTitle">Why these signals work for early screening</div>
+              <div class="motivation-slide__iconBox" style="background:#334155;">
+                <svg class="motivation-slide__svg" viewBox="0 0 24 24" fill="none">
+                  <path d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16z" stroke="white" stroke-width="2"/>
+                  <path d="M21 21l-4.3-4.3" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="motivation-slide__rightGrid" style="margin-top:10px;">
+
+              <!-- Handwriting block -->
+              <div class="motivation-slide__block">
+                <div class="motivation-slide__bI" style="background:#eef2ff;border-color:#dbeafe;">
+                  <span class="motivation-slide__dot motivation-slide__dot--blue" style="width:10px;height:10px;"></span>
+                </div>
+                <div>
+                  <div class="motivation-slide__bH">Handwriting reflects fine motor control</div>
+                  <div class="motivation-slide__bP motivation-slide__clamp3">
+                    PD can change stroke consistency and curvature stability. Spiral/wave drawings plus engineered spatial biomarkers
+                    quantify these effects.
+                  </div>
+
+                  <div class="motivation-slide__chips3">
+                    <div class="motivation-slide__chip motivation-slide__chip--blue">
+                      <strong>Stroke width</strong><span>mean / std</span>
+                    </div>
+                    <div class="motivation-slide__chip motivation-slide__chip--blue">
+                      <strong>Curvature</strong><span>direction changes</span>
+                    </div>
+                    <div class="motivation-slide__chip motivation-slide__chip--blue">
+                      <strong>Complexity</strong><span>entropy / fractal</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Speech block -->
+              <div class="motivation-slide__block">
+                <div class="motivation-slide__bI" style="background:#ecfeff;border-color:#ccfbf1;">
+                  <span class="motivation-slide__dot motivation-slide__dot--teal" style="width:10px;height:10px;"></span>
+                </div>
+                <div>
+                  <div class="motivation-slide__bH">Speech captures vocal & articulation impairment</div>
+                  <div class="motivation-slide__bP motivation-slide__clamp3">
+                    Speech changes can appear in voice quality and pitch dynamics. Combining self-supervised embeddings with
+                    spectral + acoustic measures improves robustness.
+                  </div>
+
+                  <div class="motivation-slide__chips3">
+                    <div class="motivation-slide__chip motivation-slide__chip--teal">
+                      <strong>Embeddings</strong><span>XLS‑R</span>
+                    </div>
+                    <div class="motivation-slide__chip motivation-slide__chip--teal">
+                      <strong>Spectral</strong><span>Mel / MFCC</span>
+                    </div>
+                    <div class="motivation-slide__chip motivation-slide__chip--teal">
+                      <strong>Acoustic</strong><span>Praat stats</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Takeaway (kept compact so it never pushes footer out) -->
+              <div class="motivation-slide__takeaway">
+                <div style="min-width:0;">
+                  <div class="t1">Takeaway</div>
+                  <div class="t2 motivation-slide__clamp2">Multimodal fusion reduces ambiguity by combining orthogonal symptom signals.</div>
+                  <div class="t3 motivation-slide__clamp3">
+                    Handwriting emphasizes <strong>motor control</strong>; speech emphasizes <strong>voice quality</strong>.
+                    This motivates <strong>cross‑modal attention fusion</strong>.
+                  </div>
+                </div>
+                <div class="motivation-slide__takeIcon" aria-hidden="true">
+                  <span class="motivation-slide__dot" style="background:#0f172a; width:12px;height:12px;"></span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== FOOTER ===== -->
+      <div class="motivation-slide__footer">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="motivation-slide__dot motivation-slide__dot--gray"></span>
+          <span>Multimodal Parkinson’s Disease Detection using Cross‑Modal Attention Fusion</span>
+        </div>
+        <div class="motivation-slide__next">
+          <span class="motivation-slide__dot motivation-slide__dot--blue"></span>
+          Next: Objectives
+        </div>
+      </div>
+
+    </div>
+  </div>
 </body>
 </html>
