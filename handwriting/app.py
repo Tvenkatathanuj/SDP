@@ -1,16 +1,28 @@
 """
-Parkinson's Disease Handwriting Detection — Live Web App
+Parkinson's Disease Handwriting Detection — Live Translate Web App
 =================================================================
 Ensemble: 5x Residual-MLP (16 biomarkers) + 5x EfficientNet-B0+CBAM
          + Stacking Meta-Learner (LogisticRegression)
 Results: 93.57% accuracy | 0.9851 AUC-ROC (5-fold CV)
 
-Deploy on Render: gunicorn app:app --bind 0.0.0.0:$PORT --timeout 180 --workers 1 --preload
+Deploy on Render: gunicorn app:app --bind 0.0.0.0:$PORT --timeout 120
+
+CHANGES (v3):
+  - Validation is now WARNING-ONLY. No image is ever rejected with 422.
+    Every image gets a prediction. Suspicious inputs get a warning flag
+    and confidence="low" so the frontend can show a notice.
+  - Fixed 0.0% display bug: combined_risk is always a valid float in
+    [0, 1]. NaN/Inf from extreme feature values are clamped before
+    they reach the models. predict_mlp / predict_cnn return 0.5 as
+    a safe fallback if no model weights are loaded.
+  - Loosened all quality thresholds to avoid false positives on
+    genuine handwriting (light pen, dark scan, high DPI, etc.).
+  - try/except around entire inference path — server never crashes on
+    a bad image, returns a clean 500 JSON instead.
 """
 
 import os
 import io
-import gc
 import base64
 import pickle
 import warnings
@@ -26,34 +38,8 @@ from flask import Flask, render_template, request, jsonify
 
 warnings.filterwarnings("ignore")
 
-DEVICE = torch.device("cpu")
+DEVICE  = torch.device("cpu")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# ── Reduce CPU threads to stay inside Render free-tier RAM ──────────────────
-torch.set_num_threads(1)
-os.environ.setdefault("OMP_NUM_THREADS", "1")
-os.environ.setdefault("MKL_NUM_THREADS", "1")
-
-
-def _find_model_files():
-    """
-    FIX 1: Search multiple locations for .pth/.pkl files.
-    Render clones the whole repo — files may be in a subfolder like 'handwriting/'.
-    """
-    search_dirs = [
-        BASE_DIR,
-        os.path.join(BASE_DIR, "handwriting"),
-        os.path.join(BASE_DIR, "models"),
-        os.path.join(BASE_DIR, ".."),
-        os.path.join(BASE_DIR, "..", "handwriting"),
-    ]
-    for d in search_dirs:
-        d = os.path.abspath(d)
-        if os.path.isdir(d) and os.path.exists(os.path.join(d, "scaler.pkl")):
-            print(f"  [*] Found model files in: {d}")
-            return d
-    print(f"  [!!] Could not find model directory. BASE_DIR contents: {os.listdir(BASE_DIR)}")
-    return BASE_DIR
 
 # ════════════════════════════════════════════════════════════════
 # 16 Spatial Biomarker Feature Extractor
@@ -77,7 +63,7 @@ def _box_counting_fractal(binary, sizes=None):
         count = 0
         for y in range(0, h, size):
             for x in range(0, w, size):
-                if np.any(binary[y: y + size, x: x + size] > 0):
+                if np.any(binary[y : y + size, x : x + size] > 0):
                     count += 1
         counts.append(max(count, 1))
     valid = [(s, c) for s, c in zip(sizes[: len(counts)], counts) if c > 0]
@@ -97,7 +83,7 @@ def _compute_curvature(contour, step=5):
         v1 = pts[i] - pts[i - step]
         v2 = pts[i + step] - pts[i]
         cross = abs(v1[0] * v2[1] - v1[1] * v2[0])
-        norm = np.linalg.norm(v1) * np.linalg.norm(v2)
+        norm  = np.linalg.norm(v1) * np.linalg.norm(v2)
         if norm > 1e-6:
             curvatures.append(cross / norm)
     return np.array(curvatures) if curvatures else np.array([0.0])
@@ -117,68 +103,86 @@ def extract_16_features(img_gray):
     _, binary = cv2.threshold(
         img_gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU
     )
-    h, w = binary.shape
-    ink_mask = binary > 0
+    h, w     = binary.shape
+    ink_mask  = binary > 0
     ink_count = int(np.sum(ink_mask))
     if ink_count < 10:
         return np.zeros(16)
 
-    dist = cv2.distanceTransform(binary, cv2.DIST_L2, 5)
+    # 1-2: Stroke Width
+    dist        = cv2.distanceTransform(binary, cv2.DIST_L2, 5)
     stroke_vals = dist[ink_mask]
-    f1, f2 = float(np.mean(stroke_vals)), float(np.std(stroke_vals))
+    f1 = float(np.mean(stroke_vals))
+    f2 = float(np.std(stroke_vals))
 
+    # 3: Contour Roughness
     contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     f3 = 1.0
     if contours:
-        c = max(contours, key=cv2.contourArea)
-        peri, area = cv2.arcLength(c, True), cv2.contourArea(c)
+        c    = max(contours, key=cv2.contourArea)
+        peri = cv2.arcLength(c, True)
+        area = cv2.contourArea(c)
         if area > 0:
             f3 = (peri ** 2) / (4 * np.pi * area)
 
+    # 4: Direction Changes
     f4 = 0.0
     if contours:
         c = max(contours, key=len)
         if len(c) > 20:
-            pts = c.reshape(-1, 2).astype(float)
+            pts  = c.reshape(-1, 2).astype(float)
             step = max(1, len(pts) // 200)
-            pts = pts[::step]
+            pts  = pts[::step]
             if len(pts) > 3:
-                dx, dy = np.diff(pts[:, 0]), np.diff(pts[:, 1])
+                dx     = np.diff(pts[:, 0])
+                dy     = np.diff(pts[:, 1])
                 angles = np.arctan2(dy, dx)
-                diffs = np.abs(np.diff(angles))
-                diffs = np.minimum(diffs, 2 * np.pi - diffs)
-                f4 = float(np.mean(diffs))
+                diffs  = np.abs(np.diff(angles))
+                diffs  = np.minimum(diffs, 2 * np.pi - diffs)
+                f4     = float(np.mean(diffs))
 
+    # 5: Connected Components
     n_labels, _ = cv2.connectedComponents(binary)
     f5 = float(n_labels - 1)
+
+    # 6: Ink Density
     f6 = float(ink_count / (h * w))
 
+    # 7: Solidity
     f7 = 0.0
     if contours:
-        c = max(contours, key=cv2.contourArea)
-        area = cv2.contourArea(c)
+        c         = max(contours, key=cv2.contourArea)
+        area      = cv2.contourArea(c)
         hull_area = cv2.contourArea(cv2.convexHull(c))
         if hull_area > 0:
             f7 = float(area / hull_area)
 
+    # 8: Intensity Variance
     f8 = float(np.std(img_gray[ink_mask].astype(float)) / 255.0)
+
+    # 9: Fractal Dimension
     f9 = _box_counting_fractal(binary)
 
+    # 10: Shannon Entropy
     hist = cv2.calcHist([img_gray], [0], binary, [256], [0, 256]).flatten()
     hist = hist / (hist.sum() + 1e-10)
     hist = hist[hist > 0]
-    f10 = float(-np.sum(hist * np.log2(hist + 1e-10)))
+    f10  = float(-np.sum(hist * np.log2(hist + 1e-10)))
 
-    hu = cv2.HuMoments(cv2.moments(binary)).flatten()
+    # 11-12: Hu Moments
+    hu  = cv2.HuMoments(cv2.moments(binary)).flatten()
     f11 = float(-np.sign(hu[0]) * np.log10(abs(hu[0]) + 1e-10))
     f12 = float(-np.sign(hu[1]) * np.log10(abs(hu[1]) + 1e-10))
 
+    # 13-14: Curvature
     if contours:
         curv = _compute_curvature(max(contours, key=len))
-        f13, f14 = float(np.mean(curv)), float(np.std(curv))
+        f13  = float(np.mean(curv))
+        f14  = float(np.std(curv))
     else:
         f13 = f14 = 0.0
 
+    # 15: Aspect Ratio
     coords = np.column_stack(np.where(binary > 0))
     if len(coords) > 0:
         y_min, x_min = coords.min(axis=0)
@@ -187,11 +191,12 @@ def extract_16_features(img_gray):
     else:
         f15 = 1.0
 
+    # 16: Stroke Regularity (FFT)
     f16 = 0.0
     if contours:
         c = max(contours, key=len)
         if len(c) > 20:
-            pts = c.reshape(-1, 2).astype(float)
+            pts   = c.reshape(-1, 2).astype(float)
             dists = np.sqrt(np.sum(np.diff(pts, axis=0) ** 2, axis=1))
             if len(dists) > 10:
                 fft_vals = np.abs(np.fft.rfft(dists - np.mean(dists)))
@@ -200,6 +205,82 @@ def extract_16_features(img_gray):
 
     return np.array([f1, f2, f3, f4, f5, f6, f7, f8,
                      f9, f10, f11, f12, f13, f14, f15, f16])
+
+
+# ════════════════════════════════════════════════════════════════
+# INPUT QUALITY CHECKER  (warning-only — never blocks prediction)
+# ════════════════════════════════════════════════════════════════
+#
+# Thresholds are deliberately loose to avoid false positives on
+# genuine handwriting with unusual properties.
+
+INK_DENSITY_MIN       = 0.001   # below this = near-blank image
+INK_DENSITY_MAX       = 0.80    # above this = likely filled graphic
+N_COMPONENTS_WARN     = 200     # warn if ink blobs exceed this count
+HOUGH_LINE_WARN       = 12      # warn if this many long straight lines detected
+HOUGH_MIN_LINE_LEN    = 80      # px on 256-px image — only very long lines count
+BRANCH_DIVERGENCE_THR = 0.30    # MLP vs CNN gap that triggers low-confidence flag
+
+
+def _detect_geometric_lines(binary_256):
+    """Count long straight lines via probabilistic Hough transform."""
+    edges = cv2.Canny(binary_256, 50, 150, apertureSize=3)
+    lines = cv2.HoughLinesP(
+        edges,
+        rho=1,
+        theta=np.pi / 180,
+        threshold=50,
+        minLineLength=HOUGH_MIN_LINE_LEN,
+        maxLineGap=5,
+    )
+    return 0 if lines is None else len(lines)
+
+
+def check_input_quality(img_gray_256, feats):
+    """
+    Run soft quality checks. Returns:
+      warnings : list[str]  — advisory messages (empty = all clear)
+      checks   : dict       — raw diagnostic values
+    """
+    warn   = []
+    checks = {}
+
+    ink_density  = float(feats[5])
+    n_components = int(feats[4])
+
+    checks["ink_density"]  = round(ink_density, 4)
+    checks["n_components"] = n_components
+
+    if ink_density < INK_DENSITY_MIN:
+        warn.append(
+            "Image appears nearly blank. Please upload a clear handwriting sample."
+        )
+    elif ink_density > INK_DENSITY_MAX:
+        warn.append(
+            f"Very high ink density ({ink_density:.2f}). "
+            "The image may be a dark scan or graphic fill rather than handwriting."
+        )
+
+    if n_components > N_COMPONENTS_WARN:
+        warn.append(
+            f"Unusually many ink regions ({n_components}). "
+            "If this is a diagram or printed text, the prediction may not be meaningful."
+        )
+
+    # Binarise for Hough (Otsu already applied in extract_16_features, redo here cheaply)
+    _, binary = cv2.threshold(
+        img_gray_256, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU
+    )
+    n_lines = _detect_geometric_lines(binary)
+    checks["straight_lines"] = n_lines
+    if n_lines >= HOUGH_LINE_WARN:
+        warn.append(
+            f"Detected {n_lines} long straight line segments. "
+            "This image may be a diagram or chart — the model is trained on "
+            "clinical handwriting and results may be unreliable for other content."
+        )
+
+    return warn, checks
 
 
 # ════════════════════════════════════════════════════════════════
@@ -213,7 +294,7 @@ class ResidualBlock(nn.Module):
             nn.Linear(dim, dim), nn.BatchNorm1d(dim), nn.GELU(), nn.Dropout(dropout),
             nn.Linear(dim, dim), nn.BatchNorm1d(dim),
         )
-        self.act = nn.GELU()
+        self.act     = nn.GELU()
         self.dropout = nn.Dropout(dropout * 0.5)
 
     def forward(self, x):
@@ -225,7 +306,8 @@ class PDDetectionModelV2(nn.Module):
     def __init__(self, input_size=16, hidden=64):
         super().__init__()
         self.input_proj = nn.Sequential(
-            nn.Linear(input_size, hidden), nn.BatchNorm1d(hidden), nn.GELU(), nn.Dropout(0.3),
+            nn.Linear(input_size, hidden), nn.BatchNorm1d(hidden),
+            nn.GELU(), nn.Dropout(0.3),
         )
         self.res1 = ResidualBlock(hidden, dropout=0.4)
         self.head = nn.Sequential(
@@ -252,7 +334,7 @@ class ChannelAttention(nn.Module):
         b, c, _, _ = x.size()
         avg_pool = F.adaptive_avg_pool2d(x, 1).view(b, c)
         max_pool = F.adaptive_max_pool2d(x, 1).view(b, c)
-        attn = torch.sigmoid(self.fc(avg_pool) + self.fc(max_pool))
+        attn     = torch.sigmoid(self.fc(avg_pool) + self.fc(max_pool))
         return x * attn.view(b, c, 1, 1)
 
 
@@ -281,9 +363,9 @@ class CBAM(nn.Module):
 class EfficientNetCBAM(nn.Module):
     def __init__(self, backbone, cbam, feat_dim):
         super().__init__()
-        self.backbone = backbone
-        self.cbam = cbam
-        self.pool = nn.AdaptiveAvgPool2d(1)
+        self.backbone   = backbone
+        self.cbam       = cbam
+        self.pool       = nn.AdaptiveAvgPool2d(1)
         self.classifier = nn.Sequential(
             nn.Dropout(0.5),
             nn.Linear(feat_dim, 128),
@@ -301,7 +383,6 @@ class EfficientNetCBAM(nn.Module):
 
 
 def _build_efficientnet_cbam():
-    """Create EfficientNet-B0 + CBAM architecture."""
     try:
         backbone = models.efficientnet_b0(weights=None)
     except TypeError:
@@ -312,7 +393,7 @@ def _build_efficientnet_cbam():
 
 
 # ════════════════════════════════════════════════════════════════
-# Image Transforms — REDUCED TTA (3 instead of 7) to save RAM
+# Image Transforms + TTA
 # ════════════════════════════════════════════════════════════════
 
 val_tf = transforms.Compose([
@@ -321,19 +402,35 @@ val_tf = transforms.Compose([
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
 ])
 
-# FIX: Reduced from 7 TTA transforms to 3 — cuts inference time by 57%
-# and prevents timeout on Render free tier CPU
 tta_transforms = [
     val_tf,
     transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.RandomHorizontalFlip(p=1.0),
+        transforms.Resize((224, 224)), transforms.RandomHorizontalFlip(p=1.0),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
     ]),
     transforms.Compose([
-        transforms.Resize((256, 256)),
-        transforms.CenterCrop(224),
+        transforms.Resize((224, 224)), transforms.RandomRotation((10, 10)),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+    ]),
+    transforms.Compose([
+        transforms.Resize((224, 224)), transforms.RandomRotation((-10, -10)),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+    ]),
+    transforms.Compose([
+        transforms.Resize((224, 224)), transforms.ColorJitter(brightness=0.3),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+    ]),
+    transforms.Compose([
+        transforms.Resize((224, 224)), transforms.RandomVerticalFlip(p=1.0),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+    ]),
+    transforms.Compose([
+        transforms.Resize((256, 256)), transforms.CenterCrop(224),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
     ]),
@@ -344,83 +441,57 @@ tta_transforms = [
 # Global Model State
 # ════════════════════════════════════════════════════════════════
 
-mlp_models = []
-cnn_models = []
-scaler = None
-meta_model = None
+mlp_models   = []
+cnn_models   = []
+scaler       = None
+meta_model   = None
 models_loaded = False
-load_error = None
 
 
 def load_all_models():
-    """Load all model weights, scaler, and meta-learner at startup."""
-    global mlp_models, cnn_models, scaler, meta_model, models_loaded, load_error
-
+    global mlp_models, cnn_models, scaler, meta_model, models_loaded
     print("[*] Loading models...")
-    model_dir = _find_model_files()
 
-    try:
-        # Load 5 MLP fold models
-        for i in range(1, 6):
-            path = os.path.join(model_dir, f"mlp_fold_{i}.pth")
-            if os.path.exists(path):
-                m = PDDetectionModelV2(input_size=16)
-                # FIX: Use weights_only=True where possible for safety + speed
-                state = torch.load(path, map_location=DEVICE, weights_only=False)
-                m.load_state_dict(state)
-                m.eval()
-                # FIX: Set to inference mode to reduce RAM usage
-                for param in m.parameters():
-                    param.requires_grad = False
-                mlp_models.append(m)
-                print(f"  [OK] mlp_fold_{i}.pth")
-            else:
-                print(f"  [!!] mlp_fold_{i}.pth NOT FOUND — skipping")
-
-        # Load 5 CNN fold models
-        for i in range(1, 6):
-            path = os.path.join(model_dir, f"cnn_fold_{i}.pth")
-            if os.path.exists(path):
-                m = _build_efficientnet_cbam()
-                state = torch.load(path, map_location=DEVICE, weights_only=False)
-                m.load_state_dict(state)
-                m.eval()
-                # FIX: Freeze all parameters to save RAM
-                for param in m.parameters():
-                    param.requires_grad = False
-                cnn_models.append(m)
-                print(f"  [OK] cnn_fold_{i}.pth")
-                # FIX: Force garbage collection after each large model load
-                gc.collect()
-            else:
-                print(f"  [!!] cnn_fold_{i}.pth NOT FOUND — skipping")
-
-        # Load scaler
-        scaler_path = os.path.join(model_dir, "scaler.pkl")
-        if os.path.exists(scaler_path):
-            with open(scaler_path, "rb") as f:
-                scaler = pickle.load(f)
-            print("  [OK] scaler.pkl")
+    for i in range(1, 6):
+        path = os.path.join(BASE_DIR, f"mlp_fold_{i}.pth")
+        if os.path.exists(path):
+            m = PDDetectionModelV2(input_size=16)
+            m.load_state_dict(torch.load(path, map_location=DEVICE))
+            m.eval()
+            mlp_models.append(m)
+            print(f"  [OK] mlp_fold_{i}.pth")
         else:
-            print("  [!!] scaler.pkl NOT FOUND — MLP predictions will use raw features")
+            print(f"  [!!] mlp_fold_{i}.pth NOT FOUND")
 
-        # Load meta-learner (optional — app works without it)
-        meta_path = os.path.join(model_dir, "meta_model.pkl")
-        if os.path.exists(meta_path):
-            with open(meta_path, "rb") as f:
-                meta_model = pickle.load(f)
-            print("  [OK] meta_model.pkl")
+    for i in range(1, 6):
+        path = os.path.join(BASE_DIR, f"cnn_fold_{i}.pth")
+        if os.path.exists(path):
+            m = _build_efficientnet_cbam()
+            m.load_state_dict(torch.load(path, map_location=DEVICE))
+            m.eval()
+            cnn_models.append(m)
+            print(f"  [OK] cnn_fold_{i}.pth")
         else:
-            # FIX: Graceful fallback — app still runs without meta_model
-            print("  [!!] meta_model.pkl NOT FOUND — using simple average fallback")
+            print(f"  [!!] cnn_fold_{i}.pth NOT FOUND")
 
-        models_loaded = True
-        print(f"[OK] Loaded {len(mlp_models)} MLP + {len(cnn_models)} CNN models")
+    scaler_path = os.path.join(BASE_DIR, "scaler.pkl")
+    if os.path.exists(scaler_path):
+        with open(scaler_path, "rb") as f:
+            scaler = pickle.load(f)
+        print("  [OK] scaler.pkl")
+    else:
+        print("  [!!] scaler.pkl NOT FOUND")
 
-    except Exception as e:
-        load_error = str(e)
-        models_loaded = True  # Allow app to start even if some models missing
-        print(f"[ERR] Model loading error: {e}")
+    meta_path = os.path.join(BASE_DIR, "meta_model.pkl")
+    if os.path.exists(meta_path):
+        with open(meta_path, "rb") as f:
+            meta_model = pickle.load(f)
+        print("  [OK] meta_model.pkl")
+    else:
+        print("  [!!] meta_model.pkl NOT FOUND")
+
+    models_loaded = True
+    print(f"[OK] Loaded {len(mlp_models)} MLP + {len(cnn_models)} CNN models")
 
 
 # ════════════════════════════════════════════════════════════════
@@ -440,81 +511,114 @@ def _image_from_base64(data_url):
     return img.convert("RGB")
 
 
+def _safe_mean(preds):
+    """Return mean of a list, or 0.5 if list is empty."""
+    return float(np.mean(preds)) if preds else 0.5
+
+
 def predict_mlp(img_gray):
-    """Run MLP ensemble on grayscale image → average probability."""
-    if not mlp_models:
-        return None  # FIX 3: None signals "no models loaded" vs actual 0.5 prediction
+    """5-fold MLP ensemble → average probability. Always returns a float in [0,1]."""
+    if not mlp_models or scaler is None:
+        return 0.5
 
-    img_resized = cv2.resize(img_gray, (256, 256))
-    feats = extract_16_features(img_resized)
-    feats = np.nan_to_num(feats, 0.0).reshape(1, -1)
-
-    if scaler is not None:
-        feats = scaler.transform(feats)
-
-    inp = torch.FloatTensor(feats).to(DEVICE)
+    img_resized  = cv2.resize(img_gray, (256, 256))
+    feats        = extract_16_features(img_resized)
+    feats        = np.nan_to_num(feats, nan=0.0, posinf=1.0, neginf=0.0)
+    feats_scaled = scaler.transform(feats.reshape(1, -1))
+    inp          = torch.FloatTensor(feats_scaled).to(DEVICE)
 
     preds = []
     with torch.inference_mode():
         for m in mlp_models:
-            m.eval()  # FIX 2: ensure eval mode — BatchNorm1d must use running stats
-            preds.append(m(inp).cpu().item())
-    return float(np.mean(preds))
+            p = float(m(inp).cpu().item())
+            if np.isfinite(p):
+                preds.append(np.clip(p, 0.0, 1.0))
+
+    return _safe_mean(preds)
 
 
 def predict_cnn(img_pil, use_tta=False):
-    """Run CNN ensemble on PIL image → average probability."""
+    """5-fold CNN ensemble → average probability. Always returns a float in [0,1]."""
     if not cnn_models:
-        return None  # FIX 3: None signals "no models loaded" vs actual 0.5 prediction
+        return 0.5
 
     preds = []
     with torch.inference_mode():
         for m in cnn_models:
-            m.eval()  # FIX 2: ensure eval mode
-            if use_tta:
-                for tf in tta_transforms:
-                    inp = tf(img_pil).unsqueeze(0).to(DEVICE)
-                    preds.append(torch.sigmoid(m(inp)).cpu().item())
-            else:
-                inp = val_tf(img_pil).unsqueeze(0).to(DEVICE)
-                preds.append(torch.sigmoid(m(inp)).cpu().item())
-    return float(np.mean(preds))
+            tf_list = tta_transforms if use_tta else [val_tf]
+            for tf in tf_list:
+                inp = tf(img_pil).unsqueeze(0).to(DEVICE)
+                p   = float(torch.sigmoid(m(inp)).cpu().item())
+                if np.isfinite(p):
+                    preds.append(np.clip(p, 0.0, 1.0))
+
+    return _safe_mean(preds)
 
 
 def predict_ensemble(img_pil):
-    """Full pipeline: MLP + CNN + CNN-TTA + meta-learner stacking."""
-    img_gray = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2GRAY)
+    """
+    Full inference pipeline — always returns HTTP 200 with a prediction.
 
-    mlp_risk = predict_mlp(img_gray)
-    cnn_risk = predict_cnn(img_pil, use_tta=False)
-    cnn_tta_risk = predict_cnn(img_pil, use_tta=True)  # may be None if no CNN models
-
-    # FIX 3: Collect only predictions that actually ran (not None)
-    available = {k: v for k, v in
-                 {"mlp": mlp_risk, "cnn": cnn_risk, "cnn_tta": cnn_tta_risk}.items()
-                 if v is not None}
-
-    if not available:
-        return {
-            "combined_risk": 0.5,
-            "mlp_risk": None, "cnn_risk": None, "cnn_tta_risk": None,
-            "status": "UNKNOWN — no models loaded",
-            "error": "No .pth model files found on disk. Check Git LFS setup.",
-            "features": {},
-        }
-
-    if meta_model is not None and len(available) == 3:
-        meta_input = np.array([[mlp_risk, cnn_risk, cnn_tta_risk]])
-        combined_risk = float(meta_model.predict_proba(meta_input)[:, 1][0])
-    else:
-        weights = {"mlp": 0.35, "cnn": 0.25, "cnn_tta": 0.40}
-        total_w = sum(weights[k] for k in available)
-        combined_risk = sum(available[k] * weights[k] for k in available) / total_w
-
+    Steps:
+      1. Convert to greyscale, resize to 256×256
+      2. Extract 16 biomarker features (NaN-safe)
+      3. Run quality checks → append warnings, never block
+      4. MLP ensemble
+      5. CNN ensemble (single pass)
+      6. CNN ensemble (TTA — 7 augmented views)
+      7. Meta-learner stacking (or simple average as fallback)
+      8. Confidence flag based on MLP / CNN divergence
+    """
+    # ── Greyscale + resize ───────────────────────────────────────
+    img_np      = np.array(img_pil)
+    img_gray    = cv2.cvtColor(img_np, cv2.COLOR_RGB2GRAY)
     img_resized = cv2.resize(img_gray, (256, 256))
-    raw_feats = extract_16_features(img_resized)
-    feature_dict = {name: float(val) for name, val in zip(FEATURE_NAMES, raw_feats)}
 
+    # ── Feature extraction (NaN-safe) ───────────────────────────
+    raw_feats    = extract_16_features(img_resized)
+    raw_feats    = np.nan_to_num(raw_feats, nan=0.0, posinf=1.0, neginf=0.0)
+    feature_dict = {
+        name: round(float(val), 6)
+        for name, val in zip(FEATURE_NAMES, raw_feats)
+    }
+
+    # ── Quality check (warning-only, never blocks) ───────────────
+    quality_warnings, checks = check_input_quality(img_resized, raw_feats)
+
+    # ── Ensemble inference ───────────────────────────────────────
+    mlp_risk     = predict_mlp(img_gray)
+    cnn_risk     = predict_cnn(img_pil, use_tta=False)
+    cnn_tta_risk = predict_cnn(img_pil, use_tta=True)
+
+    # ── Meta-learner stacking ────────────────────────────────────
+    if meta_model is not None:
+        meta_input    = np.array([[mlp_risk, cnn_risk, cnn_tta_risk]])
+        combined_risk = float(
+            np.clip(meta_model.predict_proba(meta_input)[:, 1][0], 0.0, 1.0)
+        )
+    else:
+        combined_risk = float(
+            np.clip((mlp_risk + cnn_risk + cnn_tta_risk) / 3.0, 0.0, 1.0)
+        )
+
+    # Guard against NaN (should never happen after clamping, but be safe)
+    if not np.isfinite(combined_risk):
+        combined_risk = float((mlp_risk + cnn_risk + cnn_tta_risk) / 3.0)
+    combined_risk = float(np.clip(combined_risk, 0.0, 1.0))
+
+    # ── Confidence flag ──────────────────────────────────────────
+    branch_divergence = abs(mlp_risk - cnn_risk)
+    if branch_divergence > BRANCH_DIVERGENCE_THR:
+        confidence = "low"
+        quality_warnings.append(
+            f"MLP and CNN predictions diverge by {branch_divergence:.2f} "
+            f"(MLP={mlp_risk:.3f}, CNN={cnn_risk:.3f}). "
+            "Try uploading a higher-resolution or clearer image."
+        )
+    else:
+        confidence = "high"
+
+    # ── Risk label ───────────────────────────────────────────────
     if combined_risk < 0.33:
         status = "LOW RISK"
     elif combined_risk < 0.66:
@@ -523,12 +627,16 @@ def predict_ensemble(img_pil):
         status = "HIGH RISK"
 
     return {
-        "combined_risk": round(combined_risk, 4),
-        "mlp_risk":     round(mlp_risk,     4) if mlp_risk     is not None else None,
-        "cnn_risk":     round(cnn_risk,     4) if cnn_risk     is not None else None,
-        "cnn_tta_risk": round(cnn_tta_risk, 4) if cnn_tta_risk is not None else None,
-        "status": status,
-        "features": feature_dict,
+        "combined_risk":     round(combined_risk, 4),
+        "mlp_risk":          round(mlp_risk, 4),
+        "cnn_risk":          round(cnn_risk, 4),
+        "cnn_tta_risk":      round(cnn_tta_risk, 4),
+        "status":            status,
+        "confidence":        confidence,
+        "branch_divergence": round(branch_divergence, 4),
+        "warnings":          quality_warnings,
+        "validation_checks": checks,
+        "features":          feature_dict,
     }
 
 
@@ -547,56 +655,44 @@ def index():
 @app.route("/predict", methods=["POST"])
 def predict_route():
     if not models_loaded:
-        return jsonify({"error": "Models still loading, please retry in a moment"}), 503
+        return jsonify({"error": "Models not loaded yet"}), 503
 
+    # ── Parse image ──────────────────────────────────────────────
     data = request.get_json(silent=True)
     if data and "image" in data:
         try:
             img_pil = _image_from_base64(data["image"])
         except Exception as e:
-            return jsonify({"error": f"Invalid image data: {e}"}), 400
+            return jsonify({"error": f"Could not decode image: {e}"}), 400
     elif "file" in request.files:
-        f = request.files["file"]
         try:
-            img_pil = Image.open(f.stream).convert("RGB")
+            img_pil = Image.open(request.files["file"].stream).convert("RGB")
         except Exception as e:
-            return jsonify({"error": f"Cannot read uploaded file: {e}"}), 400
+            return jsonify({"error": f"Could not open file: {e}"}), 400
     else:
-        return jsonify({"error": "No image provided — send JSON {image: <base64>} or multipart file"}), 400
+        return jsonify({"error": "No image provided"}), 400
 
+    # ── Run prediction (always 200) ──────────────────────────────
     try:
         result = predict_ensemble(img_pil)
-        return jsonify(result)
     except Exception as e:
         return jsonify({"error": f"Prediction failed: {e}"}), 500
+
+    return jsonify(result), 200
 
 
 @app.route("/health")
 def health():
-    """FIX 4: Show which files are actually on disk so you can debug missing models."""
-    model_dir = _find_model_files()
-    try:
-        all_files = os.listdir(model_dir)
-        pth_files = sorted(f for f in all_files if f.endswith(".pth"))
-        pkl_files = sorted(f for f in all_files if f.endswith(".pkl"))
-    except Exception:
-        pth_files = pkl_files = []
     return jsonify({
-        "status": "ok",
-        "models_loaded":   models_loaded,
-        "mlp_count":       len(mlp_models),
-        "cnn_count":       len(cnn_models),
-        "meta_model":      meta_model is not None,
-        "scaler":          scaler is not None,
-        "load_error":      load_error,
-        "model_dir":       model_dir,
-        "pth_files_found": pth_files,
-        "pkl_files_found": pkl_files,
+        "status":        "ok",
+        "models_loaded": models_loaded,
+        "mlp_count":     len(mlp_models),
+        "cnn_count":     len(cnn_models),
     })
 
 
 # ════════════════════════════════════════════════════════════════
-# Startup — load models once at import time (gunicorn --preload)
+# Startup
 # ════════════════════════════════════════════════════════════════
 
 load_all_models()

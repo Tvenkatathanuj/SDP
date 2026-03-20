@@ -27,7 +27,21 @@ from PIL import Image
 from flask import Flask, render_template, request, jsonify
 from werkzeug.utils import secure_filename
 
+
 warnings.filterwarnings("ignore")
+
+def _safe(v, default=0.0):
+    """Convert any float-like to a JSON-safe Python float.
+    Replaces NaN / Inf / -Inf with `default` (0.0) so Flask's
+    jsonify never emits the bare NaN / Infinity tokens that
+    cause JSON.parse to throw in the browser."""
+    try:
+        f = float(v)
+        if f != f or f == float('inf') or f == float('-inf'):
+            return default
+        return f
+    except (TypeError, ValueError):
+        return default
 
 DEVICE = torch.device("cpu")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -710,10 +724,14 @@ def extract_xlsr_embedding(waveform):
 
 @torch.no_grad()
 def extract_hw_features(img_np):
-    """Extract handwriting features from a numpy RGB array."""
+    """Extract handwriting features from a numpy RGB array.
+    Returns (embedding_512d, raw_image_tensor).
+    The raw (1,3,H,W) tensor is kept so _run_hw_isolated can call the
+    full EfficientNet-B4 classifier path with zero audio involvement."""
     augmented = hw_transform(image=img_np)
     tensor = augmented['image'].unsqueeze(0).to(DEVICE)
-    return hw_encoder(tensor, return_features=True)  # (1, 512)
+    embedding = hw_encoder(tensor, return_features=True)
+    return embedding, tensor
 
 
 @torch.no_grad()
@@ -739,19 +757,59 @@ def extract_audio_features(filepath):
 
 
 @torch.no_grad()
-def run_fusion_ensemble(hw_features, audio_features, hw_mask, audio_mask):
-    all_probs, all_hw, all_audio = [], [], []
+def _run_hw_isolated(hw_image_tensor):
+    """Score handwriting using the full EfficientNet-B4 classifier path.
+    Receives the raw (1,3,H,W) image tensor — NOT the 512-d embedding —
+    so backbone → CBAM → SPP → Linear runs correctly with no audio at all."""
+    logits = hw_encoder(hw_image_tensor, return_features=False)  # (1, 2)
+    return F.softmax(logits, dim=-1)[0, 1].item()
+
+
+@torch.no_grad()
+def _run_audio_isolated(audio_features):
+    """Run audio through each fold model with hw zeroed + masked OFF.
+    With hw_mask=False the model replaces hw with its learned default token,
+    so cross-attention from audio→hw attends only to that uninformative token.
+    The audio_head output is therefore driven almost purely by the audio signal.
+    Returns mean score across all 5 folds for stability."""
+    dummy_hw  = torch.zeros(1, config.hw_feature_dim, device=DEVICE)
+    hw_off    = torch.tensor([False], device=DEVICE)
+    audio_on  = torch.tensor([True],  device=DEVICE)
+    scores = []
+    for model in fusion_models:
+        model.eval()
+        out = model(dummy_hw, audio_features, hw_off, audio_on)
+        scores.append(F.softmax(out["audio_logits"], dim=-1)[0, 1].item())
+    return float(np.mean(scores))
+
+
+@torch.no_grad()
+def run_fusion_ensemble(hw_features, audio_features, hw_mask, audio_mask,
+                        hw_image_tensor=None):
+    """Returns:
+      fold_probs  – fused CMAFN scores (all 5 folds), used ONLY for
+                    uncertainty / confidence, NOT for combined_risk
+      hw_score    – isolated HW score via full EfficientNet-B4 classifier
+                    (uses raw image tensor, zero audio involvement)
+      audio_score – isolated audio score (audio branch, no hw leakage)
+    combined_risk is computed in the predict route as a strict 50/50
+    average of hw_score and audio_score when both modalities are present.
+    """
+    fold_probs = []
     for model in fusion_models:
         model.eval()
         out = model(hw_features, audio_features,
                     hw_mask.to(DEVICE), audio_mask.to(DEVICE))
-        probs = F.softmax(out["logits"], dim=-1)
-        hw_p = F.softmax(out["hw_logits"], dim=-1)
-        au_p = F.softmax(out["audio_logits"], dim=-1)
-        all_probs.append(probs[0, 1].item())
-        all_hw.append(hw_p[0, 1].item())
-        all_audio.append(au_p[0, 1].item())
-    return all_probs, all_hw, all_audio
+        fold_probs.append(F.softmax(out["logits"], dim=-1)[0, 1].item())
+
+    # Use raw image tensor for HW — passing the 512-d embedding would
+    # crash EfficientNet's conv2d layers expecting a (1,3,H,W) input.
+    hw_score    = (_run_hw_isolated(hw_image_tensor)
+                   if hw_mask.item() and hw_image_tensor is not None else None)
+    audio_score = (_run_audio_isolated(audio_features)
+                   if audio_mask.item() else None)
+
+    return fold_probs, hw_score, audio_score
 
 
 # ════════════════════════════════════════════════════════════════
@@ -793,8 +851,9 @@ def predict():
         }), 400
 
     # ── Handwriting features ──
-    hw_feats = torch.zeros(1, config.hw_feature_dim).to(DEVICE)
-    hw_mask = torch.tensor([False])
+    hw_feats        = torch.zeros(1, config.hw_feature_dim).to(DEVICE)
+    hw_image_tensor = None   # raw (1,3,H,W) tensor for isolated HW scoring
+    hw_mask         = torch.tensor([False])
     if has_hw:
         try:
             if image_b64:
@@ -804,7 +863,7 @@ def predict():
                 file_bytes = np.frombuffer(image_file.read(), np.uint8)
                 img_bgr = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
                 img_np = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
-            hw_feats = extract_hw_features(img_np)
+            hw_feats, hw_image_tensor = extract_hw_features(img_np)
             hw_mask = torch.tensor([True])
         except Exception as e:
             return jsonify({"error": f"Image processing failed: {e}"}), 400
@@ -833,13 +892,24 @@ def predict():
                 pass
 
     # ── Ensemble prediction ──
-    all_probs, all_hw_p, all_audio_p = run_fusion_ensemble(
-        hw_feats, audio_feats, hw_mask, audio_mask)
+    try:
+        fold_probs, hw_score, audio_score = run_fusion_ensemble(
+            hw_feats, audio_feats, hw_mask, audio_mask, hw_image_tensor)
+    except Exception as e:
+        return jsonify({"error": f"Model inference failed: {e}"}), 500
 
-    combined_risk = float(np.mean(all_probs))
-    hw_risk = float(np.mean(all_hw_p))
-    audio_risk = float(np.mean(all_audio_p))
-    fold_std = float(np.std(all_probs))
+    # ── Strict 50/50 equal weighting ───────────────────────────────────────
+    # hw_score and audio_score come from fully isolated encoders —
+    # no cross-modal contamination. Each present modality gets equal weight.
+    # Missing modality contributes nothing (excluded, not zeroed).
+    active_scores = [s for s in [hw_score, audio_score] if s is not None]
+    combined_risk = _safe(np.mean(active_scores))   # 0.5*hw + 0.5*audio when both
+    hw_risk       = _safe(hw_score    if hw_score    is not None else 0.0)
+    audio_risk    = _safe(audio_score if audio_score is not None else 0.0)
+    # ────────────────────────────────────────────────────────────────────────
+
+    # Uncertainty uses the fused fold spread (good proxy for model agreement)
+    fold_std   = _safe(np.std(fold_probs))
     confidence = round(max(0.0, 1.0 - fold_std * 3), 4)
 
     if combined_risk < 0.33:
@@ -849,26 +919,31 @@ def predict():
     else:
         status = "HIGH RISK"
 
+    n_active = len(active_scores)
     result = {
-        "combined_risk": round(combined_risk, 4),
-        "hw_risk": round(hw_risk, 4),
-        "audio_risk": round(audio_risk, 4),
-        "confidence": confidence,
-        "uncertainty": round(fold_std, 4),
-        "status": status,
-        "modalities_used": [],
-        "fold_predictions": [round(p, 4) for p in all_probs],
+        "combined_risk":    round(_safe(combined_risk), 4),
+        "hw_risk":          round(_safe(hw_risk),       4),
+        "audio_risk":       round(_safe(audio_risk),    4),
+        "confidence":       round(_safe(confidence),    4),
+        "uncertainty":      round(_safe(fold_std),      4),
+        "status":           status,
+        "modalities_used":  [],
+        "modality_weights": {
+            "handwriting": round(1.0 / n_active, 2) if has_hw    else 0.0,
+            "audio":       round(1.0 / n_active, 2) if has_audio else 0.0,
+        },
+        "fold_predictions": [round(_safe(p), 4) for p in fold_probs],
     }
     if has_hw:
         result["modalities_used"].append("handwriting")
     if has_audio:
         result["modalities_used"].append("audio")
         result["voice_features"] = {
-            "mean_pitch": round(float(voice_feats.get("mean_pitch", 0)), 2),
-            "std_pitch": round(float(voice_feats.get("std_pitch", 0)), 2),
-            "jitter": round(float(voice_feats.get("jitter_local", 0)) * 100, 4),
-            "shimmer": round(float(voice_feats.get("shimmer_local", 0)) * 100, 4),
-            "hnr": round(float(voice_feats.get("hnr", 0)), 2),
+            "mean_pitch": round(_safe(voice_feats.get("mean_pitch")), 2),
+            "std_pitch":  round(_safe(voice_feats.get("std_pitch")),  2),
+            "jitter":     round(_safe(voice_feats.get("jitter_local")) * 100, 4),
+            "shimmer":    round(_safe(voice_feats.get("shimmer_local")) * 100, 4),
+            "hnr":        round(_safe(voice_feats.get("hnr")), 2),
         }
 
     return jsonify(result)
