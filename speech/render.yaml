@@ -3,8 +3,8 @@ services:
     name: pd-speech-detection
     runtime: python
     rootDir: speech
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --timeout 120 --workers 1
+    buildCommand: git lfs install && git lfs pull && pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --timeout 300 --workers 1
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.7"
