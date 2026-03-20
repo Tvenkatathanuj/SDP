@@ -1,2 +1,1 @@
 # LFS disabled - all files stored as regular git objects
-*.pth filter=lfs diff=lfs merge=lfs -text
