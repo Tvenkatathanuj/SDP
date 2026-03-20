@@ -660,7 +660,7 @@ def load_handwriting_models():
         path = os.path.join(HANDWRITING_DIR, f"mlp_fold_{i}.pth")
         if os.path.exists(path):
             m = PDDetectionModelV2(input_size=16)
-            m.load_state_dict(torch.load(path, map_location=DEVICE))
+            m.load_state_dict(torch.load(path, map_location=DEVICE, weights_only=False))
             m.eval()
             hw_mlp_models.append(m)
             print(f"  [OK] mlp_fold_{i}.pth")
@@ -671,7 +671,7 @@ def load_handwriting_models():
         path = os.path.join(HANDWRITING_DIR, f"cnn_fold_{i}.pth")
         if os.path.exists(path):
             m = _build_efficientnet_cbam()
-            m.load_state_dict(torch.load(path, map_location=DEVICE))
+            m.load_state_dict(torch.load(path, map_location=DEVICE, weights_only=False))
             m.eval()
             hw_cnn_models.append(m)
             print(f"  [OK] cnn_fold_{i}.pth")
