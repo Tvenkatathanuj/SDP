@@ -36,10 +36,10 @@ warnings.filterwarnings("ignore")
 
 DEVICE = torch.device("cpu")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-HANDWRITING_DIR = os.path.join(os.path.dirname(BASE_DIR), "handwriting")
-SPEECH_DIR = os.path.join(os.path.dirname(BASE_DIR), "speech")
-FUSION_DIR = os.path.join(os.path.dirname(BASE_DIR), "fusion_models")
-FUSION_CHECKPOINT_DIR = os.path.join(FUSION_DIR, "checkpoint_fusion")
+HANDWRITING_DIR = BASE_DIR  # Models now in same directory
+SPEECH_DIR = BASE_DIR  # Models now in same directory
+FUSION_DIR = BASE_DIR  # Models now in same directory
+FUSION_CHECKPOINT_DIR = os.path.join(BASE_DIR, "checkpoint_fusion")
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
