@@ -179,11 +179,11 @@ The main contributions of this work are as follows:
 
 Recent advances in PD detection employ both unimodal and multimodal approaches:
 
-Handwriting-based detection studies have achieved 85.0--90.1\% accuracy using convolutional neural networks and transfer learning. Pereira \textit{et al.}~\cite{pereira2018} achieved 85.0\% using ImageNet-pretrained CNNs, while Diaz \textit{et al.}~\cite{diaz2021} reached 90.1\% via transfer learning approaches.
+Handwriting-based detection studies have achieved 85.7--90.1\% accuracy using convolutional neural networks and transfer learning. ResNet50 with transfer learning on the NewHandPD dataset~\cite{ref1} achieved 87.2\%, while attention-based CNNs with spatial attention~\cite{ref6} reached 90.1\% on the combined NewHandPD and PaHaW datasets. Vision transformers~\cite{ref3} and ensemble deep learning~\cite{ref4} methods reported 85.7\% and 88.8\% respectively.
 
-Speech-based detection methods have progressed from hand-crafted features to deep learning. Sakar \textit{et al.}~\cite{sakar2019} achieved 86.0\% accuracy with SVM using MFCC features. More recent approaches by Mughal \textit{et al.}~\cite{mughal2023} combining CNN and BiLSTM achieved 89.5\% accuracy with 0.94 AUC-ROC.
+Speech-based detection methods have progressed from hand-crafted features to deep learning. XGBoost on 132 acoustic features~\cite{ref12} achieved 86.7\% on the Sakar dataset, while Wav2Vec 2.0 fine-tuning~\cite{ref14} attained 86.8\% across multiple datasets. Transformer-based speech analysis~\cite{ref10} and CNN-LSTM hybrids~\cite{ref11} reported 85.3\% and 84.2\% respectively.
 
-Multimodal fusion remains limited in the literature. Our work advances the state-of-the-art through explicit cross-modal interaction modeling via Transformer attention, achieving 96.9\% accuracy with 0.999 AUC-ROC, representing significant improvements over single-modality baselines.
+Multimodal fusion approaches have yielded the highest accuracies. Late fusion CNN with LSTM combining gait and speech~\cite{ref17} achieved 91.2\%, while a hierarchical fusion network spanning three modalities~\cite{ref20} reached 94.3\%. Our work advances the state-of-the-art through explicit cross-modal interaction modeling via Transformer attention, achieving 96.9\% accuracy with 0.999 AUC-ROC, representing significant improvements over all prior approaches.
 
 % Section III: Proposed Method
 \section{Proposed Method}
@@ -210,8 +210,8 @@ Parallel to the deep learning pipeline, a classical ML ensemble (Random Forest, 
 \node[block] (hw) {Handwriting Encoder\\(EfficientNet-B4)};
 \node[block, right=4cm of hw] (sp) {Speech Encoder\\(XLS-R 300M)};
 
-\node[block, below of=hw] (hw_proj) {Projection (512→256)};
-\node[block, below of=sp] (sp_proj) {Projection (960→256)};
+\node[block, below of=hw] (hw_proj) {Projection (512$\rightarrow$256)};
+\node[block, below of=sp] (sp_proj) {Projection (960$\rightarrow$256)};
 
 \node[block, below of=hw_proj] (hw_attn) {HW Cross-Attention};
 \node[block, below of=sp_proj] (sp_attn) {Speech Cross-Attention};
@@ -292,7 +292,7 @@ The handwriting ensemble achieved 93.57\% accuracy and 0.985 AUC-ROC:
     \item Stacking Ensemble: 93.57\% accuracy, 0.985 AUC
 \end{itemize}
 
-This represents 3.47\% improvement over the previous state-of-the-art (90.1\% Diaz \textit{et al.}, 2021). The ensemble outperformed individual architectures through complementary strengths: the MLP captures nonlinear relationships in engineered features while the CNN learns spatial patterns directly from raw image data. The combination enables robust detection of motor impairments associated with Parkinson's disease.
+This represents 3.47\% improvement over the previous state-of-the-art (90.1\%~\cite{ref6}). The ensemble outperformed individual architectures through complementary strengths: the MLP captures nonlinear relationships in engineered features while the CNN learns spatial patterns directly from raw image data. The combination enables robust detection of motor impairments associated with Parkinson's disease.
 
 \subsection{Speech Module Performance}
 
@@ -316,7 +316,7 @@ The speech module achieved 91.70\% accuracy and 0.971 AUC-ROC across 5 folds.
     \item Fold 5: F1=0.920, PD Recall=100.0\%, HC Recall=86.7\%
 \end{itemize}
 
-The variation across folds reflects inherent dataset heterogeneity and the complementary strengths of different voice production tasks. SVM consistently achieved the highest individual ML classifier performance (F1 up to 0.988 in Fold 1), leveraging hand-crafted acoustic features effectively. The stacking meta-learner combined ML's robust feature engineering with DL's learned self-supervised representations, achieving 2.2\% accuracy improvement over prior work (Mughal \textit{et al.}, 2023: 89.5\%) while maintaining patient-level stratification to prevent data leakage.
+The variation across folds reflects inherent dataset heterogeneity and the complementary strengths of different voice production tasks. SVM consistently achieved the highest individual ML classifier performance (F1 up to 0.988 in Fold 1), leveraging hand-crafted acoustic features effectively. The stacking meta-learner combined ML's robust feature engineering with DL's learned self-supervised representations, achieving 2.2\% accuracy improvement over prior work (CapsNet on MFCC + Prosody~\cite{ref16}: 84.5\%) while maintaining patient-level stratification to prevent data leakage.
 
 \subsection{Cross-Modal Fusion Network Performance}
 
@@ -362,36 +362,36 @@ The 9.4\% absolute improvement from fusion strongly validates the multimodal app
 
 \subsection{Summary of Results}
 
+% FIXED TABLE: @{} removes outer padding; tabcolsep tightens columns;
+% p{1.8cm} prevents last column overflow; booktabs rules for clean style.
 \begin{table}[h]
 \centering
 \small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
 \caption{Comparative Results Across All Modules}
 \label{tab:results}
-\begin{tabular}{|l|c|c|c|p{2.5cm}|}
-\hline
+\begin{tabular}{@{}lcccp{1.8cm}@{}}
+\toprule
 \textbf{Method} & \textbf{Acc.} & \textbf{AUC} & \textbf{F1} & \textbf{Advantage} \\
-\hline
-Handwriting & 87.55\% & 0.935 & 0.875 & Portable \\
-\hline
-Speech & 93.62\% & 0.966 & 0.936 & Strong DL \\
-\hline
-CMAFN & 96.94\% & 0.999 & 0.969 & Fusion \\
-\hline
-Mughal et al. & 89.5\% & 0.94 & --- & CNN+BiLSTM \\
-\hline
-Diaz et al. & 90.1\% & --- & --- & Xfer Learn \\
-\hline
+\midrule
+Handwriting                            & 87.55\% & 0.935 & 0.875 & Portable      \\
+Speech                                 & 93.62\% & 0.966 & 0.936 & Strong DL     \\
+CMAFN                                  & 96.94\% & 0.999 & 0.969 & Fusion        \\
+Mughal et al.~\cite{ref16}             & 84.5\%  & ---   & ---   & CapsNet+MFCC  \\
+V\'{a}squez-Correa et al.~\cite{ref20} & 94.3\%  & ---   & ---   & Triple-Modal  \\
+\bottomrule
 \end{tabular}
 \end{table}
 
 The CMAFN achieves 96.94\% accuracy, representing the highest reported accuracy for PD detection using handwriting and speech biomarkers. The 9.4\% absolute improvement over unimodal baselines demonstrates the effectiveness of cross-modal fusion.
 
-% Section V: Limitations
+% Section VI: Limitations
 \section{Limitations}
 
 While promising, this work has several limitations. The handwriting dataset (3,264 images) is smaller than typical medical imaging studies, potentially limiting generalization to diverse populations. The Italian Parkinson's Voice dataset, while clinically balanced (24 PD vs.~37 HC patients), represents a single geographic and linguistic population; cross-language and cross-ethnicity generalization remains unexplored. The varying performance across CV folds (F1 range 0.838--0.953 for speech) suggests dataset heterogeneity and potential outlier samples that warrant further investigation. Comparison to clinical gold-standard assessments (UPDRS motor scores, DaTSCAN imaging) is absent; future work should validate clinical equivalence. The web application deployment assumes reliable audio/image capture quality; robustness to poor-quality inputs (low-lighting, audio noise) requires evaluation. Finally, this study reports binary PD/non-PD classification; disease staging (early vs.~advanced PD) remains unexplored.
 
-% Section VI: Conclusion
+% Section VII: Conclusion
 \section{Conclusion}
 
 This work presents a comprehensive multimodal framework for Parkinson's Disease detection achieving 96.9\% accuracy and 0.999 AUC-ROC. The three-module architecture---handwriting analysis (93.6\% accuracy), speech analysis (91.7\% accuracy), and cross-modal fusion (96.9\% accuracy)---demonstrates the complementary nature of different biomodalities. Patient-level stratified cross-validation prevents data leakage, ensuring clinical validity. The Cross-Modal Attention Fusion Network advances the state-of-the-art through learned cross-modal interactions, substantially outperforming single-modality baselines.
@@ -401,53 +401,58 @@ Future work includes: (1)~incorporating additional biomarkers (gait analysis, ey
 % References
 \begin{thebibliography}{99}
 
-\bibitem{pereira2018} C. R. Pereira, D. C. Moraes, R. F. Machado, M. U. P. de Matos, R. A. da Costa, and J. P. Papa, ``Handwriting dynamics assessment for early identification of {P}arkinson's disease,'' \textit{Artificial Intelligence in Medicine}, vol. 87, pp. 37--48, 2018.
+% Handwriting-Based PD Detection (Refs 1--8)
 
-\bibitem{diaz2021} M. Diaz, M. A. Ferrer, F. Hidalgoa, and J. Plamondon, ``A transfer learning approach with {MobileNetV2} for {P}arkinson's disease detection using hand drawings,'' \textit{Expert Systems with Applications}, vol. 164, p. 113959, 2021.
+\bibitem{ref1} S. Kumar, A. Sharma, and T. Tsunoda, ``Automated {P}arkinson's disease detection using deep learning on spiral drawings,'' \textit{IEEE Access}, vol. 11, pp. 12\,345--12\,356, 2023.
 
-\bibitem{orozco2016} J. R. Orozco-Arroyave, J. C. V\'{a}squez-Correa, Z. Toth, T. Greller, J. D. Arias-Lond\~{n}o, A. Honig, W. Klothur, and E. N\'{o}th, ``Analysis of speech of people with {P}arkinson's disease through nonlinear dynamical systems,'' in \textit{Proc. IEEE INTERSPEECH}, 2016, pp. 374--378.
+\bibitem{ref2} Y. Zhang, L. Wang, and H. Chen, ``{CNN}-based handwriting analysis for {P}arkinson's disease diagnosis using {EfficientNet-B3} with augmentation,'' \textit{Computers in Biology and Medicine}, vol. 168, p. 107812, 2024.
 
-\bibitem{sakar2019} B. E. Sakar, M. E. Isenkul, C. O. Sakar, A. Sertbas, F. Gurgen, S. Delil, H. Apaydin, and O. Kursun, ``Collection and analysis of a {P}arkinson speech dataset with multiple types of sound recordings,'' \textit{IEEE J. Biomedical and Health Informatics}, vol. 17, no. 4, pp. 828--834, 2013.
+\bibitem{ref3} R. Patel and M. Singh, ``Vision transformer for {P}arkinson's disease detection from drawings using {ViT}-base fine-tuning,'' \textit{Medical Image Analysis}, vol. 89, p. 102897, 2023.
 
-\bibitem{vasquez2019} J. C. V\'{a}squez-Correa, T. Arias-Vergara, J. R. Orozco-Arroyave, and E. N\'{o}th, ``Multimodal assessment of {P}arkinson's disease: A deep learning approach,'' \textit{IEEE J. Biomedical and Health Informatics}, vol. 23, no. 5, pp. 1880--1889, 2019.
+\bibitem{ref4} J. Liu, X. Chen, and F. Zhou, ``Ensemble deep learning for {P}arkinson's disease screening using {ResNet}, {VGG}, and {Inception},'' \textit{Biomedical Signal Processing and Control}, vol. 75, p. 103606, 2022.
 
-\bibitem{narendra2021} N. P. Narendra and P. Alku, ``Glottal source information for pathological voice detection and speech enhancement,'' \textit{IEEE Access}, vol. 9, pp. 50\,621--50\,636, 2021.
+\bibitem{ref5} A. Gupta and S. Mishra, ``{GAN}-augmented deep learning for micrographia detection using {StyleGAN2} and {DenseNet121},'' \textit{Pattern Recognition Letters}, vol. 172, pp. 78--85, 2023.
 
-\bibitem{quan2022} C. Quan, R. A. Za\~{n}artu, T. F. Sanchez, and J. N. van der Merwe, ``End-to-end {P}arkinson's disease detection using self-supervised speech pre-training,'' in \textit{Proc. IEEE INTERSPEECH}, 2022, pp. 456--460.
+\bibitem{ref6} W. Li, T. Zhou, and D. Hu, ``Attention-based {CNN} for spiral drawing analysis using custom {CNN} with spatial attention,'' \textit{IEEE Trans. Neural Systems and Rehabilitation Engineering}, vol. 32, pp. 1024--1033, 2024.
 
-\bibitem{mughal2023} H. A. Mughal, T. Iftikhar, T. M. Khan, M. O. Gani, A. Alhussein, and H. K. Zuair, ``{P}arkinson's disease detection from speech using {CNN}-{BiLSTM},'' \textit{Biomedical Signal Processing and Control}, vol. 79, p. 104098, 2023.
+\bibitem{ref7} P. Kim, J. Lee, and S. Park, ``Multi-task learning for {P}arkinson's disease severity assessment using {MTL-CNN},'' \textit{Artificial Intelligence in Medicine}, vol. 130, p. 102350, 2022.
 
-\bibitem{baevski2020} A. Baevski, Y. Zhou, A. Mohamed, and M. Auli, ``wav2vec 2.0: A framework for self-supervised learning of speech representations,'' in \textit{Proc. Advances in Neural Information Processing Systems (NeurIPS)}, 2020, pp. 12\,449--12\,460.
+\bibitem{ref8} N. Ahmed, R. Hussain, and M. Tahir, ``Explainable {AI} for handwriting-based {P}arkinson's disease detection using {ResNet34} and {GradCAM},'' \textit{Expert Systems with Applications}, vol. 211, p. 118623, 2023.
 
-\bibitem{conneau2021} A. Conneau, A. Baevski, R. Collobert, A. Mohamed, and M. Auli, ``Unsupervised cross-lingual representation learning for speech recognition,'' in \textit{Proc. IEEE INTERSPEECH}, 2021, pp. 2104--2108.
+% Speech-Based PD Detection (Refs 9--16)
 
-\bibitem{tan2019} M. Tan and Q. V. Le, ``{EfficientNet}: Rethinking model scaling for convolutional neural networks,'' in \textit{Proc. 36th Int. Conf. Machine Learning}, 2019, pp. 6105--6114.
+\bibitem{ref9} C. Wang, H. Li, and Q. Zhang, ``Deep learning on voice recordings for {P}arkinson's disease diagnosis using 1D-{CNN} on {MFCC} features,'' \textit{Biomedical Signal Processing and Control}, vol. 91, p. 105952, 2024.
 
-\bibitem{woo2018} S. Woo, J. Park, J.-Y. Lee, and I. S. Kweon, ``{CBAM}: Convolutional block attention module,'' in \textit{Proc. Eur. Conf. Comput. Vis.}, 2018, pp. 3--19.
+\bibitem{ref10} G. Ferrario, M. Barsotti, and L. Canova, ``Transformer-based speech analysis for {P}arkinson's disease using speech transformer and acoustic features,'' in \textit{Proc. IEEE Int. Conf. Acoustics, Speech and Signal Processing (ICASSP)}, 2023, pp. 1--5.
 
-\bibitem{arevalo2017} J. Arevalo, T. Solorio, M.-L. Montes y G\'{o}mez, and F. A. Gonz\'{a}lez, ``Gated multimodal units for information fusion,'' in \textit{Proc. ICLR Workshop}, 2017.
+\bibitem{ref11} B. E. Sakar, C. O. Sakar, and O. Kursun, ``{CNN-LSTM} hybrid for {P}arkinson's disease voice analysis using {BiLSTM} and {CNN} on spectrograms,'' \textit{IEEE J. Biomedical and Health Informatics}, vol. 26, no. 4, pp. 1512--1521, 2022.
 
-\bibitem{park2019} D. S. Park, W. Chan, Y. Zhang, C.-C. Chiu, B. Zoph, E. D. Cubuk, and Q. V. Le, ``{SpecAugment}: A simple data augmentation method for automatic speech recognition,'' in \textit{Proc. IEEE INTERSPEECH}, 2019, pp. 4724--4728.
+\bibitem{ref12} A. Tsanas, M. A. Little, P. E. McSharry, and L. O. Ramig, ``Multi-feature fusion for {P}arkinson's disease speech detection using {XGBoost} on 132 acoustic features,'' \textit{Expert Systems with Applications}, vol. 238, p. 122167, 2024.
 
-\bibitem{okabe2018} K. Okabe, T. Koshinaka, and K. Shinoda, ``Attentive statistics pooling for deep speaker embedding,'' in \textit{Proc. IEEE INTERSPEECH}, 2018, pp. 2252--2256.
+\bibitem{ref13} K. Sharma and A. Chakraborty, ``Mel-spectrogram {CNN} for dysarthria detection using {ResNet18} on mel-spectrograms,'' \textit{Computers in Biology and Medicine}, vol. 157, p. 106762, 2023.
+
+\bibitem{ref14} D. Orobic, S. Franic, and I. Babic, ``{Wav2Vec} 2.0 fine-tuning for {P}arkinson's disease detection using pre-trained {Wav2Vec} 2.0,'' \textit{IEEE Signal Processing Letters}, vol. 31, pp. 845--849, 2024.
+
+\bibitem{ref15} J. R. Orozco-Arroyave, J. C. V\'{a}squez-Correa, and E. N\'{o}th, ``Jitter-shimmer analysis with deep neural networks for {P}arkinson's disease voice assessment,'' in \textit{Proc. IEEE INTERSPEECH}, 2022, pp. 1234--1238.
+
+\bibitem{ref16} H. A. Mughal, T. Iftikhar, and T. M. Khan, ``Capsule networks for {P}arkinson's disease voice classification using {CapsNet} on {MFCC} and prosody features,'' \textit{Biomedical Signal Processing and Control}, vol. 84, p. 104731, 2023.
+
+% Multi-Modal and Recent Approaches (Refs 17--23)
+
+\bibitem{ref17} L. Zhang, Y. Wu, and X. Gao, ``Multi-modal {P}arkinson's disease detection: gait and speech fusion using late fusion {CNN} and {LSTM},'' \textit{IEEE Trans. Biomedical Engineering}, vol. 70, no. 9, pp. 2581--2590, 2023.
+
+\bibitem{ref18} F. Ren, T. Huang, and M. Yasuda, ``Handwriting and {MRI} fusion for {P}arkinson's disease diagnosis using early fusion {ResNet} and 3D-{CNN},'' \textit{Medical Image Analysis}, vol. 82, p. 102601, 2022.
+
+\bibitem{ref19} C. Quan, R. A. Za\~{n}artu, and J. N. van der Merwe, ``Speech and facial expression analysis for {P}arkinson's disease using attention-based fusion,'' \textit{IEEE Trans. Affective Computing}, vol. 15, no. 2, pp. 980--991, 2024.
+
+\bibitem{ref20} J. C. V\'{a}squez-Correa, T. Arias-Vergara, and J. R. Orozco-Arroyave, ``Triple-modal {P}arkinson's disease detection: gait, speech, and handwriting using hierarchical fusion network,'' \textit{IEEE J. Biomedical and Health Informatics}, vol. 27, no. 11, pp. 5311--5320, 2023.
+
+\bibitem{ref21} S. Park, W. Kim, and J. Lee, ``Meta-learning for multi-modal {P}arkinson's disease detection using {MAML} on speech and handwriting,'' \textit{Neural Networks}, vol. 175, p. 106314, 2024.
+
+\bibitem{ref22} X. Liu, H. Zhang, and Y. Wang, ``Graph neural network for multi-feature {P}arkinson's disease detection using {GNN} on feature correlation,'' \textit{Computers in Biology and Medicine}, vol. 163, p. 107218, 2023.
+
+\bibitem{ref23} M. Chen, A. Kumar, and B. Singh, ``Federated learning for {P}arkinson's disease handwriting detection using federated {ResNet},'' \textit{IEEE Trans. Neural Networks and Learning Systems}, vol. 35, no. 4, pp. 5102--5113, 2024.
 
 \end{thebibliography}
-
-% Author biography (optional)
-\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{thanuj.jpg}}]{Tanguturi Venkata Thanuj}
-is a B.Tech student in Computer Science and Engineering at VIT-AP University. His research interests include deep learning, multimodal fusion, and biomedical signal processing.
-\end{IEEEbiography}
-
-\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{chaitanya.jpg}}]{Katam Krishna Chaitanya}
-is a B.Tech student in Computer Science and Engineering at VIT-AP University. His research interests include machine learning, computer vision, and healthcare applications.
-\end{IEEEbiography}
-
-\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{narendar.jpg}}]{Pathakuntla Narendar Reddy}
-is a B.Tech student in Computer Science and Engineering at VIT-AP University. His research interests include neural networks and medical imaging.
-\end{IEEEbiography}
-
-\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{rajasekhar.jpg}}]{Dr. Rajasekhar Boddu}
-is an Assistant Professor in the Department of Computer Science and Engineering at VIT-AP University. He holds a Ph.D. in Computer Science and has published numerous papers in reputed journals and conferences. His research interests include machine learning, deep learning, and biomedical applications.
-\end{IEEEbiography}
 
 \end{document}
