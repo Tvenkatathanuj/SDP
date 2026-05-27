@@ -275,6 +275,178 @@
         .btn-analyze:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(7,17,43,.35), 0 0 0 1px rgba(74,158,255,.3); }
         .btn-analyze:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
 
+        /* ── Report Button ── */
+        .btn-report {
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: .88rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: transform .15s, box-shadow .2s, opacity .2s;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            letter-spacing: .2px;
+            box-shadow: 0 4px 16px rgba(124,58,237,.30);
+            min-width: 48px;
+        }
+        .btn-report:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(124,58,237,.45), 0 0 0 1px rgba(168,85,247,.4); }
+        .btn-report:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-report .spinner { width: 16px; height: 16px; border-width: 2px; }
+
+        /* ── Narrative Button ── */
+        .btn-narrative {
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: .88rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: transform .15s, box-shadow .2s, opacity .2s;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            letter-spacing: .2px;
+            box-shadow: 0 4px 16px rgba(5,150,105,.30);
+            min-width: 48px;
+        }
+        .btn-narrative:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(5,150,105,.45), 0 0 0 1px rgba(16,185,129,.4); }
+        .btn-narrative:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-narrative .spinner { width: 16px; height: 16px; border-width: 2px; }
+
+        /* ── Heatmap Button ── */
+        .btn-heatmap {
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: .88rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: transform .15s, box-shadow .2s, opacity .2s;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            letter-spacing: .2px;
+            box-shadow: 0 4px 16px rgba(245,158,11,.30);
+            min-width: 48px;
+        }
+        .btn-heatmap:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(245,158,11,.45), 0 0 0 1px rgba(251,191,36,.4); }
+        .btn-heatmap:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* ── Heatmap Modal ── */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            max-width: 900px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+        }
+        .modal-header h2 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all .2s;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+        }
+        .modal-close:hover { color: var(--text-primary); }
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .heatmap-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .heatmap-container h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .heatmap-image {
+            width: 100%;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--surface-2);
+            box-shadow: var(--shadow);
+            max-height: 400px;
+            object-fit: contain;
+        }
+        .heatmap-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 350px;
+            background: var(--surface-2);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* ── Narrative Panel ── */
+        .narrative-panel {
+            margin-top: 20px;
+        }
+        .narrative-body {
+            padding: 20px 22px;
+            font-size: .88rem;
+            line-height: 1.75;
+            color: var(--text-primary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .narrative-body p {
+            margin-bottom: 14px;
+        }
+        .narrative-body p:last-child {
+            margin-bottom: 0;
+        }
+        .narrative-placeholder {
+            padding: 40px 24px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        .narrative-placeholder .ph-icon { font-size: 2.4rem; opacity: .4; margin-bottom: 10px; }
+        .narrative-placeholder p { font-size: .82rem; line-height: 1.5; }
+
         /* ── History ── */
         .history-item {
             display: flex; align-items: center; gap: 12px;
@@ -427,119 +599,14 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ── Heatmap Modal ── */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal.active { display: flex; }
-        .modal-content {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            padding: 30px;
-            max-width: 900px;
-            width: 90%;
-            max-height: 85vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-lg);
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 15px;
-        }
-        .modal-header h2 {
-            font-size: 1.5rem;
-            color: var(--text-primary);
-        }
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.8rem;
-            cursor: pointer;
-            color: var(--text-muted);
-            transition: all .2s;
-            padding: 0;
-            width: 30px;
-            height: 30px;
-        }
-        .modal-close:hover { color: var(--text-primary); }
-        .heatmap-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        .heatmap-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .heatmap-container h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-        .heatmap-image {
-            width: 100%;
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            background: var(--surface-2);
-            box-shadow: var(--shadow);
-            max-height: 400px;
-            object-fit: contain;
-        }
-        .heatmap-loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 350px;
-            background: var(--surface-2);
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            font-size: 1rem;
-        }
-        .btn-secondary {
-            flex: 1;
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
-            color: #fff;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-size: .88rem;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: 'DM Sans', sans-serif;
-            transition: transform .15s, box-shadow .2s, opacity .2s;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            letter-spacing: .2px;
-            box-shadow: 0 4px 16px rgba(245,158,11,.25);
-        }
-        .btn-secondary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(245,158,11,.35), 0 0 0 1px rgba(245,158,11,.3); }
-        .btn-secondary:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
-
         /* ── Responsive ── */
         @media (max-width: 1100px) {
             .three-col { grid-template-columns: 1fr 1fr; }
-            .heatmap-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 768px) {
             .three-col { grid-template-columns: 1fr; }
             header { padding: 0 16px; }
             .container { padding: 0 16px 40px; }
-            .modal-content { padding: 20px; }
-            .heatmap-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -555,7 +622,6 @@
     </div>
     <div class="header-right">
         <div class="hdr-chip">📊 v2.0</div>
-        <button class="hdr-chip" onclick="clearHistory()" title="Clear prediction history" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#ef4444;">🗑️ Clear</button>
         <button class="hdr-chip" onclick="toggleDarkMode()">🌙 Dark</button>
     </div>
 </header>
@@ -588,15 +654,14 @@
 
             <div class="action-row">
                 <button id="analyzeBtn" class="btn-analyze" onclick="analyze()">🔬 Analyze</button>
+                <button id="narrativeBtn" class="btn-narrative" onclick="fetchNarrative()" title="Generate AI Narrative" disabled>🤖</button>
+                <button id="reportBtn" class="btn-report" onclick="downloadReport()" title="Download PDF Report" disabled>📄</button>
+                <button id="heatmapBtn" class="btn-heatmap" onclick="showHeatmap()" title="View Heatmap & GridCAM" style="display:none;">🔥</button>
             </div>
 
             <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
                 📂 Drag & drop or click to upload
                 <input type="file" id="fileInput" accept="image/*" onchange="handleUpload(event)">
-            </div>
-
-            <div class="action-row" style="margin-top: 12px;">
-                <button id="heatmapBtn" class="btn-secondary" onclick="showHeatmap()" style="display:none;">🔥 View Heatmap & GridCAM</button>
             </div>
         </div>
 
@@ -652,6 +717,20 @@
             </div>
         </div>
     </div>
+
+    <!-- AI Narrative Panel -->
+    <div class="panel narrative-panel" id="narrativePanel" style="display:none;">
+        <div class="panel-header">
+            <div class="panel-icon-wrap" style="background:rgba(5,150,105,0.08);border-color:rgba(16,185,129,0.2);">🤖</div>
+            <h2>AI Clinical Narrative</h2>
+        </div>
+        <div id="narrativeContent" data-narrative>
+            <div class="narrative-placeholder">
+                <div class="ph-icon">🤖</div>
+                <p>Click the green 🤖 button to generate an AI-powered clinical narrative</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <footer>
@@ -659,6 +738,36 @@
 </footer>
 
 <div class="toast" id="toast"></div>
+
+<!-- Heatmap Modal -->
+<div id="heatmapModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>🔥 Heatmap & GridCAM Visualization</h2>
+            <button class="modal-close" onclick="closeHeatmap()">✕</button>
+        </div>
+        <div class="heatmap-grid">
+            <div class="heatmap-container">
+                <h3>Original Image</h3>
+                <img id="heatmapOriginal" class="heatmap-image" alt="Original" />
+            </div>
+            <div class="heatmap-container">
+                <h3>Grad-CAM Heatmap</h3>
+                <img id="heatmapGradCAM" class="heatmap-image" alt="Grad-CAM" />
+            </div>
+        </div>
+        <div class="heatmap-grid">
+            <div class="heatmap-container">
+                <h3>GridCAM Overlay</h3>
+                <img id="heatmapGridCAM" class="heatmap-image" alt="GridCAM" />
+            </div>
+            <div class="heatmap-container">
+                <h3>Attention Map</h3>
+                <img id="heatmapAttention" class="heatmap-image" alt="Attention" />
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
 // ═════════════════════════════════════════
@@ -670,36 +779,9 @@ let strokes = [];
 let template = 'spiral';
 let analysisHistory = [];
 let trendChart = null;
-let lastPrediction = null;  // Store last prediction for heatmap
-let lastImageDataURL = null;  // Store last image for heatmap
 const explanations = {};
-
-// Validate prediction data
-function isValidPrediction(pred) {
-    if (!pred || typeof pred !== 'object') return false;
-    if (typeof pred.combined_risk !== 'number') return false;
-    if (pred.combined_risk < 0 || pred.combined_risk > 1) return false;
-    if (typeof pred.mlp_risk !== 'number') return false;
-    if (pred.mlp_risk < 0 || pred.mlp_risk > 1) return false;
-    if (typeof pred.cnn_risk !== 'number') return false;
-    if (pred.cnn_risk < 0 || pred.cnn_risk > 1) return false;
-    if (typeof pred.cnn_tta_risk !== 'number') return false;
-    if (pred.cnn_tta_risk < 0 || pred.cnn_tta_risk > 1) return false;
-    if (typeof pred.timestamp !== 'number' || pred.timestamp < 0) return false;
-    if (!pred.status || typeof pred.status !== 'string') return false;
-    if (!pred.features || typeof pred.features !== 'object') return false;
-    return true;
-}
-
-// Clear history function
-function clearHistory() {
-    if (confirm('Are you sure? This will delete all prediction history.')) {
-        analysisHistory = [];
-        localStorage.removeItem('pdHistory');
-        updateHistory();
-        console.log('🗑️ History cleared');
-    }
-}
+let lastPrediction = null;  // Store last prediction for report
+let lastImageDataURL = null;  // Store last image for heatmap
 
 // ═════════════════════════════════════════
 // Canvas
@@ -850,6 +932,7 @@ async function analyze() {
     
     try {
         const dataURL = canvas.toDataURL('image/png');
+        lastImageDataURL = dataURL;  // Store for heatmap later
         const resp = await fetch('/predict', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -858,28 +941,17 @@ async function analyze() {
         const result = await resp.json();
         if (result.error) throw new Error(result.error);
         
-        // Ensure all required fields exist
-        if (!result.timestamp) result.timestamp = Date.now();
-        if (!result.id) result.id = `pred_${result.timestamp}`;
-        if (!result.combined_risk) result.combined_risk = 0.5;
-        if (!result.status) result.status = 'UNKNOWN';
-        if (!result.features) result.features = {};
-        
-        // Store for heatmap
         lastPrediction = result;
-        lastImageDataURL = dataURL;
-        document.getElementById('heatmapBtn').style.display = 'flex';
-        
         renderResults(result);
-        // Validate before storing
-        if (isValidPrediction(result)) {
-            analysisHistory.push(result);
-            localStorage.setItem('pdHistory', JSON.stringify(analysisHistory));
-            updateHistory();
-        } else {
-            console.error('❌ Invalid prediction data, not storing:', result);
-        }
+        analysisHistory.push(result);
+        localStorage.setItem('pdHistory', JSON.stringify(analysisHistory));
+        updateHistory();
         updateTrend();
+
+        // Enable report and narrative buttons now that we have a prediction
+        document.getElementById('reportBtn').disabled = false;
+        document.getElementById('narrativeBtn').disabled = false;
+        document.getElementById('heatmapBtn').style.display = 'flex';
     } catch (err) {
         showToast('Error: ' + err.message);
     } finally {
@@ -932,18 +1004,11 @@ function renderResults(r) {
 
     // Main gauge + model predictions
     let html = `
-        <div style="display:flex;flex-direction:column;gap:16px;">
+        <div style="display:flex;flex-direction:column;gap:16px;padding:16px;">
             <!-- Combined Risk (Main) -->
             <div style="display:flex;align-items:center;gap:16px;padding:16px;background:var(--surface-3);border-radius:12px;border:1px solid var(--border);">
                 <div style="flex:1;">
                     <svg viewBox="0 0 240 160" xmlns="http://www.w3.org/2000/svg" style="width:180px;height:120px;">
-                        <defs>
-                            <linearGradient id="gauge-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" style="stop-color:#16a34a;stop-opacity:1" />
-                                <stop offset="50%" style="stop-color:#f59e0b;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#dc2626;stop-opacity:1" />
-                            </linearGradient>
-                        </defs>
                         <path d="M 20 130 A 100 100 0 0 1 220 130" fill="none" stroke="#e8f5e9" stroke-width="16" stroke-linecap="round"/>
                         <path d="M 20 130 A 100 100 0 0 1 120 30" fill="none" stroke="#fef3c7" stroke-width="16" stroke-linecap="round"/>
                         <path d="M 20 130 A 100 100 0 0 0 56 52" fill="none" stroke="#fee2e2" stroke-width="16" stroke-linecap="round"/>
@@ -987,7 +1052,6 @@ function renderResults(r) {
 
     document.getElementById('resultsContent').innerHTML = html;
 
-    // Update feature grid
     if (r.features) {
         const feats = Object.entries(r.features);
         feats.sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
@@ -1000,6 +1064,8 @@ function renderResults(r) {
             </div>
         `).join('');
     }
+
+    document.getElementById('resultsContent').innerHTML = html;
 }
 
 function showExplanation(name, e) {
@@ -1033,13 +1099,7 @@ function updateHistory() {
     
     document.getElementById('trendSection').style.display = 'block';
     const html = analysisHistory.slice().reverse().map((pred, idx) => {
-        // Safely extract and validate data
-        const risk = Math.max(0, Math.min(100, (pred.combined_risk || 0.5) * 100));
-        const timestamp = pred.timestamp || Date.now();
-        const status = pred.status || 'UNKNOWN';
-        const date = new Date(timestamp);
-        const timeStr = date.getTime() > 0 ? date.toLocaleTimeString() : 'Invalid';
-        
+        const risk = pred.combined_risk * 100;
         let bgColor = 'rgba(34,197,94,0.15)';
         if (risk >= 66) bgColor = 'rgba(239,68,68,0.15)';
         else if (risk >= 33) bgColor = 'rgba(245,158,11,0.15)';
@@ -1048,8 +1108,8 @@ function updateHistory() {
             <div class="history-item" style="background:${bgColor};border-radius:6px;padding:8px;margin-bottom:6px;">
                 <div class="h-icon">${risk >= 66 ? '🔴' : (risk >= 33 ? '🟡' : '🟢')}</div>
                 <div class="h-details">
-                    <div class="h-risk">${risk.toFixed(1)}% — ${status}</div>
-                    <div class="h-time">${timeStr}</div>
+                    <div class="h-risk">${risk.toFixed(1)}% — ${pred.status}</div>
+                    <div class="h-time">${new Date(pred.timestamp).toLocaleTimeString()}</div>
                 </div>
             </div>
         `;
@@ -1060,16 +1120,12 @@ function updateHistory() {
 function updateTrend() {
     if (analysisHistory.length < 2) return;
     
-    // Safely extract risks, filtering out invalid values
-    const risks = analysisHistory.map(p => {
-        const r = p.combined_risk || 0.5;
-        return Math.max(0, Math.min(1, r));
-    });
+    const risks = analysisHistory.map(p => p.combined_risk);
     const x = Array.from({length: risks.length}, (_, i) => i);
-    const avgRisk = risks.length > 0 ? risks.reduce((a, b) => a + b) / risks.length : 0.5;
+    const avgRisk = risks.reduce((a, b) => a + b) / risks.length;
     
     // Simple trend
-    const slope = risks.length > 1 ? (risks[risks.length-1] - risks[0]) / (risks.length - 1) : 0;
+    const slope = (risks[risks.length-1] - risks[0]) / (risks.length - 1);
     let trendText = 'Stable';
     if (slope < -0.05) trendText = '📉 Improving';
     else if (slope > 0.05) trendText = '📈 Worsening';
@@ -1119,6 +1175,147 @@ function toggleDarkMode() {
     localStorage.setItem('darkMode', document.body.classList.contains('dark'));
 }
 
+// Init
+window.addEventListener('load', () => {
+    if (localStorage.getItem('darkMode') === 'true') toggleDarkMode();
+    analysisHistory = JSON.parse(localStorage.getItem('pdHistory') || '[]');
+    updateHistory();
+    initCanvas();
+});
+
+// Fetch explanations
+fetch('/api/features/explain').then(r => r.json()).then(data => {
+    Object.assign(explanations, data);
+});
+
+// ═════════════════════════════════════════
+// AI Narrative
+// ═════════════════════════════════════════
+async function fetchNarrative() {
+    if (!lastPrediction) {
+        showToast('Run an analysis first before generating a narrative');
+        return;
+    }
+
+    const btn = document.getElementById('narrativeBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>';
+
+    // Show the narrative panel with loading state
+    const panel = document.getElementById('narrativePanel');
+    panel.style.display = 'block';
+    document.getElementById('narrativeContent').innerHTML =
+        '<div class="narrative-placeholder"><div class="ph-icon"><span class="spinner" style="width:32px;height:32px;border-width:3px;color:var(--accent);"></span></div><p>Generating clinical narrative...</p></div>';
+
+    try {
+        const resp = await fetch('/api/narrative', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prediction: lastPrediction }),
+        });
+
+        const data = await resp.json();
+
+        if (!resp.ok) {
+            throw new Error(data.error || `Server responded with ${resp.status}`);
+        }
+
+        if (!data.narrative) {
+            throw new Error('No narrative text returned');
+        }
+
+        // Split into paragraphs and render
+        const paragraphs = data.narrative.split(/\n\s*\n/).filter(p => p.trim());
+        const htmlParagraphs = paragraphs.map(p =>
+            `<p>${p.trim().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>`
+        ).join('');
+
+        document.getElementById('narrativeContent').innerHTML =
+            `<div class="narrative-body" data-narrative>${htmlParagraphs}</div>`;
+
+        showToast('AI narrative generated successfully!');
+        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    } catch (err) {
+        console.error('Narrative error:', err);
+        document.getElementById('narrativeContent').innerHTML =
+            `<div class="narrative-placeholder"><div class="ph-icon">⚠️</div><p>${err.message}</p></div>`;
+        showToast('Narrative error: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '🤖';
+    }
+}
+
+// ═════════════════════════════════════════
+// PDF Report Download
+// ═════════════════════════════════════════
+async function downloadReport() {
+    if (!lastPrediction) {
+        showToast('Run an analysis first before generating a report');
+        return;
+    }
+
+    const btn = document.getElementById('reportBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>';
+
+    try {
+        // Collect data
+        const canvasImage = canvas.toDataURL('image/png');
+
+        // Try to grab the AI narrative text if it exists on screen
+        let narrativeText = '';
+        const narrativeEl = document.getElementById('narrativeContent')
+            || document.querySelector('.narrative-body')
+            || document.querySelector('[data-narrative]');
+        if (narrativeEl) {
+            narrativeText = narrativeEl.innerText || narrativeEl.textContent || '';
+        }
+
+        const resp = await fetch('/api/report', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                prediction: lastPrediction,
+                narrative: narrativeText,
+                canvas_image: canvasImage,
+            }),
+        });
+
+        if (!resp.ok) {
+            const err = await resp.json().catch(() => ({ error: 'Unknown error' }));
+            throw new Error(err.error || `Server responded with ${resp.status}`);
+        }
+
+        // Determine filename from content-disposition or fallback
+        const disposition = resp.headers.get('Content-Disposition') || '';
+        let filename = 'pd_report.pdf';
+        if (disposition.includes('filename=')) {
+            filename = disposition.split('filename=')[1].replace(/"/g, '').trim();
+        }
+
+        // Trigger browser download
+        const blob = await resp.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showToast('Report downloaded successfully!');
+    } catch (err) {
+        console.error('Report download error:', err);
+        showToast('Report error: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '📄';
+    }
+}
+
 // ═════════════════════════════════════════
 // Heatmap & GridCAM Visualization
 // ═════════════════════════════════════════
@@ -1155,7 +1352,7 @@ async function showHeatmap() {
                 document.getElementById('heatmapAttention').src = `data:image/png;base64,${data.attention_map}`;
             }
         } else {
-            console.warn('Heatmap endpoint not available (backend needs implementation)');
+            console.warn('Heatmap endpoint not available');
             document.getElementById('heatmapGradCAM').parentElement.innerHTML = '<div class="heatmap-loading">Heatmap generation coming soon...</div>';
             document.getElementById('heatmapGridCAM').parentElement.innerHTML = '<div class="heatmap-loading">Heatmap generation coming soon...</div>';
             document.getElementById('heatmapAttention').parentElement.innerHTML = '<div class="heatmap-loading">Heatmap generation coming soon...</div>';
@@ -1179,73 +1376,8 @@ document.addEventListener('click', (e) => {
         closeHeatmap();
     }
 });
-
-// Init
-window.addEventListener('load', () => {
-    if (localStorage.getItem('darkMode') === 'true') toggleDarkMode();
-    
-    // Load and validate history
-    const stored = JSON.parse(localStorage.getItem('pdHistory') || '[]');
-    const validPreds = stored.filter(isValidPrediction);
-    
-    // If we had to remove invalid data, update storage
-    if (validPreds.length < stored.length) {
-        console.warn(`⚠️ Removed ${stored.length - validPreds.length} corrupted entries`);
-        if (validPreds.length > 0) {
-            localStorage.setItem('pdHistory', JSON.stringify(validPreds));
-        } else {
-            localStorage.removeItem('pdHistory');
-        }
-    }
-    
-    analysisHistory = validPreds;
-    updateHistory();
-    initCanvas();
-    console.log('📊 Loaded history:', analysisHistory.length, 'valid predictions');
-});
-
-// Fetch explanations with error handling
-fetch('/api/features/explain')
-    .then(r => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-    })
-    .then(data => {
-        Object.assign(explanations, data);
-        console.log('✅ Loaded', Object.keys(data).length, 'feature explanations');
-    })
-    .catch(err => console.warn('⚠️ Could not load explanations:', err.message));
 </script>
-
-<!-- Heatmap Modal -->
-<div id="heatmapModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>🔥 Heatmap & GridCAM Visualization</h2>
-            <button class="modal-close" onclick="closeHeatmap()">✕</button>
-        </div>
-        <div class="heatmap-grid">
-            <div class="heatmap-container">
-                <h3>Original Image</h3>
-                <img id="heatmapOriginal" class="heatmap-image" alt="Original" />
-            </div>
-            <div class="heatmap-container">
-                <h3>Grad-CAM Heatmap</h3>
-                <img id="heatmapGradCAM" class="heatmap-image" alt="Grad-CAM" />
-            </div>
-        </div>
-        <div class="heatmap-grid">
-            <div class="heatmap-container">
-                <h3>GridCAM Overlay</h3>
-                <img id="heatmapGridCAM" class="heatmap-image" alt="GridCAM" />
-            </div>
-            <div class="heatmap-container">
-                <h3>Attention Map</h3>
-                <img id="heatmapAttention" class="heatmap-image" alt="Attention" />
-            </div>
-        </div>
-    </div>
-</div>
 
 </body>
 </html>
+

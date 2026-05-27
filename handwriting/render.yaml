@@ -14,3 +14,5 @@ services:
         value: "1"
       - key: MKL_NUM_THREADS
         value: "1"
+      - key: COHERE_API_KEY
+        value: ""
